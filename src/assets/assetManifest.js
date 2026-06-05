@@ -2,7 +2,7 @@ export const assets = {
   maps: {
     world: {
       json: "./maps/dali-temple-route-design-first/dali-temple-route-design-first.tiled.json",
-      image: "./maps/dali-temple-route-design-first/dali-temple-route-design-first-rendered.png"
+      image: "./maps/dali-temple-route-design-first/dali-temple-route-design-first-rendered-crisp.png"
     }
   },
   sprites: {

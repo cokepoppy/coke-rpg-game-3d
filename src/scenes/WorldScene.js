@@ -16,6 +16,8 @@ export class WorldScene {
     this.dialogBox = dialogBox;
     this.state = new GameState();
     this.battleManager = new BattleManager();
+    this.autoWalk = null;
+    this.lastScriptResult = null;
   }
 
   async load() {
@@ -30,16 +32,26 @@ export class WorldScene {
       gameState: this.state,
       battleManager: this.battleManager
     });
-    queueMicrotask(() => this.scriptRunner.run("opening"));
+    window.__rpgScene = this;
+    queueMicrotask(() => this.runScript("opening"));
   }
 
   update(dt) {
     if (this.scriptRunner?.running) return;
-    this.player.update(dt, this.input, this.collision);
+    if (this.autoWalk) {
+      const arrived = this.player.stepToward(this.autoWalk.target, dt, this.autoWalk.speed);
+      if (arrived) {
+        const done = this.autoWalk.resolve;
+        this.autoWalk = null;
+        done();
+      }
+    } else {
+      this.player.update(dt, this.input, this.collision);
+    }
     this.camera.follow(this.player, this.map);
     this.activeTrigger = this.map.triggerAt(this.player);
     if (this.activeTrigger && (this.input.consume("enter") || this.input.consume(" "))) {
-      this.scriptRunner.run(this.activeTrigger.name);
+      this.runScript(this.activeTrigger.name);
     }
   }
 
@@ -47,6 +59,30 @@ export class WorldScene {
     this.context.clearRect(0, 0, this.camera.width, this.camera.height);
     this.renderer.drawBase();
     this.player.draw(this.context, this.camera);
+  }
+
+  async runScript(scriptId) {
+    const result = await this.scriptRunner.run(scriptId);
+    this.lastScriptResult = result;
+    if (result?.kind === "battle-requested") {
+      this.state.remember(`遭遇战：${result.enemyId}`);
+    }
+    return result;
+  }
+
+  walkToTrigger(name, speed = 1400) {
+    const trigger = this.map.triggerByName(name);
+    if (!trigger) throw new Error(`Missing trigger: ${name}`);
+    return this.walkTo({
+      x: trigger.x + trigger.width / 2,
+      y: trigger.y + trigger.height / 2
+    }, speed);
+  }
+
+  walkTo(target, speed = 1400) {
+    return new Promise((resolve) => {
+      this.autoWalk = { target, speed, resolve };
+    });
   }
 }
 

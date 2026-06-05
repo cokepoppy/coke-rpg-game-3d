@@ -34,6 +34,29 @@ export class Player {
     this.animator.update(dt, moving);
   }
 
+  stepToward(target, dt, speed = 520) {
+    const dx = target.x - this.x;
+    const dy = target.y - this.y;
+    const distance = Math.hypot(dx, dy);
+    const step = speed * dt;
+    if (distance <= Math.max(8, step)) {
+      this.x = target.x;
+      this.y = target.y;
+      this.animator.update(dt, false);
+      return true;
+    }
+    const axis = {
+      x: dx / distance,
+      y: dy / distance
+    };
+    if (Math.abs(axis.x) > Math.abs(axis.y)) this.direction = axis.x < 0 ? "left" : "right";
+    else this.direction = axis.y < 0 ? "up" : "down";
+    this.x += axis.x * step;
+    this.y += axis.y * step;
+    this.animator.update(dt, true);
+    return false;
+  }
+
   draw(context, camera) {
     const source = this.animator.sourceRect(this.direction);
     const drawWidth = this.animator.config.drawWidth || 64;

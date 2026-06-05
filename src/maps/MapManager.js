@@ -16,13 +16,17 @@ export class MapManager {
     this.image = image;
     this.width = data.width * this.tileSize;
     this.height = data.height * this.tileSize;
-    this.triggers = objectsByType(data, "trigger");
+    this.triggers = [...objectsByType(data, "trigger"), ...storyTriggers()];
     this.collision = objectsByType(data, "collision");
     return this;
   }
 
   objectLayer(name) {
     return this.data.layers.find((layer) => layer.type === "objectgroup" && layer.name === name);
+  }
+
+  triggerByName(name) {
+    return this.triggers.find((trigger) => trigger.name === name);
   }
 
   triggerAt(rect) {
@@ -50,6 +54,22 @@ function objectsByType(data, type) {
     .filter((layer) => layer.type === "objectgroup")
     .flatMap((layer) => layer.objects || [])
     .filter((object) => object.type === type);
+}
+
+function storyTriggers() {
+  return [
+    {
+      id: 9001,
+      name: "bronze_box",
+      type: "trigger",
+      x: 560,
+      y: 560,
+      width: 240,
+      height: 220,
+      visible: true,
+      properties: [{ name: "event", type: "string", value: "treasure" }]
+    }
+  ];
 }
 
 function intersects(a, b) {

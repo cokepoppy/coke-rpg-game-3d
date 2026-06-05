@@ -6,6 +6,7 @@ export class MapRenderer {
   }
 
   drawBase() {
+    this.context.imageSmoothingEnabled = false;
     this.context.drawImage(
       this.map.image,
       this.camera.x,

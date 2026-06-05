@@ -57,6 +57,43 @@ export const storyScripts = {
       }
     }
   },
+  bronze_box: {
+    id: "bronze_box",
+    start: "inspect",
+    repeatFlag: "bronze_box_opened",
+    nodes: {
+      inspect: {
+        speaker: "灯亭",
+        text: "石阶旁的灯火照出一只旧铜匣。匣底刻着“无量”二字，锁扣旁有三道细痕。",
+        choices: [
+          { label: "按刻痕开锁", next: "open" },
+          { label: "先收起来", next: "leave" }
+        ]
+      },
+      open: {
+        speaker: "铜匣",
+        text: "锁舌轻响，匣中露出一枚古旧玉佩和半张泛黄地图。你似乎找到了通往寺后密道的线索。",
+        actions: [
+          { type: "setFlag", flag: "bronze_box_opened" },
+          { type: "completeQuest", questId: "find_bronze_box" },
+          { type: "addItem", itemId: "old_jade", amount: 1 },
+          { type: "addItem", itemId: "secret_map_half", amount: 1 },
+          {
+            type: "addQuest",
+            quest: {
+              id: "temple_secret_path",
+              title: "寺后密道",
+              description: "带着铜匣中的半张地图，去天龙古寺询问守寺僧。"
+            }
+          }
+        ]
+      },
+      leave: {
+        speaker: "主角",
+        text: "机关未明，还是先别妄动。"
+      }
+    }
+  },
   medicine_market: {
     id: "medicine_market",
     start: "vendor",

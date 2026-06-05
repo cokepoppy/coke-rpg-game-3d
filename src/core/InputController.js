@@ -1,7 +1,9 @@
 export class InputController {
   constructor(target = window) {
     this.keys = new Set();
+    this.once = new Set();
     target.addEventListener("keydown", (event) => this.keys.add(event.key.toLowerCase()));
+    target.addEventListener("keydown", (event) => this.once.add(event.key.toLowerCase()));
     target.addEventListener("keyup", (event) => this.keys.delete(event.key.toLowerCase()));
   }
 
@@ -18,5 +20,12 @@ export class InputController {
 
   pressed(key) {
     return this.keys.has(key.toLowerCase());
+  }
+
+  consume(key) {
+    const normalized = key.toLowerCase();
+    const active = this.once.has(normalized);
+    this.once.delete(normalized);
+    return active;
   }
 }

@@ -29,3 +29,59 @@ body {
   max-width: min(720px, calc(100vw - 32px));
   color: #f5ead0;
 }
+
+.dialog-box {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  width: min(880px, calc(100vw - 40px));
+  transform: translateX(-50%);
+  padding: 18px 20px;
+  border: 1px solid rgba(232, 208, 151, 0.42);
+  background: rgba(21, 18, 14, 0.92);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+}
+
+.dialog-box[hidden] {
+  display: none;
+}
+
+.dialog-speaker {
+  margin-bottom: 8px;
+  color: #e2b55d;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.dialog-text {
+  color: #f5ead0;
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.dialog-actions button {
+  min-height: 38px;
+  padding: 8px 14px;
+  border: 1px solid rgba(232, 208, 151, 0.42);
+  border-radius: 6px;
+  background: rgba(73, 56, 34, 0.84);
+  color: #f5ead0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.dialog-actions button:focus-visible,
+.dialog-actions button:hover {
+  outline: none;
+  border-color: #e2b55d;
+  background: rgba(113, 80, 42, 0.94);
+}

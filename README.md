@@ -12,6 +12,14 @@ python3 -m http.server 5173
 
 也可以直接用浏览器打开 `index.html`。
 
+模块化原型入口：
+
+```text
+http://localhost:5173/index.modular.html
+```
+
+这个入口使用 `src/` 下的 ES modules，把地图、角色、输入、摄像机、剧情脚本、对话 UI 和战斗边界拆开维护。
+
 ## Auto Sprite Studio
 
 打开 `http://localhost:5173/sprite-studio.html`。
@@ -30,3 +38,20 @@ python3 -m http.server 5173
 - 用方向键或 WASD 操控人物在江湖场景中移动。
 - 靠近草丛、石井、市集、古道、演武场等区域会触发战斗、补给、招募、秘籍事件。
 - 战斗中使用普攻、绝学、调息和丹药击败敌人。
+
+## 模块化 RPG 系统
+
+- `src/maps/MapManager.js`：加载 Tiled JSON、地图大图、触发区和碰撞对象。
+- `src/entities/Player.js`：处理玩家移动、朝向和行走帧动画。
+- `src/story/ScriptRunner.js`：执行剧情节点、选择、任务、物品、flag 和战斗请求。
+- `src/story/storyScripts.js`：数据化剧情脚本，包括开场对话、草丛遭遇、药摊、演武解谜和 Boss 入口。
+- `src/ui/DialogBox.js`：独立对话 UI 控制器。
+- `src/battle/BattleManager.js`：战斗请求边界，后续可接战棋战斗系统。
+
+## Codex 插件源码
+
+`codex-plugins/` 里保存了本项目沉淀出的本地 Codex 插件源码：
+
+- `auto-map-studio`：地图概念图、64x64 tileset、Tiled JSON 和地图调试预览。
+- `auto-sprite-studio`：人物行走帧生成、切分、锚点漂移检测和重组。
+- `rpg-game-studio`：浏览器 RPG 代码架构、地图管理、角色、对话和剧情脚本系统脚手架。

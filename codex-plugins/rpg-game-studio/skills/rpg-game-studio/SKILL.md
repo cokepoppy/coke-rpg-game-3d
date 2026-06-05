@@ -43,6 +43,11 @@ src/
   maps/CollisionSystem.js
   maps/MapManager.js
   maps/MapRenderer.js
+  story/GameState.js
+  story/QuestLog.js
+  story/ScriptRunner.js
+  story/storyScripts.js
+  ui/DialogBox.js
   scenes/WorldScene.js
   main.js
 ```
@@ -69,6 +74,26 @@ node /Users/shangguanchenhuan/plugins/rpg-game-studio/scripts/scaffold_browser_r
 The script writes a modular browser RPG skeleton and avoids overwriting existing files unless `--force` is passed.
 
 `--tile-size` is the runtime map grid size. `--hero-frame-width` and `--hero-frame-height` are source sprite sheet cell sizes; they can be larger than 64 because the renderer can draw the character at a fixed in-world size through `--hero-draw-width` and `--hero-draw-height`.
+
+## Story System Command
+
+Use this when the user asks for dialogue, quest scripting, puzzle scripting, treasure discovery, NPC scenes, or plot progress driven by data.
+
+```bash
+node /Users/shangguanchenhuan/plugins/rpg-game-studio/scripts/scaffold_story_system.mjs \
+  --project /path/to/game \
+  --language js
+```
+
+This writes:
+
+- `src/story/GameState.js`: flags, inventory, quest state, recent story log
+- `src/story/QuestLog.js`: active and completed quest views
+- `src/story/ScriptRunner.js`: dialogue node traversal and action execution
+- `src/story/storyScripts.js`: starter data format for branching story scripts
+- `src/ui/DialogBox.js`: reusable dialogue UI controller
+
+Story scripts should be data-first. Keep dialogue text, choices, conditions, and actions in story data; keep rendering in UI modules; keep battle math in `BattleManager`; keep map triggers in `MapManager`.
 
 ## Implementation Rules
 

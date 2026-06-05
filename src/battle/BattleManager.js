@@ -3,7 +3,7 @@ export class BattleManager {
     return {
       kind: "battle-requested",
       trigger,
-      enemyId: property(trigger, "enemyId") || trigger.name
+      enemyId: trigger.enemyId || property(trigger, "enemyId") || trigger.name
     };
   }
 }

@@ -1,0 +1,191 @@
+{
+  "name": "dali-temple-route",
+  "theme": "Tian Long Ba Bu inspired Dali mountain temple route, wuxia 2D pixel RPG",
+  "recommendedPipeline": "hybrid_concept_to_tileset_to_layered_tilemap",
+  "reason": "Use GPT Image 2 for concept and visual assets, but keep runtime maps as tile/object/collision data. Directly slicing a giant generated illustration is fast for mockups but produces poor reusable tiles and inconsistent seams.",
+  "map": {
+    "width": 64,
+    "height": 48,
+    "tileSize": 32,
+    "viewport": {
+      "width": 20,
+      "height": 12,
+      "note": "The map is larger than one screen; camera scrolls over this tile grid."
+    }
+  },
+  "prompts": {
+    "conceptSketch": "Create a top-down pixel-inspired RPG map concept for Tian Long Ba Bu inspired Dali mountain temple route, wuxia 2D pixel RPG. Show a larger-than-screen mountain route with a temple hub, dirt paths, tall grass encounter area, training yard, water/stream edge, cliffs, gates, and a player spawn. This is a composition reference only, not a final tileset. No text, no UI, no labels.",
+    "foundationMap": "Create a ground-only foundation map for Tian Long Ba Bu inspired Dali mountain temple route, wuxia 2D pixel RPG. Top-down 2D RPG perspective. Include only terrain: grass, dirt paths, stone floor, water, cliffs, and walkable boundaries. Do not include characters, buildings, trees, furniture, gates, signs, chests, labels, UI, or text.",
+    "roughTileset": "Generate a rough 2D pixel-inspired RPG tileset sheet for Tian Long Ba Bu inspired Dali mountain temple route, wuxia 2D pixel RPG. Include isolated terrain tiles and compact props on a perfectly flat #FF00FF background. Needed tiles: grass, dirt path, stone floor, tall grass, water edge, cliff edge, wall/fence pieces, gate, lantern, sign, crate, rock, shrub, table, door. Every tile/prop must be separated with generous padding. No labels, no grid lines, no text.",
+    "propPack": "Generate a compact prop pack for Tian Long Ba Bu inspired Dali mountain temple route, wuxia 2D pixel RPG, top-down 2D RPG perspective. Include isolated props: stone lantern, wooden gate, inn sign, market table, medicine chest, rocks, shrubs, banner, door, training dummy. Perfectly flat #FF00FF background, generous padding, no text labels.",
+    "dressedReference": "Use the foundation map as visual reference and add a sparse in-world mockup of gameplay objects. Place up to 9 objects: temple gate, inn sign, medicine stall, tall grass encounter patch, training yard, stream bridge, cliff blockers, player spawn, boss gate. No annotations, no labels, no UI."
+  },
+  "tilePalette": {
+    "empty": 0,
+    "grass": 1,
+    "dirt": 2,
+    "stone": 3,
+    "tallGrass": 4,
+    "water": 5,
+    "cliff": 6,
+    "floor": 7
+  },
+  "objectPlan": [
+    {
+      "id": 1,
+      "name": "player_spawn",
+      "type": "spawn",
+      "rect": {
+        "x": 1024,
+        "y": 1312,
+        "width": 32,
+        "height": 32
+      },
+      "properties": []
+    },
+    {
+      "id": 2,
+      "name": "temple_rest",
+      "type": "trigger",
+      "rect": {
+        "x": 832,
+        "y": 256,
+        "width": 320,
+        "height": 160
+      },
+      "properties": [
+        {
+          "name": "event",
+          "type": "string",
+          "value": "rest"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "tall_grass_encounter",
+      "type": "trigger",
+      "rect": {
+        "x": 96,
+        "y": 448,
+        "width": 512,
+        "height": 448
+      },
+      "properties": [
+        {
+          "name": "event",
+          "type": "string",
+          "value": "battle"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "market_medicine",
+      "type": "trigger",
+      "rect": {
+        "x": 1408,
+        "y": 736,
+        "width": 288,
+        "height": 192
+      },
+      "properties": [
+        {
+          "name": "event",
+          "type": "string",
+          "value": "supply"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "training_yard",
+      "type": "trigger",
+      "rect": {
+        "x": 1472,
+        "y": 384,
+        "width": 384,
+        "height": 320
+      },
+      "properties": [
+        {
+          "name": "event",
+          "type": "string",
+          "value": "battle"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "boss_gate",
+      "type": "trigger",
+      "rect": {
+        "x": 1728,
+        "y": 992,
+        "width": 192,
+        "height": 224
+      },
+      "properties": [
+        {
+          "name": "event",
+          "type": "string",
+          "value": "boss"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "north_cliff_blocker",
+      "type": "collision",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 2048,
+        "height": 64
+      },
+      "properties": []
+    },
+    {
+      "id": 8,
+      "name": "south_cliff_blocker",
+      "type": "collision",
+      "rect": {
+        "x": 0,
+        "y": 1440,
+        "width": 2048,
+        "height": 96
+      },
+      "properties": []
+    },
+    {
+      "id": 9,
+      "name": "west_cliff_blocker",
+      "type": "collision",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 64,
+        "height": 1536
+      },
+      "properties": []
+    },
+    {
+      "id": 10,
+      "name": "east_cliff_blocker",
+      "type": "collision",
+      "rect": {
+        "x": 1984,
+        "y": 0,
+        "width": 64,
+        "height": 1536
+      },
+      "properties": []
+    }
+  ],
+  "outputs": {
+    "tiledJson": "dali-temple-route.tiled.json",
+    "blueprintJson": "dali-temple-route.blueprint.json",
+    "suggestedTileset": "dali-temple-route-tileset.png",
+    "suggestedProps": "dali-temple-route-props.png"
+  }
+}

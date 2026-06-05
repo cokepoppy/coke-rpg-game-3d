@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Auto Sprite Studio</title>
+    <link rel="stylesheet" href="./sprite-studio.css" />
+  </head>
+  <body>
+    <main class="studio-shell">
+      <section class="hero-panel">
+        <div class="brand-row">
+          <span class="mark">S</span>
+          <div>
+            <strong>Auto Sprite Studio</strong>
+            <span>Prompt → Sprite Sheet → Frame Animation</span>
+          </div>
+        </div>
+        <h1>AI 角色帧动画自动化工具</h1>
+        <p>把 GPT Image 2 生成的角色 sheet 变成可用动画：切帧、去漂移、统一脚底锚点、预览四方向行走并导出。</p>
+        <label class="prompt-box">
+          <span>生成提示词</span>
+          <textarea id="promptText">4x4 top-down wuxia swordsman walk cycle sprite sheet, rows: down left right up, four frames per row, stable feet anchor, magenta chroma key background.</textarea>
+        </label>
+        <div class="button-row">
+          <button id="loadExample">载入当前 GPT Image 2 结果</button>
+          <label class="file-button">
+            导入 Sheet
+            <input id="fileInput" type="file" accept="image/png,image/webp,image/jpeg" />
+          </label>
+          <button id="normalizeSheet">自动对齐并导出</button>
+        </div>
+      </section>
+
+      <section class="preview-panel">
+        <div class="panel-head">
+          <div>
+            <span>Live Preview</span>
+            <strong id="previewTitle">四方向行走预览</strong>
+          </div>
+          <div class="segmented" id="directionButtons">
+            <button data-dir="down" class="active">下</button>
+            <button data-dir="left">左</button>
+            <button data-dir="right">右</button>
+            <button data-dir="up">上</button>
+          </div>
+        </div>
+        <div class="stage">
+          <canvas id="previewCanvas" width="384" height="384"></canvas>
+        </div>
+        <div class="controls">
+          <label>FPS <input id="fps" type="range" min="3" max="14" value="8" /></label>
+          <label>Scale <input id="scale" type="range" min="2" max="6" value="4" /></label>
+          <a id="downloadLink" download="normalized-walk-sheet.png">下载修正 Sheet</a>
+        </div>
+      </section>
+
+      <section class="inspector-panel">
+        <div class="panel-head">
+          <div>
+            <span>Sprite-ify</span>
+            <strong>漂移检测</strong>
+          </div>
+        </div>
+        <div class="metrics">
+          <div><span>Grid</span><b id="gridMetric">4 × 4</b></div>
+          <div><span>Source</span><b id="sourceMetric">未载入</b></div>
+          <div><span>Max X Drift</span><b id="xDrift">-</b></div>
+          <div><span>Max Foot Drift</span><b id="yDrift">-</b></div>
+        </div>
+        <canvas id="sheetCanvas" width="512" height="512"></canvas>
+        <ol id="pipelineLog"></ol>
+      </section>
+    </main>
+    <script src="./sprite-studio.js" defer></script>
+  </body>
+</html>

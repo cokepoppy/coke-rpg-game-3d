@@ -1,0 +1,26 @@
+{
+  "name": "auto-map-studio",
+  "version": "0.1.0+codex.20260605024212",
+  "description": "Codex-native AI tileset, design-first 2D map, and RPG asset workflow.",
+  "author": {
+    "name": "Local developer"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Auto Map Studio",
+    "shortDescription": "Generate, clean, align, preview, and export 2D map assets in Codex.",
+    "longDescription": "Auto Map Studio provides a Codex-native workflow for 2D game maps: plan tilemap or layered-map pipelines, prompt image generation for full-map concepts and rough map assets, detect and clean AI-generated tiles, normalize them into grid-perfect PNG tilesets, export metadata, and create design-first map previews with Tiled-style object data.",
+    "developerName": "Local developer",
+    "category": "Productivity",
+    "capabilities": [
+      "Tileset component detection",
+      "Chroma-key background cleanup",
+      "Grid-perfect tile export",
+      "Design-first concept map workflow",
+      "Tiled JSON and object layer export",
+      "Map preview generation",
+      "Tile metadata export"
+    ],
+    "defaultPrompt": "Use Auto Map Studio to generate or clean a 2D RPG tileset and map preview."
+  }
+}

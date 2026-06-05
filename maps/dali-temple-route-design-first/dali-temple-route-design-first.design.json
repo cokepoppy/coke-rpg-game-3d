@@ -1,0 +1,296 @@
+{
+  "name": "dali-temple-route-design-first",
+  "concept": "/Users/shangguanchenhuan/Documents/home2025/coke-game-rpg/maps/dali-temple-route-design-first/dali-temple-route-concept.png",
+  "pipeline": "design_first_concept_to_layout_to_tilemap",
+  "note": "This map starts from a full-map design composition, then rasterizes named regions, organic paths, landmarks, triggers, and collision/object layers.",
+  "design": {
+    "regions": [
+      {
+        "name": "main_temple_courtyard",
+        "type": "stone",
+        "ellipse": [
+          35,
+          11,
+          11,
+          6
+        ]
+      },
+      {
+        "name": "left_tall_grass_field",
+        "type": "tallGrass",
+        "ellipse": [
+          15,
+          24,
+          11,
+          10
+        ]
+      },
+      {
+        "name": "training_yard",
+        "type": "meadow",
+        "ellipse": [
+          55,
+          24,
+          9,
+          7
+        ]
+      },
+      {
+        "name": "market_flat",
+        "type": "dirt",
+        "ellipse": [
+          48,
+          38,
+          11,
+          6
+        ]
+      },
+      {
+        "name": "entry_steps",
+        "type": "stone",
+        "rect": [
+          32,
+          50,
+          7,
+          4
+        ]
+      }
+    ],
+    "water": {
+      "name": "right_stream",
+      "width": 5,
+      "points": [
+        [
+          62,
+          1
+        ],
+        [
+          59,
+          9
+        ],
+        [
+          60,
+          16
+        ],
+        [
+          55,
+          21
+        ],
+        [
+          53,
+          28
+        ]
+      ]
+    },
+    "paths": [
+      {
+        "name": "main_climb",
+        "width": 6,
+        "points": [
+          [
+            35,
+            54
+          ],
+          [
+            35,
+            44
+          ],
+          [
+            32,
+            35
+          ],
+          [
+            34,
+            28
+          ],
+          [
+            35,
+            20
+          ],
+          [
+            35,
+            13
+          ]
+        ]
+      },
+      {
+        "name": "market_branch",
+        "width": 5,
+        "points": [
+          [
+            34,
+            35
+          ],
+          [
+            41,
+            35
+          ],
+          [
+            48,
+            38
+          ],
+          [
+            54,
+            38
+          ]
+        ]
+      },
+      {
+        "name": "grass_branch",
+        "width": 5,
+        "points": [
+          [
+            34,
+            28
+          ],
+          [
+            27,
+            27
+          ],
+          [
+            20,
+            25
+          ],
+          [
+            13,
+            29
+          ]
+        ]
+      },
+      {
+        "name": "training_branch",
+        "width": 5,
+        "points": [
+          [
+            38,
+            20
+          ],
+          [
+            45,
+            19
+          ],
+          [
+            52,
+            21
+          ],
+          [
+            57,
+            22
+          ]
+        ]
+      },
+      {
+        "name": "stream_bridge_branch",
+        "width": 4,
+        "points": [
+          [
+            42,
+            16
+          ],
+          [
+            49,
+            12
+          ],
+          [
+            58,
+            12
+          ]
+        ]
+      }
+    ],
+    "landmarks": [
+      {
+        "name": "player_spawn",
+        "tile": "lantern",
+        "x": 35,
+        "y": 51,
+        "type": "spawn"
+      },
+      {
+        "name": "red_gate",
+        "tile": "torii",
+        "x": 35,
+        "y": 39,
+        "type": "prop"
+      },
+      {
+        "name": "temple_gate",
+        "tile": "torii",
+        "x": 35,
+        "y": 14,
+        "type": "rest"
+      },
+      {
+        "name": "medicine_stall",
+        "tile": "medicine",
+        "x": 48,
+        "y": 38,
+        "type": "supply"
+      },
+      {
+        "name": "training_dummy",
+        "tile": "dummy",
+        "x": 55,
+        "y": 24,
+        "type": "battle"
+      },
+      {
+        "name": "bridge",
+        "tile": "bridge",
+        "x": 54,
+        "y": 19,
+        "type": "prop"
+      },
+      {
+        "name": "boss_banner",
+        "tile": "banner",
+        "x": 60,
+        "y": 37,
+        "type": "boss"
+      },
+      {
+        "name": "left_sign",
+        "tile": "sign",
+        "x": 9,
+        "y": 38,
+        "type": "prop"
+      }
+    ],
+    "scatter": [
+      {
+        "tile": "rock",
+        "count": 34,
+        "avoidPaths": true
+      },
+      {
+        "tile": "shrub",
+        "count": 26,
+        "avoidPaths": true
+      },
+      {
+        "tile": "lantern",
+        "count": 12,
+        "nearPaths": true
+      },
+      {
+        "tile": "fence",
+        "count": 18,
+        "aroundRegions": [
+          "left_tall_grass_field",
+          "training_yard"
+        ]
+      }
+    ]
+  },
+  "prompts": {
+    "concept": "Generate a complete top-down pixel-inspired wuxia RPG map concept with entrance, winding road, temple, tall grass encounter area, market stall, training yard, stream bridge, cliffs, lanterns, and red maple framing. No labels, no UI, no grid.",
+    "tileset": "Generate isolated top-down pixel-inspired wuxia RPG terrain tiles and props on #FF00FF: grass, dirt path, stone floor, tall grass, water edge, cliff edge, gate, lantern, medicine stall, sign, crate, rock, shrub, training dummy, bridge, door, banner."
+  },
+  "outputs": {
+    "rendered": "/Users/shangguanchenhuan/Documents/home2025/coke-game-rpg/maps/dali-temple-route-design-first/dali-temple-route-design-first-rendered.png",
+    "tileLayout": "/Users/shangguanchenhuan/Documents/home2025/coke-game-rpg/maps/dali-temple-route-design-first/dali-temple-route-design-first-tile-layout.png",
+    "tileset": "/Users/shangguanchenhuan/Documents/home2025/coke-game-rpg/maps/dali-temple-route-design-first/dali-temple-route-design-first-tileset.png",
+    "tiled": "/Users/shangguanchenhuan/Documents/home2025/coke-game-rpg/maps/dali-temple-route-design-first/dali-temple-route-design-first.tiled.json",
+    "blueprint": "/Users/shangguanchenhuan/Documents/home2025/coke-game-rpg/maps/dali-temple-route-design-first/dali-temple-route-design-first.design.json"
+  }
+}

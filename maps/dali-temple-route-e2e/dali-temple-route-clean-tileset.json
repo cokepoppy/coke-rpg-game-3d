@@ -1,0 +1,382 @@
+{
+  "input": "/Users/shangguanchenhuan/Documents/home2025/coke-game-rpg/maps/dali-temple-route-e2e/dali-temple-route-rough-tileset.png",
+  "output": "/Users/shangguanchenhuan/Documents/home2025/coke-game-rpg/maps/dali-temple-route-e2e/dali-temple-route-clean-tileset.png",
+  "preview": "/Users/shangguanchenhuan/Documents/home2025/coke-game-rpg/maps/dali-temple-route-e2e/dali-temple-route-preview.png",
+  "source": {
+    "width": 1536,
+    "height": 1024,
+    "keyColor": [
+      239,
+      23,
+      239
+    ]
+  },
+  "tile": {
+    "width": 192,
+    "height": 192,
+    "cols": 6,
+    "rows": 3
+  },
+  "detection": {
+    "components": 21,
+    "accepted": 18,
+    "rejected": 3,
+    "minArea": 256,
+    "minSize": 8,
+    "maxAspect": 6
+  },
+  "anchor": "bottom-center",
+  "tiles": [
+    {
+      "id": 0,
+      "row": 0,
+      "col": 0,
+      "source": {
+        "left": 752,
+        "top": 29,
+        "width": 230,
+        "height": 218,
+        "area": 42068
+      },
+      "output": {
+        "left": 10,
+        "top": 29,
+        "width": 172,
+        "height": 163
+      }
+    },
+    {
+      "id": 1,
+      "row": 0,
+      "col": 1,
+      "source": {
+        "left": 280,
+        "top": 36,
+        "width": 205,
+        "height": 211,
+        "area": 41357
+      },
+      "output": {
+        "left": 205,
+        "top": 20,
+        "width": 167,
+        "height": 172
+      }
+    },
+    {
+      "id": 2,
+      "row": 0,
+      "col": 2,
+      "source": {
+        "left": 1257,
+        "top": 36,
+        "width": 245,
+        "height": 211,
+        "area": 45943
+      },
+      "output": {
+        "left": 394,
+        "top": 44,
+        "width": 172,
+        "height": 148
+      }
+    },
+    {
+      "id": 3,
+      "row": 0,
+      "col": 3,
+      "source": {
+        "left": 39,
+        "top": 38,
+        "width": 203,
+        "height": 209,
+        "area": 40212
+      },
+      "output": {
+        "left": 589,
+        "top": 20,
+        "width": 167,
+        "height": 172
+      }
+    },
+    {
+      "id": 4,
+      "row": 0,
+      "col": 4,
+      "source": {
+        "left": 523,
+        "top": 38,
+        "width": 199,
+        "height": 209,
+        "area": 39653
+      },
+      "output": {
+        "left": 782,
+        "top": 20,
+        "width": 164,
+        "height": 172
+      }
+    },
+    {
+      "id": 5,
+      "row": 0,
+      "col": 5,
+      "source": {
+        "left": 1016,
+        "top": 38,
+        "width": 206,
+        "height": 209,
+        "area": 40349
+      },
+      "output": {
+        "left": 971,
+        "top": 20,
+        "width": 170,
+        "height": 172
+      }
+    },
+    {
+      "id": 6,
+      "row": 1,
+      "col": 0,
+      "source": {
+        "left": 438,
+        "top": 278,
+        "width": 371,
+        "height": 240,
+        "area": 50615
+      },
+      "output": {
+        "left": 10,
+        "top": 273,
+        "width": 172,
+        "height": 111
+      }
+    },
+    {
+      "id": 7,
+      "row": 1,
+      "col": 1,
+      "source": {
+        "left": 1093,
+        "top": 283,
+        "width": 290,
+        "height": 240,
+        "area": 54059
+      },
+      "output": {
+        "left": 202,
+        "top": 242,
+        "width": 172,
+        "height": 142
+      }
+    },
+    {
+      "id": 8,
+      "row": 1,
+      "col": 2,
+      "source": {
+        "left": 880,
+        "top": 290,
+        "width": 132,
+        "height": 233,
+        "area": 16878
+      },
+      "output": {
+        "left": 432,
+        "top": 212,
+        "width": 97,
+        "height": 172
+      }
+    },
+    {
+      "id": 9,
+      "row": 1,
+      "col": 3,
+      "source": {
+        "left": 51,
+        "top": 342,
+        "width": 330,
+        "height": 155,
+        "area": 35374
+      },
+      "output": {
+        "left": 586,
+        "top": 303,
+        "width": 172,
+        "height": 81
+      }
+    },
+    {
+      "id": 10,
+      "row": 1,
+      "col": 4,
+      "source": {
+        "left": 1257,
+        "top": 539,
+        "width": 188,
+        "height": 244,
+        "area": 19957
+      },
+      "output": {
+        "left": 798,
+        "top": 212,
+        "width": 133,
+        "height": 172
+      }
+    },
+    {
+      "id": 11,
+      "row": 1,
+      "col": 5,
+      "source": {
+        "left": 116,
+        "top": 545,
+        "width": 172,
+        "height": 214,
+        "area": 21012
+      },
+      "output": {
+        "left": 987,
+        "top": 212,
+        "width": 138,
+        "height": 172
+      }
+    },
+    {
+      "id": 12,
+      "row": 2,
+      "col": 0,
+      "source": {
+        "left": 401,
+        "top": 573,
+        "width": 162,
+        "height": 163,
+        "area": 22078
+      },
+      "output": {
+        "left": 15,
+        "top": 413,
+        "width": 162,
+        "height": 163
+      }
+    },
+    {
+      "id": 13,
+      "row": 2,
+      "col": 1,
+      "source": {
+        "left": 644,
+        "top": 573,
+        "width": 216,
+        "height": 160,
+        "area": 23431
+      },
+      "output": {
+        "left": 202,
+        "top": 449,
+        "width": 172,
+        "height": 127
+      }
+    },
+    {
+      "id": 14,
+      "row": 2,
+      "col": 2,
+      "source": {
+        "left": 949,
+        "top": 573,
+        "width": 191,
+        "height": 151,
+        "area": 20473
+      },
+      "output": {
+        "left": 394,
+        "top": 440,
+        "width": 172,
+        "height": 136
+      }
+    },
+    {
+      "id": 15,
+      "row": 2,
+      "col": 3,
+      "source": {
+        "left": 984,
+        "top": 752,
+        "width": 162,
+        "height": 238,
+        "area": 21077
+      },
+      "output": {
+        "left": 614,
+        "top": 404,
+        "width": 117,
+        "height": 172
+      }
+    },
+    {
+      "id": 16,
+      "row": 2,
+      "col": 4,
+      "source": {
+        "left": 619,
+        "top": 775,
+        "width": 272,
+        "height": 214,
+        "area": 50823
+      },
+      "output": {
+        "left": 778,
+        "top": 441,
+        "width": 172,
+        "height": 135
+      }
+    },
+    {
+      "id": 17,
+      "row": 2,
+      "col": 5,
+      "source": {
+        "left": 292,
+        "top": 778,
+        "width": 249,
+        "height": 203,
+        "area": 40695
+      },
+      "output": {
+        "left": 970,
+        "top": 436,
+        "width": 172,
+        "height": 140
+      }
+    }
+  ],
+  "rejected": [
+    {
+      "left": 42,
+      "right": 45,
+      "top": 43,
+      "bottom": 46,
+      "area": 12,
+      "reason": "filter"
+    },
+    {
+      "left": 771,
+      "right": 775,
+      "top": 474,
+      "bottom": 478,
+      "area": 14,
+      "reason": "filter"
+    },
+    {
+      "left": 718,
+      "right": 718,
+      "top": 835,
+      "bottom": 835,
+      "area": 1,
+      "reason": "filter"
+    }
+  ],
+  "generatedAt": "2026-06-03T08:53:35.951Z"
+}

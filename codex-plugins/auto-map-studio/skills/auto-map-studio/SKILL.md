@@ -128,6 +128,33 @@ Prefer this mode for early RPG scenes because it preserves the designer's compos
 
 Use 64x64 as the fixed runtime tile size unless the user explicitly asks otherwise. Full-map concept images can be any useful resolution, but exported Tiled JSON, collision rectangles, object coordinates, and runtime tilesets should align to 64px units.
 
+## Interior Room Workflow
+
+Use this when the user wants enterable rooms, searchable cabinets, chests, desks, shelves, puzzle objects, or indoor story scenes.
+
+Recommended shape:
+
+1. Generate the whole room from a designer perspective first, as one coherent top-down or three-quarter top-down interior map.
+2. Resize/crop the final room background to a fixed 64px grid, commonly `20x12` tiles (`1280x768`) for the current browser RPG viewport.
+3. Keep the room as a layered map base during prototype work. Do not force early room art into tiny repeating tiles if the room is unique.
+4. Export a Tiled JSON object layer with named triggers:
+   - `room_exit`
+   - `room_wardrobe`
+   - `room_medicine_cabinet`
+   - `room_chest`
+   - `room_scroll_desk`
+5. Put treasure, search, cabinet-open, puzzle, and map-transition behavior in story scripts, not in the renderer.
+6. Use the RPG code plugin to wire room entry/exit through `MapTransitionManager`.
+
+Prompt pattern:
+
+```text
+Create a complete top-down / three-quarter top-down pixel-inspired wuxia RPG room interior map concept.
+The room must be one coherent playable scene with readable walkable floor space.
+Include a doorway exit, searchable cabinet, medicine shelf, chest, desk with scrolls, bed, table, lanterns, and screen divider.
+No characters, no labels, no UI, no text, no watermark.
+```
+
 ## AI Generation Prompt Pattern
 
 For rough tilesets:

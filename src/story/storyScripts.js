@@ -108,6 +108,172 @@ export const storyScripts = {
       }
     }
   },
+  inn_room_door: {
+    id: "inn_room_door",
+    start: "door",
+    nodes: {
+      door: {
+        speaker: "客栈内室",
+        text: "木门虚掩，里面传来淡淡药香。阿萝说铜匣线索可能和这间客房有关。",
+        choices: [
+          { label: "进入房间", next: "enter" },
+          { label: "先不进去", next: "leave" }
+        ]
+      },
+      enter: {
+        speaker: "主角",
+        text: "进去看看。",
+        actions: [{ type: "enterMap", mapId: "daliInnRoom", spawn: "entrance" }]
+      },
+      leave: {
+        speaker: "主角",
+        text: "先在外面再查一圈。"
+      }
+    }
+  },
+  room_exit: {
+    id: "room_exit",
+    start: "exit",
+    nodes: {
+      exit: {
+        speaker: "门口",
+        text: "屋外山风卷过廊下，回到客栈外的小路吗？",
+        choices: [
+          { label: "离开房间", next: "leave" },
+          { label: "继续搜索", next: "stay" }
+        ]
+      },
+      leave: {
+        speaker: "主角",
+        text: "房里该看的地方差不多了。",
+        actions: [{ type: "enterMap", mapId: "world", spawn: "innReturn" }]
+      },
+      stay: {
+        speaker: "主角",
+        text: "再检查一下柜子和书桌。"
+      }
+    }
+  },
+  room_wardrobe: {
+    id: "room_wardrobe",
+    start: "closed",
+    repeatFlag: "room_wardrobe_opened",
+    nodes: {
+      closed: {
+        speaker: "木柜",
+        text: "高柜门缝里卡着一截蓝布，像是有人匆忙藏过东西。",
+        choices: [
+          { label: "打开木柜", next: "open" },
+          { label: "暂时不动", next: "leave" }
+        ]
+      },
+      open: {
+        speaker: "木柜",
+        text: "柜门吱呀一声打开，里面落下一只旧布囊。布囊里有一枚碎银和一封未署名的信。",
+        actions: [
+          { type: "setFlag", flag: "room_wardrobe_opened" },
+          { type: "addItem", itemId: "silver_piece", amount: 1 },
+          { type: "addItem", itemId: "unsigned_letter", amount: 1 },
+          { type: "remember", text: "在客房木柜里找到碎银和未署名的信。" }
+        ]
+      },
+      leave: {
+        speaker: "主角",
+        text: "柜门太旧，硬拉可能惊动别人。"
+      }
+    }
+  },
+  room_medicine_cabinet: {
+    id: "room_medicine_cabinet",
+    start: "cabinet",
+    repeatFlag: "room_medicine_taken",
+    nodes: {
+      cabinet: {
+        speaker: "药柜",
+        text: "药柜上层摆着止血散，下层有一格暗抽屉，抽屉边缘沾着朱砂粉。",
+        choices: [
+          { label: "搜暗抽屉", next: "take" },
+          { label: "只拿止血散", next: "simple" }
+        ]
+      },
+      take: {
+        speaker: "药柜",
+        text: "暗抽屉里藏着一瓶续命丹和半截铜钥匙。钥匙断口和铜匣里的刻痕正好相合。",
+        actions: [
+          { type: "setFlag", flag: "room_medicine_taken" },
+          { type: "addItem", itemId: "life_pill", amount: 1 },
+          { type: "addItem", itemId: "broken_copper_key", amount: 1 }
+        ]
+      },
+      simple: {
+        speaker: "药柜",
+        text: "你拿到一包止血散。",
+        actions: [
+          { type: "setFlag", flag: "room_medicine_taken" },
+          { type: "addItem", itemId: "hemostatic_powder", amount: 1 }
+        ]
+      }
+    }
+  },
+  room_chest: {
+    id: "room_chest",
+    start: "chest",
+    repeatFlag: "room_chest_opened",
+    nodes: {
+      chest: {
+        speaker: "红漆箱",
+        text: "箱锁很新，和屋里陈旧的摆设不太相称。箱盖上压着一只茶盏，似乎有人故意留下记号。",
+        choices: [
+          { label: "用铜钥匙试锁", next: "open" },
+          { label: "以后再开", next: "leave" }
+        ]
+      },
+      open: {
+        speaker: "红漆箱",
+        text: "箱中没有金银，只有一张折好的山道图。图上圈出了天龙古寺后的密道入口。",
+        actions: [
+          { type: "setFlag", flag: "room_chest_opened" },
+          { type: "addItem", itemId: "secret_path_map", amount: 1 },
+          { type: "completeQuest", questId: "temple_secret_path" },
+          {
+            type: "addQuest",
+            quest: {
+              id: "enter_secret_path",
+              title: "进入密道",
+              description: "带着山道图前往天龙古寺，寻找寺后的密道入口。"
+            }
+          }
+        ]
+      },
+      leave: {
+        speaker: "主角",
+        text: "先别动箱子。"
+      }
+    }
+  },
+  room_scroll_desk: {
+    id: "room_scroll_desk",
+    start: "desk",
+    nodes: {
+      desk: {
+        speaker: "书桌",
+        text: "桌上摊着一卷账册，夹页里反复出现“灯亭、铜匣、寺后”三个词。",
+        choices: [
+          { label: "抄下线索", next: "copy" },
+          { label: "合上账册", next: "leave" }
+        ]
+      },
+      copy: {
+        speaker: "主角",
+        text: "线索已经连起来了：灯亭铜匣只是引子，真正的入口在寺后。",
+        actions: [{ type: "remember", text: "书桌账册提到灯亭、铜匣和寺后密道。" }]
+      },
+      leave: {
+        speaker: "主角",
+        text: "这本账册不像客栈自己的东西。"
+      }
+    }
+  },
   training_yard: {
     id: "training_yard",
     start: "dummy",

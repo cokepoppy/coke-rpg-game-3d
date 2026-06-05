@@ -1,0 +1,100 @@
+{
+  "name": "dali-inn-room",
+  "pipeline": "design_first_room_to_layered_map",
+  "tileSize": 64,
+  "room": {
+    "width": 20,
+    "height": 12,
+    "pixelWidth": 1280,
+    "pixelHeight": 768
+  },
+  "concept": "dali-inn-room-concept.png",
+  "rendered": "dali-inn-room-rendered.png",
+  "interactions": [
+    {
+      "name": "room_exit",
+      "rect": {
+        "x": 560,
+        "y": 690,
+        "width": 160,
+        "height": 78
+      },
+      "properties": [
+        {
+          "name": "event",
+          "type": "string",
+          "value": "map_transition"
+        },
+        {
+          "name": "targetMap",
+          "type": "string",
+          "value": "world"
+        }
+      ]
+    },
+    {
+      "name": "room_wardrobe",
+      "rect": {
+        "x": 980,
+        "y": 250,
+        "width": 188,
+        "height": 210
+      },
+      "properties": [
+        {
+          "name": "event",
+          "type": "string",
+          "value": "treasure"
+        }
+      ]
+    },
+    {
+      "name": "room_medicine_cabinet",
+      "rect": {
+        "x": 935,
+        "y": 112,
+        "width": 188,
+        "height": 150
+      },
+      "properties": [
+        {
+          "name": "event",
+          "type": "string",
+          "value": "treasure"
+        }
+      ]
+    },
+    {
+      "name": "room_chest",
+      "rect": {
+        "x": 970,
+        "y": 572,
+        "width": 188,
+        "height": 110
+      },
+      "properties": [
+        {
+          "name": "event",
+          "type": "string",
+          "value": "treasure"
+        }
+      ]
+    },
+    {
+      "name": "room_scroll_desk",
+      "rect": {
+        "x": 690,
+        "y": 130,
+        "width": 225,
+        "height": 130
+      },
+      "properties": [
+        {
+          "name": "event",
+          "type": "string",
+          "value": "puzzle"
+        }
+      ]
+    }
+  ]
+}

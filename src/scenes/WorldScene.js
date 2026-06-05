@@ -1,7 +1,5 @@
 import { assets } from "../assets/assetManifest.js";
-import { MapManager } from "../maps/MapManager.js";
-import { MapRenderer } from "../maps/MapRenderer.js";
-import { CollisionSystem } from "../maps/CollisionSystem.js";
+import { MapTransitionManager } from "../maps/MapTransitionManager.js";
 import { Player } from "../entities/Player.js";
 import { BattleManager } from "../battle/BattleManager.js";
 import { GameState } from "../story/GameState.js";
@@ -16,16 +14,21 @@ export class WorldScene {
     this.dialogBox = dialogBox;
     this.state = new GameState();
     this.battleManager = new BattleManager();
+    this.mapTransitions = new MapTransitionManager(context, camera);
     this.autoWalk = null;
     this.lastScriptResult = null;
   }
 
   async load() {
-    this.map = await new MapManager(assets.maps.world).load();
-    this.renderer = new MapRenderer(this.context, this.map, this.camera);
-    this.collision = new CollisionSystem(this.map);
+    const world = await this.mapTransitions.load("world", "start");
+    this.mapId = world.id;
+    this.map = world.map;
+    this.renderer = world.renderer;
+    this.collision = world.collision;
     const heroSheet = await loadImage(assets.sprites.hero.sheet);
     this.player = new Player(assets.sprites.hero, heroSheet);
+    this.player.x = world.spawn.x;
+    this.player.y = world.spawn.y;
     this.scriptRunner = new ScriptRunner({
       scripts: storyScripts,
       dialogBox: this.dialogBox,
@@ -67,7 +70,22 @@ export class WorldScene {
     if (result?.kind === "battle-requested") {
       this.state.remember(`遭遇战：${result.enemyId}`);
     }
+    if (result?.kind === "map-transition") {
+      await this.enterMap(result.mapId, result.spawn);
+    }
     return result;
+  }
+
+  async enterMap(mapId, spawnId) {
+    const next = await this.mapTransitions.load(mapId, spawnId);
+    this.mapId = next.id;
+    this.map = next.map;
+    this.renderer = next.renderer;
+    this.collision = next.collision;
+    this.player.x = next.spawn.x;
+    this.player.y = next.spawn.y;
+    this.autoWalk = null;
+    this.camera.follow(this.player, this.map);
   }
 
   walkToTrigger(name, speed = 1400) {

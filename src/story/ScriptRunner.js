@@ -43,6 +43,7 @@ export class ScriptRunner {
       if (action.type === "completeQuest") this.gameState.completeQuest(action.questId);
       if (action.type === "remember") this.gameState.remember(action.text);
       if (action.type === "startBattle") result = this.battleManager.requestBattle(action);
+      if (action.type === "enterMap") result = { kind: "map-transition", mapId: action.mapId, spawn: action.spawn };
     }
     return result;
   }

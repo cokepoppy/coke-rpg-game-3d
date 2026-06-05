@@ -43,6 +43,7 @@ src/
   maps/CollisionSystem.js
   maps/MapManager.js
   maps/MapRenderer.js
+  maps/MapTransitionManager.js
   story/GameState.js
   story/QuestLog.js
   story/ScriptRunner.js
@@ -94,6 +95,17 @@ This writes:
 - `src/ui/DialogBox.js`: reusable dialogue UI controller
 
 Story scripts should be data-first. Keep dialogue text, choices, conditions, and actions in story data; keep rendering in UI modules; keep battle math in `BattleManager`; keep map triggers in `MapManager`.
+
+## Multi-Map Room Scenes
+
+Use this pattern for entering buildings, rooms, caves, dungeons, or interior scenes:
+
+- Put every map in `assets.maps` with `json`, `image`, and `spawns`.
+- Use `MapTransitionManager` to load a map, renderer, collision system, and spawn point together.
+- A door trigger should run a story script such as `inn_room_door`; the script emits an `enterMap` action.
+- Room objects should be normal story triggers: `room_wardrobe`, `room_medicine_cabinet`, `room_chest`, `room_scroll_desk`, `room_exit`.
+- Keep search results in `storyScripts.js`; keep inventory/flags in `GameState`; keep map switching in `WorldScene.enterMap`.
+- End-to-end QA should include an automated tour script that walks to triggers, runs scripts, clicks choices, and saves screenshots.
 
 ## Implementation Rules
 

@@ -48,6 +48,24 @@ http://localhost:5173/index.modular.html
 - `src/ui/DialogBox.js`：独立对话 UI 控制器。
 - `src/battle/BattleManager.js`：战斗请求边界，后续可接战棋战斗系统。
 
+## 房间内场景
+
+`maps/dali-inn-room/` 是一个设计优先的室内地图样例：
+
+- 先生成完整房间设计图，再导出为 `20x12` 个 `64px` tile 的运行底图。
+- 房间 Tiled JSON 里包含门口、木柜、药柜、书桌、红漆箱等触发器。
+- `MapTransitionManager` 负责 `world` 和 `daliInnRoom` 之间切换。
+- `storyScripts.js` 负责柜子搜索、开药柜、发现线索、开箱获得密道地图、出门返回。
+
+房间剧情验收截图：
+
+```bash
+NODE_PATH=/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules \
+/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node scripts/room_tour.mjs
+```
+
+输出在 `screenshots/room-tour/`。
+
 ## Codex 插件源码
 
 `codex-plugins/` 里保存了本项目沉淀出的本地 Codex 插件源码：

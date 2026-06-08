@@ -80,7 +80,7 @@ export class BattleState {
     attacker.acted = true;
     attacker.moved = true;
     target.takeDamage(skill.damage);
-    attacker.animation = { type: "attack", target: { ...target.cell }, time: 0.28 };
+    attacker.animation = { type: "attack", target: { ...target.cell }, time: 0.28, duration: 0.28, effectId: skill.effectId || "sword_slash" };
     target.animation = { type: "hit", time: 0.22 };
     this.logEvent(`${attacker.name} 使用${skill.name}，${target.name} 受到 ${skill.damage} 点伤害。`);
     if (!target.alive) this.logEvent(`${target.name} 倒下了。`);

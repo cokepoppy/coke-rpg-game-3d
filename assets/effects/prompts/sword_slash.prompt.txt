@@ -1,0 +1,7 @@
+Generate one 1x6 sprite sheet for a 2D pixel-art wuxia battle effect: 刀剑斩击.
+Effect: bright crescent saber slash, pale gold edge, fast horizontal strike.
+Shared style: pixel-art wuxia RPG battle visual effects, clean readable frame animation.
+Exact 1 row x 6 columns, six animation frames from start to finish.
+Each frame centered in its cell, same scale, crisp alpha-ready silhouette.
+Perfectly flat solid #FF00FF chroma-key background.
+No characters, no labels, no grid lines, no text, no UI, no watermark.

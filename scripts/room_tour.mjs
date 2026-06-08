@@ -8,6 +8,7 @@ const { chromium } = require("playwright");
 
 const root = process.cwd();
 const outDir = path.join(root, "screenshots/room-tour");
+const baseUrl = process.env.BASE_URL || "http://localhost:5173";
 await fs.mkdir(outDir, { recursive: true });
 
 const browser = await chromium.launch({
@@ -26,7 +27,7 @@ page.on("response", (response) => {
   if (response.status() >= 400) responses.push(`${response.status()} ${response.url()}`);
 });
 
-await page.goto("http://localhost:5173/index.modular.html", { waitUntil: "networkidle" });
+await page.goto(`${baseUrl}/index.modular.html`, { waitUntil: "networkidle" });
 await finishOpening();
 
 await page.evaluate(async () => {

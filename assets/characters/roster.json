@@ -1,0 +1,75 @@
+{
+  "style": "Tian Long Ba Bu inspired Dali wuxia pixel RPG, top-down 3/4 compact readable sprites",
+  "contract": {
+    "type": "four_direction_walk",
+    "rows": 4,
+    "cols": 4,
+    "directions": ["down", "left", "right", "up"],
+    "framesPerDirection": 4,
+    "background": "#FF00FF",
+    "drawWidth": 88,
+    "drawHeight": 88
+  },
+  "characters": [
+    {
+      "id": "duan_yu",
+      "name": "段誉",
+      "role": "player",
+      "source": "existing",
+      "sheet": "../hero-walk-sheet-audited.png",
+      "frameWidth": 313,
+      "frameHeight": 313,
+      "drawWidth": 128,
+      "drawHeight": 128,
+      "description": "young Dali noble swordsman in blue robe, gentle but agile"
+    },
+    {
+      "id": "a_luo",
+      "name": "阿萝",
+      "role": "ally",
+      "description": "young Dali healer woman, teal and ivory travel robe, medicine pouch, light-footed"
+    },
+    {
+      "id": "monk_guard",
+      "name": "守寺武僧",
+      "role": "ally",
+      "description": "Dali temple martial monk, ochre robe, prayer beads, staff fighter"
+    },
+    {
+      "id": "masked_scout",
+      "name": "一品堂暗哨",
+      "role": "enemy",
+      "description": "masked Yipintang scout, dark red-black robe, short saber, stealth posture"
+    },
+    {
+      "id": "scout_archer",
+      "name": "一品堂弩手",
+      "role": "enemy",
+      "description": "Yipintang crossbow soldier, black leather armor, small crossbow, narrow stance"
+    },
+    {
+      "id": "yipintang_leader",
+      "name": "一品堂小头目",
+      "role": "enemy",
+      "description": "elite Yipintang officer, crimson mantle, lamellar armor, commanding saber stance"
+    },
+    {
+      "id": "inn_keeper",
+      "name": "客栈掌柜",
+      "role": "npc",
+      "description": "middle-aged Dali inn keeper, brown vest over pale robe, account pouch, cautious expression"
+    },
+    {
+      "id": "medicine_vendor",
+      "name": "药摊老人",
+      "role": "npc",
+      "description": "elderly medicine vendor, grey robe, herb basket, kind posture"
+    },
+    {
+      "id": "temple_monk",
+      "name": "守寺僧",
+      "role": "npc",
+      "description": "calm Dali temple monk, simple saffron robe, wooden beads, solemn stance"
+    }
+  ]
+}

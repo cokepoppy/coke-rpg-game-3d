@@ -1,0 +1,37 @@
+{
+  "style": "pixel-art wuxia RPG battle visual effects, clean readable frame animation",
+  "contract": {
+    "rows": 1,
+    "cols": 6,
+    "background": "#FF00FF",
+    "frameWidth": 128,
+    "frameHeight": 128
+  },
+  "effects": [
+    {
+      "id": "sword_slash",
+      "name": "刀剑斩击",
+      "description": "bright crescent saber slash, pale gold edge, fast horizontal strike"
+    },
+    {
+      "id": "qi_projectile",
+      "name": "剑气飞行",
+      "description": "thin pale blue-white inner-force sword energy projectile, flying left to right"
+    },
+    {
+      "id": "hit_spark",
+      "name": "受击火花",
+      "description": "compact orange-gold impact spark burst for melee hit"
+    },
+    {
+      "id": "heal_glow",
+      "name": "治疗光效",
+      "description": "soft green healing glow ring with small rising particles"
+    },
+    {
+      "id": "dust_step",
+      "name": "步法尘土",
+      "description": "small tan dust puff from quick footwork movement"
+    }
+  ]
+}

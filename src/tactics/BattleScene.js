@@ -2,6 +2,8 @@ import { BattleState } from "./BattleState.js";
 import { EnemyAI } from "./EnemyAI.js";
 import { TacticsMap } from "./TacticsMap.js";
 import { TacticsRenderer } from "./TacticsRenderer.js";
+import { loadCharacterSprites } from "../assets/characterLoader.js";
+import { loadEffects } from "../assets/effectLoader.js";
 import { BattleHud } from "../ui/BattleHud.js";
 
 export class BattleScene {
@@ -17,7 +19,10 @@ export class BattleScene {
   async load() {
     this.map = await TacticsMap.load(this.config.map);
     this.state = new BattleState({ map: this.map, battle: this.config });
-    this.renderer = new TacticsRenderer(this.context, this.map, this.state);
+    const spriteIds = this.state.units.map((unit) => unit.spriteId || unit.id);
+    const sprites = await loadCharacterSprites(spriteIds);
+    const effects = await loadEffects(["sword_slash", "qi_projectile", "hit_spark", "heal_glow", "dust_step"]);
+    this.renderer = new TacticsRenderer(this.context, this.map, this.state, sprites, effects);
     this.enemyAI = new EnemyAI(this.state);
     this.hud = new BattleHud(document.querySelector("#battle-ui"));
     this.hud.mount({

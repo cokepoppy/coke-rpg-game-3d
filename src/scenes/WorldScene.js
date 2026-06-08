@@ -7,6 +7,7 @@ import { GameState } from "../story/GameState.js";
 import { ScriptRunner } from "../story/ScriptRunner.js";
 import { storyScripts } from "../story/storyScripts.js";
 import { BattleScene } from "../tactics/BattleScene.js";
+import { loadCharacterSprites } from "../assets/characterLoader.js";
 
 export class WorldScene {
   constructor(context, input, camera, dialogBox) {
@@ -30,6 +31,7 @@ export class WorldScene {
     this.collision = world.collision;
     const heroSheet = await loadImage(assets.sprites.hero.sheet);
     this.player = new Player(assets.sprites.hero, heroSheet);
+    await this.loadNpcSprites();
     this.player.x = world.spawn.x;
     this.player.y = world.spawn.y;
     this.scriptRunner = new ScriptRunner({
@@ -97,7 +99,13 @@ export class WorldScene {
     this.player.x = next.spawn.x;
     this.player.y = next.spawn.y;
     this.autoWalk = null;
+    await this.loadNpcSprites();
     this.camera.follow(this.player, this.map);
+  }
+
+  async loadNpcSprites() {
+    const ids = (assets.maps[this.mapId]?.npcs || []).map((npc) => npc.spriteId || npc.id);
+    this.npcRenderer.setSprites(await loadCharacterSprites(ids));
   }
 
   async startBattle(result) {

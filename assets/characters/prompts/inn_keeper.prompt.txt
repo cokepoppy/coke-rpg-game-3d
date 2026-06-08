@@ -1,0 +1,10 @@
+Generate one 4x4 sprite sheet for a 2D pixel-art wuxia RPG character: 客栈掌柜.
+Character: middle-aged Dali inn keeper, brown vest over pale robe, account pouch, cautious expression.
+Shared style: Tian Long Ba Bu inspired Dali wuxia pixel RPG, top-down 3/4 compact readable sprites.
+Top-down 3/4 RPG perspective, compact readable game sprite, consistent identity.
+Exact 4 columns x 4 rows.
+Row 1 faces down walk cycle, row 2 faces left, row 3 faces right, row 4 faces up.
+Four frames per row: idle, left step, idle, right step.
+Every frame centered in its cell with identical scale and a stable bottom-center feet anchor.
+Perfectly flat solid #FF00FF chroma-key background.
+No shadows outside the character, no labels, no grid lines, no text, no UI, no watermark.

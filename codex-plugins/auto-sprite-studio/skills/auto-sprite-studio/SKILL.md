@@ -110,6 +110,74 @@ For browser projects, also provide a local animation inspector page. It should s
 
 Do not rely only on checking the character inside the world map. Map art can hide crop mistakes, dirty pixels, and foot-anchor drift.
 
+## Batch Character Roster Workflow
+
+Use this when the user wants many RPG characters made efficiently from AI image generation.
+
+Recommended shape:
+
+1. Create `assets/characters/roster.json` with one entry per character. Include `id`, `name`, `role`, `description`, and the shared 4x4 walk-sheet contract.
+2. Generate prompt files from the roster:
+
+```bash
+NODE_PATH="/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules" \
+"/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node" \
+"/Users/shangguanchenhuan/plugins/auto-sprite-studio/scripts/create_character_prompts.mjs"
+```
+
+3. Use GPT Image 2 / built-in image generation once per character prompt. Save each result as:
+
+```text
+assets/characters/<character-id>/<character-id>-walk-raw.png
+```
+
+4. Run the roster processor:
+
+```bash
+NODE_PATH="/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules" \
+"/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node" \
+"/Users/shangguanchenhuan/plugins/auto-sprite-studio/scripts/process_character_roster.mjs"
+```
+
+This runs `auto_sprite_sheet.mjs`, then `sprite_animation_audit.mjs`, then writes `src/assets/characterManifest.js`.
+
+Quality gate:
+
+- residue pixels after audit should be `0`
+- row foot drift should be close to `0`
+- row x drift should be low enough that playback does not wobble
+- inspect the generated contact sheets before using sprites in game scenes
+
+The game should consume `characterManifest.js` by `spriteId`; world NPCs and battle units should not hard-code image paths.
+
+## Battle Effect Roster Workflow
+
+Use this for reusable combat animation effects such as sword slash, sword energy projectile, hit spark, heal glow, dust step, stun ring, or elemental effects.
+
+1. Create `assets/effects/effect-roster.json`.
+2. Generate prompt files:
+
+```bash
+node /Users/shangguanchenhuan/plugins/auto-sprite-studio/scripts/create_effect_prompts.mjs
+```
+
+3. Use GPT Image 2 once per effect prompt and save each raw effect as:
+
+```text
+assets/effects/<effect-id>/<effect-id>-raw.png
+```
+
+4. Process the effects:
+
+```bash
+NODE_PATH="/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules" \
+node /Users/shangguanchenhuan/plugins/auto-sprite-studio/scripts/process_effect_roster.mjs
+```
+
+This writes cleaned chroma-keyed PNG sheets and updates `src/assets/effectManifest.js`.
+
+Prefer reusable shared effects over one bespoke attack animation per character in early prototypes. This gives the best production speed while still replacing crude canvas placeholders with real GPT Image 2 generated animation art.
+
 ## Drift Explanation
 
 When an animation appears to wobble or float, measure the alpha bounding box of each frame. AI-generated sheets often keep the character visually consistent but place each frame at a different center inside its cell. Runtime code then crops fixed cells, so the character appears to drift. This plugin fixes that by aligning each row to a shared bottom-center anchor.

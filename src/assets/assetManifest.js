@@ -48,7 +48,9 @@ export const assets = {
           name: "一品堂暗哨",
           x: 1130,
           y: 800,
-          faction: "enemy"
+          faction: "enemy",
+          spriteId: "masked_scout",
+          direction: "down"
         }
       ]
     },

@@ -1,6 +1,13 @@
+import { CharacterSpriteRenderer } from "./CharacterSpriteRenderer.js";
+
 export class NpcMarkerRenderer {
   constructor(context) {
     this.context = context;
+    this.spriteRenderer = new CharacterSpriteRenderer();
+  }
+
+  setSprites(sprites) {
+    this.spriteRenderer.setSprites(sprites);
   }
 
   draw(npcs, camera) {
@@ -16,6 +23,14 @@ export class NpcMarkerRenderer {
     context.beginPath();
     context.ellipse(x, y + 22, 24, 8, 0, 0, Math.PI * 2);
     context.fill();
+    if (this.spriteRenderer.draw(context, npc.spriteId || npc.id, { x, y: y + 16, direction: npc.direction || "down", frame: 0 })) {
+      context.fillStyle = "#f5ead0";
+      context.font = "15px Songti SC, serif";
+      context.textAlign = "center";
+      context.fillText(npc.name, x, y - 52);
+      context.restore();
+      return;
+    }
     context.fillStyle = npc.faction === "enemy" ? "#8f2d2d" : "#2d6fb2";
     context.fillRect(x - 18, y - 24, 36, 48);
     context.fillStyle = "#17100f";

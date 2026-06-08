@@ -1,0 +1,21 @@
+{
+  "id": "dali-battle-courtyard",
+  "title": "苍山寺前伏击",
+  "prompt": "Top-down / three-quarter top-down pixel-inspired wuxia tactical battle arena for a Tian Long Ba Bu inspired RPG, Dali mountain temple courtyard on a cliff road, 16 by 10 tactical grid friendly, no characters, no UI, no labels.",
+  "pipeline": [
+    "Generate full battle map concept first for composition and mood.",
+    "Resize to 1024x640 so one tactical cell equals 64x64 runtime pixels.",
+    "Author blocked cells, player spawns, enemy spawns, and battle objectives in tactics JSON.",
+    "Use the battle map as a coherent background for prototype play; optionally extract reusable props or tiles later."
+  ],
+  "tileSize": 64,
+  "grid": {
+    "width": 16,
+    "height": 10
+  },
+  "assets": {
+    "concept": "dali-battle-courtyard-concept.png",
+    "runtime": "dali-battle-courtyard-rendered.png",
+    "tactics": "dali-battle-courtyard.tactics.json"
+  }
+}

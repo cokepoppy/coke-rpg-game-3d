@@ -155,6 +155,37 @@ Include a doorway exit, searchable cabinet, medicine shelf, chest, desk with scr
 No characters, no labels, no UI, no text, no watermark.
 ```
 
+## Tactical Battle Map Workflow
+
+Use this when the user needs a Heroes of Might and Magic, SanGuoZhi 11, or grid tactics battle scene.
+
+Recommended first-pass shape:
+
+1. Generate the complete battlefield from a designer perspective first. This keeps lanes, cover, landmarks, and visual rhythm coherent.
+2. Resize/crop the battle background to an exact runtime grid. For the current browser RPG, use `16x10` cells at `64x64`, which exports to `1024x640`.
+3. Do not slice the whole concept directly into reusable terrain tiles during the prototype pass. Treat it as a battle background and author structured tactical data beside it.
+4. Export a `<name>.tactics.json` file with:
+   - `tileSize`
+   - `width` and `height`
+   - `blocked` grid cells
+   - `playerSpawns`
+   - `enemySpawns`
+   - `objectives`
+5. Keep encounter dialogue and start-battle triggers in the RPG story scripts. The map skill exports tactical data; the RPG code skill consumes it.
+6. Add an automated QA tour that enters the encounter, screenshots the pre-battle dialogue, selected-unit move range, movement result, attack, enemy turn, and battle log.
+
+Prompt pattern:
+
+```text
+Create a complete top-down / three-quarter top-down pixel-inspired wuxia tactical battle map.
+The scene must be one coherent playable battlefield designed for a <W>x<H> grid with 64px runtime cells.
+Include readable walkable lanes, obstacle clusters, cover, terrain landmarks, and clear spawn zones.
+Do not draw visible UI grid lines.
+No characters, no labels, no UI, no text, no watermark.
+```
+
+If the same battlefield later needs editor-grade reuse, generate a separate prop pack and tileset from the approved concept direction, then run the tileset forge workflow.
+
 ## AI Generation Prompt Pattern
 
 For rough tilesets:

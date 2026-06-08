@@ -107,6 +107,32 @@ Use this pattern for entering buildings, rooms, caves, dungeons, or interior sce
 - Keep search results in `storyScripts.js`; keep inventory/flags in `GameState`; keep map switching in `WorldScene.enterMap`.
 - End-to-end QA should include an automated tour script that walks to triggers, runs scripts, clicks choices, and saves screenshots.
 
+## Tactical Battle System Workflow
+
+Use this when the user wants turn-based grid combat, battle encounters launched by NPC dialogue, combat skills, enemy AI, or reusable combat QA loops.
+
+Recommended module boundaries:
+
+- `src/battle/BattleManager.js`: converts story actions such as `startBattle` into battle configs.
+- `src/tactics/TacticsMap.js`: loads battle map JSON, blocked cells, spawn cells, and 64px grid metadata.
+- `src/tactics/BattleState.js`: owns turn state, selected units, legal movement, attacks, skill points, victory/defeat, and battle logs.
+- `src/tactics/EnemyAI.js`: runs deterministic enemy turns against the same movement and attack rules as the player.
+- `src/tactics/TacticsRenderer.js`: draws the battle background, grid, move highlights, units, HP bars, and attack animation feedback.
+- `src/tactics/BattleScene.js`: connects map, state, renderer, input, HUD, and finish callbacks.
+- `src/ui/BattleHud.js`: renders turn status, selected unit stats, skill buttons, end-turn, and combat log.
+
+Workflow:
+
+1. Add an enemy NPC or encounter trigger to the world map data.
+2. Add a story script with a choice such as `拔剑迎战`; the accepted branch emits `{ type: "startBattle", enemyId }`.
+3. Keep pre-battle dialogue in `storyScripts.js`; keep battle math in tactics modules.
+4. Load a design-first tactics map JSON with fixed `64x64` cells.
+5. On player click, select own unit, show legal move cells, move to a clicked legal cell, then allow attacks or skills when an enemy is in range.
+6. After the player ends the turn, run enemy AI through the same movement and attack state APIs.
+7. Write a Playwright QA script that screenshots the encounter dialogue, battle start, movement range, move, attack, enemy turn, and post-AI state; also write a JSON battle log for Codex feedback.
+
+Battle QA is part of the workflow, not an afterthought. If screenshots or logs show drift, missing highlights, invalid turn transitions, or broken attacks, fix the corresponding module and rerun the tour.
+
 ## Implementation Rules
 
 When applying this skill to a repo:

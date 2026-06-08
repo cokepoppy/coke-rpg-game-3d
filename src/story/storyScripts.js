@@ -57,6 +57,30 @@ export const storyScripts = {
       }
     }
   },
+  enemy_scout_npc: {
+    id: "enemy_scout_npc",
+    start: "challenge",
+    repeatFlag: "masked_scout_defeated",
+    nodes: {
+      challenge: {
+        speaker: "一品堂暗哨",
+        text: "少侠止步。寺前这条路，今夜不许外人上山。你若再近一步，刀剑无眼。",
+        choices: [
+          { label: "拔剑迎战", next: "battle" },
+          { label: "暂避锋芒", next: "leave" }
+        ]
+      },
+      battle: {
+        speaker: "主角",
+        text: "既是冲我来的，那就不用再藏。",
+        actions: [{ type: "startBattle", enemyId: "masked_scout" }]
+      },
+      leave: {
+        speaker: "主角",
+        text: "先避开暗哨，另寻时机。"
+      }
+    }
+  },
   bronze_box: {
     id: "bronze_box",
     start: "inspect",

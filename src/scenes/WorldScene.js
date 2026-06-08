@@ -1,10 +1,12 @@
 import { assets } from "../assets/assetManifest.js";
 import { MapTransitionManager } from "../maps/MapTransitionManager.js";
+import { NpcMarkerRenderer } from "../entities/NpcMarkerRenderer.js";
 import { Player } from "../entities/Player.js";
 import { BattleManager } from "../battle/BattleManager.js";
 import { GameState } from "../story/GameState.js";
 import { ScriptRunner } from "../story/ScriptRunner.js";
 import { storyScripts } from "../story/storyScripts.js";
+import { BattleScene } from "../tactics/BattleScene.js";
 
 export class WorldScene {
   constructor(context, input, camera, dialogBox) {
@@ -15,6 +17,7 @@ export class WorldScene {
     this.state = new GameState();
     this.battleManager = new BattleManager();
     this.mapTransitions = new MapTransitionManager(context, camera);
+    this.npcRenderer = new NpcMarkerRenderer(context);
     this.autoWalk = null;
     this.lastScriptResult = null;
   }
@@ -40,6 +43,10 @@ export class WorldScene {
   }
 
   update(dt) {
+    if (this.battleScene?.active) {
+      this.battleScene.update(dt);
+      return;
+    }
     if (this.scriptRunner?.running) return;
     if (this.autoWalk) {
       const arrived = this.player.stepToward(this.autoWalk.target, dt, this.autoWalk.speed);
@@ -59,8 +66,13 @@ export class WorldScene {
   }
 
   render() {
+    if (this.battleScene?.active) {
+      this.battleScene.render();
+      return;
+    }
     this.context.clearRect(0, 0, this.camera.width, this.camera.height);
     this.renderer.drawBase();
+    this.npcRenderer.draw(assets.maps[this.mapId]?.npcs || [], this.camera);
     this.player.draw(this.context, this.camera);
   }
 
@@ -68,7 +80,7 @@ export class WorldScene {
     const result = await this.scriptRunner.run(scriptId);
     this.lastScriptResult = result;
     if (result?.kind === "battle-requested") {
-      this.state.remember(`遭遇战：${result.enemyId}`);
+      await this.startBattle(result);
     }
     if (result?.kind === "map-transition") {
       await this.enterMap(result.mapId, result.spawn);
@@ -86,6 +98,25 @@ export class WorldScene {
     this.player.y = next.spawn.y;
     this.autoWalk = null;
     this.camera.follow(this.player, this.map);
+  }
+
+  async startBattle(result) {
+    this.state.remember(`遭遇战：${result.enemyId}`);
+    this.battleScene = new BattleScene({
+      context: this.context,
+      config: result.battle,
+      onFinish: (outcome) => {
+        if (outcome === "victory") {
+          const rewards = result.battle.rewards || {};
+          for (const flag of rewards.flags || []) this.state.setFlag(flag);
+          for (const item of rewards.items || []) this.state.addItem(item.itemId, item.amount);
+          if (rewards.memory) this.state.remember(rewards.memory);
+        }
+        this.battleScene = null;
+        this.camera.follow(this.player, this.map);
+      }
+    });
+    await this.battleScene.load();
   }
 
   walkToTrigger(name, speed = 1400) {

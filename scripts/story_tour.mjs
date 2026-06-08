@@ -47,9 +47,9 @@ await visit("bronze_box", "04-bronze-box-found", async () => {
 });
 
 await visit("encounter_grass", "06-grass-ambush", async () => {
-  await clickChoice("拨草查看");
+  await clickChoice("暂时离开");
   await waitDialog();
-  await shot("07-grass-battle-request");
+  await shot("07-grass-avoided");
   await clickFirst();
 });
 

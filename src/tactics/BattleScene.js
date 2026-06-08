@@ -1,0 +1,95 @@
+import { BattleState } from "./BattleState.js";
+import { EnemyAI } from "./EnemyAI.js";
+import { TacticsMap } from "./TacticsMap.js";
+import { TacticsRenderer } from "./TacticsRenderer.js";
+import { BattleHud } from "../ui/BattleHud.js";
+
+export class BattleScene {
+  constructor({ context, config, onFinish }) {
+    this.context = context;
+    this.config = config;
+    this.onFinish = onFinish;
+    this.active = false;
+    this.enemyThinking = false;
+    this.pointerHandler = (event) => this.handlePointer(event);
+  }
+
+  async load() {
+    this.map = await TacticsMap.load(this.config.map);
+    this.state = new BattleState({ map: this.map, battle: this.config });
+    this.renderer = new TacticsRenderer(this.context, this.map, this.state);
+    this.enemyAI = new EnemyAI(this.state);
+    this.hud = new BattleHud(document.querySelector("#battle-ui"));
+    this.hud.mount({
+      onEndTurn: () => this.state.endPlayerTurn(),
+      onUseSkill: (skillId) => this.useSkill(skillId)
+    });
+    this.context.canvas.addEventListener("click", this.pointerHandler);
+    this.active = true;
+    window.__battleScene = this;
+  }
+
+  update(dt) {
+    if (!this.active) return;
+    this.tickAnimations(dt);
+    if (this.state.side === "enemy" && !this.enemyThinking && !this.state.finished) {
+      this.enemyThinking = true;
+      this.enemyAI.runTurn().finally(() => {
+        this.enemyThinking = false;
+      });
+    }
+    if (this.state.finished) {
+      this.finishTimer = (this.finishTimer || 0) + dt;
+      if (this.finishTimer > 1.2) this.finish();
+    }
+    this.hud.render(this.state);
+  }
+
+  render() {
+    this.renderer.draw();
+  }
+
+  dispose() {
+    this.active = false;
+    this.context.canvas.removeEventListener("click", this.pointerHandler);
+    this.hud?.unmount();
+  }
+
+  finish() {
+    if (!this.active) return;
+    const result = this.state.result;
+    this.dispose();
+    this.onFinish?.(result);
+  }
+
+  handlePointer(event) {
+    if (this.state.side !== "player" || this.state.finished) return;
+    const rect = this.context.canvas.getBoundingClientRect();
+    const point = {
+      x: ((event.clientX - rect.left) / rect.width) * this.context.canvas.width,
+      y: ((event.clientY - rect.top) / rect.height) * this.context.canvas.height
+    };
+    const cell = this.renderer.cellFromCanvasPoint(point);
+    if (!cell) return;
+    this.state.selectCell(cell);
+  }
+
+  useSkill(skillId) {
+    const selected = this.state.selected;
+    if (!selected) return;
+    const target = this.state.living("enemy").find((enemy) => distanceCells(selected.cell, enemy.cell) <= selected.attackRange + 1);
+    if (target) this.state.attackSelected(target.id, skillId);
+  }
+
+  tickAnimations(dt) {
+    for (const unit of this.state.units) {
+      if (!unit.animation) continue;
+      unit.animation.time -= dt;
+      if (unit.animation.time <= 0) unit.animation = null;
+    }
+  }
+}
+
+function distanceCells(a, b) {
+  return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+}

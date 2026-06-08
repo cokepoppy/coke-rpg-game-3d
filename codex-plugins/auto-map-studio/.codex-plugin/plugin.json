@@ -1,7 +1,7 @@
 {
   "name": "auto-map-studio",
-  "version": "0.1.0+codex.20260605074535",
-  "description": "Codex-native AI tileset, design-first 2D map, and RPG asset workflow.",
+  "version": "0.1.0+codex.20260608131500",
+  "description": "Codex-native AI tileset, design-first 2D map, interior, and tactical battle-map workflow.",
   "author": {
     "name": "Local developer"
   },
@@ -17,6 +17,7 @@
       "Chroma-key background cleanup",
       "Grid-perfect tile export",
       "Design-first concept map workflow",
+      "Tactical battle map workflow",
       "Tiled JSON and object layer export",
       "Map preview generation",
       "Tile metadata export"

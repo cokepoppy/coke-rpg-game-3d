@@ -29,6 +29,26 @@ export const assets = {
           height: 260,
           visible: true,
           properties: [{ name: "event", type: "string", value: "map_transition" }]
+        },
+        {
+          id: 9003,
+          name: "enemy_scout_npc",
+          type: "trigger",
+          x: 1040,
+          y: 720,
+          width: 180,
+          height: 160,
+          visible: true,
+          properties: [{ name: "event", type: "string", value: "battle" }]
+        }
+      ],
+      npcs: [
+        {
+          id: "enemy_scout_npc",
+          name: "一品堂暗哨",
+          x: 1130,
+          y: 800,
+          faction: "enemy"
         }
       ]
     },
@@ -49,6 +69,12 @@ export const assets = {
       drawHeight: 128,
       directions: ["down", "left", "right", "up"],
       framesPerDirection: 4
+    }
+  },
+  battles: {
+    maskedScout: {
+      id: "masked_scout",
+      map: "./maps/dali-battle-courtyard/dali-battle-courtyard.tactics.json"
     }
   }
 };

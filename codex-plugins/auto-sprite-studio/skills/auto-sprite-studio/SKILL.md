@@ -62,7 +62,8 @@ NODE_PATH="/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/
 If the bundled runtime paths are different in the current session, call `load_workspace_dependencies` first and use the reported Node.js executable and package directory.
 
 5. Read the metadata. A successful alignment should reduce each row's `xDrift` and `footDrift` close to `0`.
-6. Use the normalized sheet in the game runtime, not the raw AI sheet.
+6. Run animation audit before using the sheet in the game. This catches hidden residue pixels, bad frame bounds, cropped feet, and frame wobble that are hard to see on a map.
+7. Use the audited sheet in the game runtime, not the raw AI sheet.
 
 ## Existing Sheet Workflow
 
@@ -71,6 +72,43 @@ If the user already has a sheet, skip image generation and run the postprocessor
 ```bash
 node scripts/auto_sprite_sheet.mjs --input actor.png --out actor-normalized.png --rows 4 --cols 4
 ```
+
+## Animation QA Workflow
+
+Use this after every generated or normalized character sheet.
+
+```bash
+NODE_PATH="/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules" \
+"/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node" \
+"/Users/shangguanchenhuan/plugins/auto-sprite-studio/scripts/sprite_animation_audit.mjs" \
+  --input <sheet.png> \
+  --out <sheet-audited.png> \
+  --report <sheet-audited.json> \
+  --contact <sheet-audit-contact.png>
+```
+
+What the audit does:
+
+- slices the sheet by the declared grid
+- finds alpha connected components in each frame
+- treats the largest component as the character body
+- flags all smaller components as residue pixels
+- removes residue components from the audited output
+- realigns each direction row by body bottom-center anchors
+- writes before/after drift metrics and residue counts
+- writes a contact sheet for visual review
+
+For browser projects, also provide a local animation inspector page. It should show:
+
+- four direction playback
+- one-frame zoom
+- body bounds
+- original alpha bounds
+- foot anchor line
+- residue component overlays
+- source/cleaned sheet switching
+
+Do not rely only on checking the character inside the world map. Map art can hide crop mistakes, dirty pixels, and foot-anchor drift.
 
 ## Drift Explanation
 
@@ -81,7 +119,10 @@ When an animation appears to wobble or float, measure the alpha bounding box of 
 Expected outputs:
 
 - normalized sprite sheet PNG
+- audited sprite sheet PNG
 - metadata JSON containing dimensions, drift metrics, frame bounds, and row/column metadata
+- audit JSON containing body components and residue pixels
+- contact sheet or browser screenshots for QA
 - optional extracted individual frame PNGs
 
 Report final paths and the before/after drift numbers to the user.

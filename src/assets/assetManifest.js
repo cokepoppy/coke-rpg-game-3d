@@ -42,7 +42,7 @@ export const assets = {
   },
   sprites: {
     hero: {
-      sheet: "./assets/hero-walk-sheet-normalized.png",
+      sheet: "./assets/hero-walk-sheet-audited.png",
       frameWidth: 313,
       frameHeight: 313,
       drawWidth: 128,

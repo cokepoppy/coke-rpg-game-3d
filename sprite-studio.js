@@ -5,28 +5,45 @@ const DIRECTIONS = ["down", "left", "right", "up"];
 const state = {
   image: null,
   sourceName: "",
-  normalized: null,
   frames: [],
   direction: "down",
   frame: 0,
   fps: 8,
-  scale: 4
+  scale: 5,
+  showBody: true,
+  showAll: true,
+  showResidue: true,
+  showFoot: true
 };
 
 const previewCanvas = document.querySelector("#previewCanvas");
 const previewCtx = previewCanvas.getContext("2d");
+const frameCanvas = document.querySelector("#frameCanvas");
+const frameCtx = frameCanvas.getContext("2d");
 const sheetCanvas = document.querySelector("#sheetCanvas");
 const sheetCtx = sheetCanvas.getContext("2d");
 const logEl = document.querySelector("#pipelineLog");
-const downloadLink = document.querySelector("#downloadLink");
 
-document.querySelector("#loadExample").addEventListener("click", () => loadImage("./assets/hero-walk-sheet.png", "GPT Image 2 wuxia sheet"));
-document.querySelector("#normalizeSheet").addEventListener("click", normalizeAndRender);
 document.querySelector("#fps").addEventListener("input", (event) => {
   state.fps = Number(event.target.value);
 });
 document.querySelector("#scale").addEventListener("input", (event) => {
   state.scale = Number(event.target.value);
+  renderAll();
+});
+for (const id of ["showBody", "showAll", "showResidue", "showFoot"]) {
+  document.querySelector(`#${id}`).addEventListener("change", (event) => {
+    state[id] = event.target.checked;
+    renderAll();
+  });
+}
+document.querySelector("#prevFrame").addEventListener("click", () => {
+  state.frame = (state.frame + COLS - 1) % COLS;
+  renderAll();
+});
+document.querySelector("#nextFrame").addEventListener("click", () => {
+  state.frame = (state.frame + 1) % COLS;
+  renderAll();
 });
 document.querySelector("#fileInput").addEventListener("change", (event) => {
   const file = event.target.files?.[0];
@@ -37,6 +54,13 @@ document.querySelectorAll("[data-dir]").forEach((button) => {
   button.addEventListener("click", () => {
     state.direction = button.dataset.dir;
     document.querySelectorAll("[data-dir]").forEach((item) => item.classList.toggle("active", item === button));
+    renderAll();
+  });
+});
+document.querySelectorAll("[data-src]").forEach((button) => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll("[data-src]").forEach((item) => item.classList.toggle("active", item === button));
+    loadImage(button.dataset.src, button.dataset.name);
   });
 });
 
@@ -45,66 +69,22 @@ function loadImage(src, name) {
   image.onload = () => {
     state.image = image;
     state.sourceName = name;
-    state.normalized = null;
-    drawSheetPreview(image);
-    analyzeSource(image);
-    log(["载入 sheet。", "按 4x4 网格切分。", "等待执行脚底锚点对齐。"]);
+    state.frames = extractFrameMeta(image);
+    updateMetrics(image);
+    renderAll();
+    log([
+      `载入 ${name}。`,
+      "按 4x4 行走帧网格切分。",
+      "用 alpha 连通域区分人物主体和残留像素。",
+      "检查四方向播放、单帧包围盒、脚底锚点和残留块。"
+    ]);
   };
   image.src = src;
 }
 
-function analyzeSource(image) {
-  const frames = extractFrameMeta(image);
-  state.frames = frames;
-  const metrics = measureDrift(frames);
-  const width = image.naturalWidth || image.width;
-  const height = image.naturalHeight || image.height;
-  document.querySelector("#sourceMetric").textContent = `${width}×${height}`;
-  document.querySelector("#xDrift").textContent = `${metrics.x}px`;
-  document.querySelector("#yDrift").textContent = `${metrics.y}px`;
-}
-
-function normalizeAndRender() {
-  if (!state.image) return;
-  const cellW = Math.floor(state.image.naturalWidth / COLS);
-  const cellH = Math.floor(state.image.naturalHeight / ROWS);
-  const output = document.createElement("canvas");
-  output.width = cellW * COLS;
-  output.height = cellH * ROWS;
-  const ctx = output.getContext("2d");
-  ctx.clearRect(0, 0, output.width, output.height);
-
-  const frames = extractFrameMeta(state.image);
-  const byRow = groupByRow(frames);
-  frames.forEach((frame) => {
-    const rowFrames = byRow[frame.row];
-    const targetCenter = Math.round(cellW / 2);
-    const targetFoot = Math.max(...rowFrames.map((item) => item.bounds.bottom));
-    const dx = Math.round(targetCenter - frame.bounds.centerX);
-    const dy = Math.round(targetFoot - frame.bounds.bottom);
-    ctx.drawImage(
-      state.image,
-      frame.sx,
-      frame.sy,
-      cellW,
-      cellH,
-      frame.col * cellW + dx,
-      frame.row * cellH + dy,
-      cellW,
-      cellH
-    );
-  });
-
-  state.normalized = output;
-  drawSheetPreview(output);
-  analyzeSource(output);
-  downloadLink.href = output.toDataURL("image/png");
-  log(["检测每帧透明像素包围盒。", "按每一行动作统一 bottom-center 脚底锚点。", "重新合成稳定 4x4 sheet。", "下载链接已更新。"]);
-}
-
 function extractFrameMeta(image) {
-  const cellW = Math.floor(image.naturalWidth / COLS || image.width / COLS);
-  const cellH = Math.floor(image.naturalHeight / ROWS || image.height / ROWS);
+  const cellW = Math.floor((image.naturalWidth || image.width) / COLS);
+  const cellH = Math.floor((image.naturalHeight || image.height) / ROWS);
   const scratch = document.createElement("canvas");
   scratch.width = cellW;
   scratch.height = cellH;
@@ -117,106 +97,194 @@ function extractFrameMeta(image) {
       ctx.clearRect(0, 0, cellW, cellH);
       ctx.drawImage(image, sx, sy, cellW, cellH, 0, 0, cellW, cellH);
       const pixels = ctx.getImageData(0, 0, cellW, cellH);
-      frames.push({ row, col, sx, sy, bounds: findAlphaBounds(pixels, cellW, cellH) });
+      const components = findComponents(pixels, cellW, cellH).filter((component) => component.count >= 40);
+      components.sort((a, b) => b.count - a.count);
+      const body = components[0] || emptyBounds(cellW, cellH);
+      const residue = components.slice(1);
+      const all = mergeBounds(components, cellW, cellH);
+      frames.push({ row, col, sx, sy, cellW, cellH, body, all, residue, residuePixels: residue.reduce((sum, item) => sum + item.count, 0) });
     }
   }
   return frames;
 }
 
-function findAlphaBounds(imageData, width, height) {
-  let left = width;
-  let top = height;
-  let right = 0;
-  let bottom = 0;
+function findComponents(imageData, width, height) {
+  const seen = new Uint8Array(width * height);
+  const components = [];
   const data = imageData.data;
+  const key = (x, y) => y * width + x;
+  const alpha = (x, y) => data[(y * width + x) * 4 + 3];
   for (let y = 0; y < height; y += 1) {
     for (let x = 0; x < width; x += 1) {
-      const index = (y * width + x) * 4;
-      if (data[index + 3] < 24) continue;
-      left = Math.min(left, x);
-      top = Math.min(top, y);
-      right = Math.max(right, x);
-      bottom = Math.max(bottom, y);
+      const start = key(x, y);
+      if (seen[start] || alpha(x, y) < 24) continue;
+      const queue = [[x, y]];
+      let cursor = 0;
+      let left = x;
+      let right = x;
+      let top = y;
+      let bottom = y;
+      let count = 0;
+      seen[start] = 1;
+      while (cursor < queue.length) {
+        const [px, py] = queue[cursor];
+        cursor += 1;
+        count += 1;
+        left = Math.min(left, px);
+        right = Math.max(right, px);
+        top = Math.min(top, py);
+        bottom = Math.max(bottom, py);
+        for (const [nx, ny] of [
+          [px + 1, py],
+          [px - 1, py],
+          [px, py + 1],
+          [px, py - 1]
+        ]) {
+          if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue;
+          const next = key(nx, ny);
+          if (seen[next] || alpha(nx, ny) < 24) continue;
+          seen[next] = 1;
+          queue.push([nx, ny]);
+        }
+      }
+      components.push({ count, left, top, right, bottom, width: right - left + 1, height: bottom - top + 1, centerX: Math.round((left + right) / 2) });
     }
   }
-  if (left > right) return { left: 0, top: 0, right: width, bottom: height, centerX: width / 2 };
-  return { left, top, right, bottom, centerX: Math.round((left + right) / 2) };
+  return components;
 }
 
-function groupByRow(frames) {
-  return DIRECTIONS.map((_, row) => frames.filter((frame) => frame.row === row));
+function updateMetrics(image) {
+  const cellW = Math.floor((image.naturalWidth || image.width) / COLS);
+  const cellH = Math.floor((image.naturalHeight || image.height) / ROWS);
+  const residue = state.frames.reduce((sum, frame) => sum + frame.residuePixels, 0);
+  const drift = measureDrift(state.frames);
+  const maxX = Math.max(...drift.map((row) => row.xDrift));
+  const maxFoot = Math.max(...drift.map((row) => row.footDrift));
+  document.querySelector("#sourceMetric").textContent = `${image.naturalWidth || image.width}×${image.naturalHeight || image.height}`;
+  document.querySelector("#cellMetric").textContent = `${cellW}×${cellH}`;
+  document.querySelector("#residueMetric").textContent = `${residue}px`;
+  document.querySelector("#driftMetric").textContent = `X ${maxX}px / Foot ${maxFoot}px`;
 }
 
 function measureDrift(frames) {
-  let maxX = 0;
-  let maxY = 0;
-  groupByRow(frames).forEach((rowFrames) => {
-    const xs = rowFrames.map((frame) => frame.bounds.centerX);
-    const ys = rowFrames.map((frame) => frame.bounds.bottom);
-    maxX = Math.max(maxX, Math.max(...xs) - Math.min(...xs));
-    maxY = Math.max(maxY, Math.max(...ys) - Math.min(...ys));
+  return DIRECTIONS.map((_, row) => {
+    const rowFrames = frames.filter((frame) => frame.row === row);
+    const xs = rowFrames.map((frame) => frame.body.centerX);
+    const ys = rowFrames.map((frame) => frame.body.bottom);
+    return {
+      row,
+      xDrift: Math.max(...xs) - Math.min(...xs),
+      footDrift: Math.max(...ys) - Math.min(...ys)
+    };
   });
-  return { x: Math.round(maxX), y: Math.round(maxY) };
 }
 
-function drawSheetPreview(image) {
-  sheetCanvas.width = image.naturalWidth || image.width;
-  sheetCanvas.height = image.naturalHeight || image.height;
-  sheetCtx.clearRect(0, 0, sheetCanvas.width, sheetCanvas.height);
-  sheetCtx.drawImage(image, 0, 0);
-  sheetCtx.strokeStyle = "rgba(255,255,255,.45)";
-  sheetCtx.lineWidth = Math.max(1, Math.round(sheetCanvas.width / 640));
-  for (let x = 1; x < COLS; x += 1) {
-    sheetCtx.beginPath();
-    sheetCtx.moveTo((sheetCanvas.width / COLS) * x, 0);
-    sheetCtx.lineTo((sheetCanvas.width / COLS) * x, sheetCanvas.height);
-    sheetCtx.stroke();
-  }
-  for (let y = 1; y < ROWS; y += 1) {
-    sheetCtx.beginPath();
-    sheetCtx.moveTo(0, (sheetCanvas.height / ROWS) * y);
-    sheetCtx.lineTo(sheetCanvas.width, (sheetCanvas.height / ROWS) * y);
-    sheetCtx.stroke();
-  }
+function renderAll() {
+  drawPreview();
+  drawFrameInspector();
+  drawSheetPreview();
 }
 
 function drawPreview() {
-  previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-  previewCtx.fillStyle = "#172319";
-  previewCtx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
-  previewCtx.strokeStyle = "rgba(255,255,255,.08)";
-  for (let i = 0; i <= previewCanvas.width; i += 24) {
-    previewCtx.beginPath();
-    previewCtx.moveTo(i, 0);
-    previewCtx.lineTo(i, previewCanvas.height);
-    previewCtx.stroke();
-    previewCtx.beginPath();
-    previewCtx.moveTo(0, i);
-    previewCtx.lineTo(previewCanvas.width, i);
-    previewCtx.stroke();
-  }
-
-  const source = state.normalized || state.image;
-  if (!source) return;
-  const cellW = Math.floor((source.naturalWidth || source.width) / COLS);
-  const cellH = Math.floor((source.naturalHeight || source.height) / ROWS);
-  const row = DIRECTIONS.indexOf(state.direction);
-  const frame = state.frame % COLS;
-  const scale = state.scale;
-  const dw = Math.round(cellW * scale * 0.32);
-  const dh = Math.round(cellH * scale * 0.32);
+  drawChecker(previewCtx, previewCanvas.width, previewCanvas.height, 24);
+  const frame = selectedFrame();
+  if (!state.image || !frame) return;
+  const size = Math.round(Math.max(frame.cellW, frame.cellH) * state.scale * 0.38);
+  const x = Math.round((previewCanvas.width - size) / 2);
+  const y = Math.round((previewCanvas.height - size) / 2);
   previewCtx.imageSmoothingEnabled = false;
-  previewCtx.drawImage(
-    source,
-    frame * cellW,
-    row * cellH,
-    cellW,
-    cellH,
-    Math.round((previewCanvas.width - dw) / 2),
-    Math.round((previewCanvas.height - dh) / 2),
-    dw,
-    dh
-  );
+  previewCtx.drawImage(state.image, frame.sx, frame.sy, frame.cellW, frame.cellH, x, y, size, size);
+  drawOverlay(previewCtx, frame, x, y, size / frame.cellW);
+}
+
+function drawFrameInspector() {
+  drawChecker(frameCtx, frameCanvas.width, frameCanvas.height, 16);
+  const frame = selectedFrame();
+  if (!state.image || !frame) return;
+  const scale = Math.min(frameCanvas.width / frame.cellW, frameCanvas.height / frame.cellH) * 0.92;
+  const x = Math.round((frameCanvas.width - frame.cellW * scale) / 2);
+  const y = Math.round((frameCanvas.height - frame.cellH * scale) / 2);
+  frameCtx.imageSmoothingEnabled = false;
+  frameCtx.drawImage(state.image, frame.sx, frame.sy, frame.cellW, frame.cellH, x, y, Math.round(frame.cellW * scale), Math.round(frame.cellH * scale));
+  drawOverlay(frameCtx, frame, x, y, scale);
+  document.querySelector("#frameLabel").textContent = `${DIRECTIONS[frame.row]} ${frame.col}`;
+  document.querySelector("#frameReport").innerHTML = `
+    <b>${DIRECTIONS[frame.row]} frame ${frame.col}</b>
+    <span>主体：${frame.body.width}×${frame.body.height}, bottom ${frame.body.bottom}</span>
+    <span>原始框：${frame.all.width}×${frame.all.height}, bottom ${frame.all.bottom}</span>
+    <span>残留像素：${frame.residuePixels}</span>
+    <span>残留块：${frame.residue.length}</span>
+  `;
+}
+
+function drawSheetPreview() {
+  if (!state.image) return;
+  sheetCanvas.width = state.image.naturalWidth || state.image.width;
+  sheetCanvas.height = state.image.naturalHeight || state.image.height;
+  sheetCtx.clearRect(0, 0, sheetCanvas.width, sheetCanvas.height);
+  sheetCtx.drawImage(state.image, 0, 0);
+  sheetCtx.lineWidth = Math.max(1, Math.round(sheetCanvas.width / 800));
+  state.frames.forEach((frame) => {
+    const x = frame.sx;
+    const y = frame.sy;
+    if (state.showAll) strokeRect(sheetCtx, x + frame.all.left, y + frame.all.top, frame.all.width, frame.all.height, "#d85a40");
+    if (state.showBody) strokeRect(sheetCtx, x + frame.body.left, y + frame.body.top, frame.body.width, frame.body.height, "#6fca9f");
+    if (state.showResidue) {
+      for (const residue of frame.residue) fillRect(sheetCtx, x + residue.left, y + residue.top, residue.width, residue.height, "rgba(255,0,80,.45)");
+    }
+  });
+}
+
+function drawOverlay(ctx, frame, x, y, scale) {
+  if (state.showResidue) for (const residue of frame.residue) fillRect(ctx, x + residue.left * scale, y + residue.top * scale, residue.width * scale, residue.height * scale, "rgba(255,0,80,.45)");
+  if (state.showAll) strokeRect(ctx, x + frame.all.left * scale, y + frame.all.top * scale, frame.all.width * scale, frame.all.height * scale, "#d85a40");
+  if (state.showBody) strokeRect(ctx, x + frame.body.left * scale, y + frame.body.top * scale, frame.body.width * scale, frame.body.height * scale, "#6fca9f");
+  if (state.showFoot) {
+    ctx.strokeStyle = "#e2b55d";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x + frame.body.left * scale, y + (frame.body.bottom + 1) * scale);
+    ctx.lineTo(x + (frame.body.right + 1) * scale, y + (frame.body.bottom + 1) * scale);
+    ctx.stroke();
+  }
+}
+
+function selectedFrame() {
+  const row = DIRECTIONS.indexOf(state.direction);
+  return state.frames.find((frame) => frame.row === row && frame.col === state.frame);
+}
+
+function drawChecker(ctx, width, height, cell) {
+  ctx.clearRect(0, 0, width, height);
+  for (let y = 0; y < height; y += cell) {
+    for (let x = 0; x < width; x += cell) {
+      ctx.fillStyle = (x / cell + y / cell) % 2 === 0 ? "#182018" : "#101410";
+      ctx.fillRect(x, y, cell, cell);
+    }
+  }
+}
+
+function strokeRect(ctx, x, y, width, height, color) {
+  ctx.strokeStyle = color;
+  ctx.strokeRect(Math.round(x) + 0.5, Math.round(y) + 0.5, Math.max(1, Math.round(width)), Math.max(1, Math.round(height)));
+}
+
+function fillRect(ctx, x, y, width, height, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(Math.round(x), Math.round(y), Math.max(1, Math.round(width)), Math.max(1, Math.round(height)));
+}
+
+function mergeBounds(components, width, height) {
+  if (!components.length) return emptyBounds(width, height);
+  const left = Math.min(...components.map((component) => component.left));
+  const top = Math.min(...components.map((component) => component.top));
+  const right = Math.max(...components.map((component) => component.right));
+  const bottom = Math.max(...components.map((component) => component.bottom));
+  return { left, top, right, bottom, width: right - left + 1, height: bottom - top + 1, centerX: Math.round((left + right) / 2) };
+}
+
+function emptyBounds(width, height) {
+  return { count: 0, left: 0, top: 0, right: width - 1, bottom: height - 1, width, height, centerX: Math.round(width / 2) };
 }
 
 function log(items) {
@@ -227,11 +295,11 @@ let last = 0;
 function loop(now) {
   if (now - last > 1000 / state.fps) {
     state.frame = (state.frame + 1) % COLS;
-    drawPreview();
+    renderAll();
     last = now;
   }
   requestAnimationFrame(loop);
 }
 
-loadImage("./assets/hero-walk-sheet.png", "GPT Image 2 wuxia sheet");
+loadImage("./assets/hero-walk-sheet-audited.png", "Audited cleaned sheet");
 requestAnimationFrame(loop);

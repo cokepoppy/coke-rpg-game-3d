@@ -1,6 +1,6 @@
 {
   "name": "auto-sprite-studio",
-  "version": "0.1.0+codex.20260601091424",
+  "version": "0.1.0+codex.20260608035643",
   "description": "Codex-native AI sprite sheet generation and alignment workflow.",
   "author": {
     "name": "Local developer"
@@ -8,13 +8,15 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Auto Sprite Studio",
-    "shortDescription": "Generate, slice, align, and export 2D sprite sheets in Codex.",
-    "longDescription": "Auto Sprite Studio provides a Codex-native workflow for GPT Image generated 2D game sprites: generate a character sheet, remove chroma-key backgrounds, detect frame drift, align frames by bottom-center foot anchors, and export normalized PNG sheets plus metadata.",
+    "shortDescription": "Generate, slice, clean, inspect, align, and export 2D sprite sheets in Codex.",
+    "longDescription": "Auto Sprite Studio provides a Codex-native workflow for GPT Image generated 2D game sprites: generate a character sheet, remove chroma-key backgrounds, detect frame drift, clean residue components, align frames by bottom-center foot anchors, inspect animation playback, and export audited PNG sheets plus metadata.",
     "developerName": "Local developer",
     "category": "Productivity",
     "capabilities": [
       "Sprite sheet post-processing",
       "Frame drift measurement",
+      "Residue component detection",
+      "Animation QA playback",
       "Bottom-center anchor alignment",
       "Frame extraction and metadata export"
     ],

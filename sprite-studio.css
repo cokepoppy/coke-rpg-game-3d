@@ -274,3 +274,126 @@ canvas {
     overflow: auto;
   }
 }
+
+.inspector-mode {
+  grid-template-columns: minmax(20rem, 0.78fr) minmax(28rem, 1fr) minmax(28rem, 1fr);
+}
+
+.inspector-mode h1 {
+  font-size: clamp(2.2rem, 3.6vw, 4.2rem);
+}
+
+.asset-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.55rem;
+}
+
+.asset-list button.active {
+  border-color: rgba(111, 202, 159, 0.8);
+  background: rgba(38, 112, 82, 0.88);
+}
+
+.wide {
+  width: 100%;
+}
+
+.inspector-mode .metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.inspector-mode .metrics div {
+  min-height: 4rem;
+  display: grid;
+  align-content: center;
+  gap: 0.25rem;
+  padding: 0.7rem;
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.inspector-mode .metrics span,
+.frame-report span {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.inspector-mode .metrics b {
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.frame-stepper {
+  display: grid;
+  grid-template-columns: auto minmax(5rem, auto) auto;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.frame-stepper button {
+  min-height: 2.1rem;
+  padding: 0 0.75rem;
+}
+
+.frame-detail {
+  display: grid;
+  grid-template-columns: minmax(18rem, 1fr) minmax(12rem, 0.48fr);
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+#frameCanvas {
+  width: 100%;
+  background: #101410;
+  border: 1px solid var(--line);
+}
+
+.frame-report {
+  display: grid;
+  align-content: start;
+  gap: 0.55rem;
+  padding: 0.85rem;
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.frame-report b {
+  color: var(--gold);
+  font-size: 1rem;
+}
+
+#sheetCanvas {
+  width: 100%;
+  max-height: 34vh;
+  object-fit: contain;
+  padding: 0.8rem;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.inspector-mode .controls {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.inspector-mode .controls label {
+  min-height: 2.4rem;
+  align-content: center;
+}
+
+.inspector-mode .controls label:has(input[type="checkbox"]) {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+@media (max-width: 1280px) {
+  .inspector-mode {
+    grid-template-columns: 1fr;
+  }
+
+  .frame-detail {
+    grid-template-columns: 1fr;
+  }
+}

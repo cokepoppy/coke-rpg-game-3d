@@ -24,13 +24,29 @@ http://localhost:5173/index.modular.html
 
 打开 `http://localhost:5173/sprite-studio.html`。
 
-这个工具页参考 Sorceress 的 Auto-Sprite 思路做了本地原型：
+这个工具页参考 Sorceress 的 Auto-Sprite 思路做了本地原型，现在也是人物动画检查器：
 
 - 载入 GPT Image 2 生成的 4x4 人物行走 sheet。
 - 按 4 方向 x 4 帧切分。
-- 检测每帧人物透明像素包围盒，计算横向中心和脚底锚点漂移。
-- 自动重组 sheet，让每行动作的脚底锚点一致。
-- 实时预览 down / left / right / up 四方向动画并下载修正后的 PNG。
+- 检测每帧人物主体连通域、原始透明包围盒、残留像素和脚底锚点。
+- 自动清理非主体残留块，重新按 body bottom-center 对齐。
+- 实时预览 down / left / right / up 四方向动画。
+- 单帧放大显示主体框、原始框、脚底线、残留块，方便看出切图脏像素。
+
+当前人物使用 `assets/hero-walk-sheet-audited.png`。这版修掉了旧 sheet 左右方向底部的残留像素：
+
+- 旧归一化 sheet 残留：`6386px`
+- 清理后残留：`0px`
+- 四方向清理后 `xDrift` / `footDrift` 都为 `0px`
+
+动画检查截图：
+
+```bash
+NODE_PATH=/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules \
+/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node scripts/sprite_inspector_tour.mjs
+```
+
+输出在 `screenshots/sprite-inspector/`。
 
 ## 玩法
 

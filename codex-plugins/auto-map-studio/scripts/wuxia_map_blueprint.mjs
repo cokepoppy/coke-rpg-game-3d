@@ -94,7 +94,7 @@ const blueprint = {
   theme,
   recommendedPipeline: "hybrid_concept_to_tileset_to_layered_tilemap",
   reason:
-    "Use GPT Image 2 for concept and visual assets, but keep runtime maps as tile/object/collision data. Directly slicing a giant generated illustration is fast for mockups but produces poor reusable tiles and inconsistent seams.",
+    "Use Codex built-in image_gen for concept and visual assets, but keep runtime maps as tile/object/collision data. Directly slicing a giant generated illustration is fast for mockups but produces poor reusable tiles and inconsistent seams.",
   map: {
     width,
     height,

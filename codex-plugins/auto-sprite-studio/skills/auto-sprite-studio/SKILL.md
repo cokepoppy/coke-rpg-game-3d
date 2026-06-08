@@ -1,6 +1,6 @@
 ---
 name: auto-sprite-studio
-description: "Generate and postprocess 2D game sprite sheets inside Codex: prompt GPT Image 2 for a character sheet, remove chroma-key backgrounds, slice frames, measure drift, align frames by bottom-center foot anchors, preview results, and export engine-ready PNG sheets plus metadata."
+description: "Generate and postprocess 2D game sprite sheets inside Codex: prompt Codex built-in image_gen for a character sheet, remove chroma-key backgrounds, slice frames, measure drift, align frames by bottom-center foot anchors, preview results, and export engine-ready PNG sheets plus metadata."
 ---
 
 # Auto Sprite Studio
@@ -11,7 +11,7 @@ Use this skill when the user wants a Codex-native workflow like Sorceress Auto-S
 
 This is a Codex workflow plugin, not a hosted SaaS backend. It provides:
 
-- a generation prompt pattern for GPT Image 2 / built-in image generation
+- a generation prompt pattern for Codex built-in `image_gen`
 - a deterministic postprocessor at `scripts/auto_sprite_sheet.mjs`
 - frame drift metrics before and after alignment
 - normalized PNG sheet output
@@ -125,7 +125,7 @@ NODE_PATH="/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/
 "/Users/shangguanchenhuan/plugins/auto-sprite-studio/scripts/create_character_prompts.mjs"
 ```
 
-3. Use GPT Image 2 / built-in image generation once per character prompt. Save each result as:
+3. Use Codex built-in `image_gen` once per character prompt. Save each result as:
 
 ```text
 assets/characters/<character-id>/<character-id>-walk-raw.png
@@ -161,7 +161,7 @@ Use this for reusable combat animation effects such as sword slash, sword energy
 node /Users/shangguanchenhuan/plugins/auto-sprite-studio/scripts/create_effect_prompts.mjs
 ```
 
-3. Use GPT Image 2 once per effect prompt and save each raw effect as:
+3. Use Codex built-in `image_gen` once per effect prompt and save each raw effect as:
 
 ```text
 assets/effects/<effect-id>/<effect-id>-raw.png
@@ -176,7 +176,7 @@ node /Users/shangguanchenhuan/plugins/auto-sprite-studio/scripts/process_effect_
 
 This writes cleaned chroma-keyed PNG sheets and updates `src/assets/effectManifest.js`.
 
-Prefer reusable shared effects over one bespoke attack animation per character in early prototypes. This gives the best production speed while still replacing crude canvas placeholders with real GPT Image 2 generated animation art.
+Prefer reusable shared effects over one bespoke attack animation per character in early prototypes. This gives the best production speed while still replacing crude canvas placeholders with real `image_gen` animation art.
 
 ## Drift Explanation
 

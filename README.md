@@ -26,7 +26,7 @@ http://localhost:5173/index.modular.html
 
 这个工具页参考 Sorceress 的 Auto-Sprite 思路做了本地原型，现在也是人物动画检查器：
 
-- 载入 GPT Image 2 生成的 4x4 人物行走 sheet。
+- 载入 Codex 内置 `image_gen` 生成的 4x4 人物行走 sheet。
 - 按 4 方向 x 4 帧切分。
 - 检测每帧人物主体连通域、原始透明包围盒、残留像素和脚底锚点。
 - 自动清理非主体残留块，重新按 body bottom-center 对齐。

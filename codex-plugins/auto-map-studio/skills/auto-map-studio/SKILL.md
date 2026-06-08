@@ -61,7 +61,7 @@ If the bundled runtime paths differ, call `load_workspace_dependencies` and use 
 
 For a Tian Long Ba Bu / wuxia pixel RPG, prefer this hybrid pipeline:
 
-1. Generate a full-map concept sketch with GPT Image 2 to establish mood, layout, landmarks, and camera composition.
+1. Generate a full-map concept sketch with Codex built-in `image_gen` to establish mood, layout, landmarks, and camera composition.
 2. Do not slice that full concept directly into runtime tiles. Treat it as reference only because AI concept maps usually have inconsistent seams, lighting, object scale, and edge continuity.
 3. Generate a rough tileset sheet and prop pack from the concept direction.
 4. Run `auto_tileset_forge.mjs` to clean and normalize the rough sheet.

@@ -21,7 +21,8 @@
         <p>用独立播放器检查四方向行走帧：放大播放、逐帧查看、显示主体框、原始透明框、脚底线和残留像素。这个页面用于 AI 自动验收，也方便人工看问题。</p>
 
         <div class="asset-list" id="assetButtons">
-          <button data-src="./assets/hero-walk-sheet-audited.png" data-name="Audited cleaned sheet" class="active">清理版</button>
+          <button data-src="./assets/hero-walk-sheet-anchored.png" data-name="Anchored hero sheet" class="active">锚点版</button>
+          <button data-src="./assets/hero-walk-sheet-audited.png" data-name="Audited cleaned sheet">清理版</button>
           <button data-src="./assets/hero-walk-sheet-normalized.png" data-name="Normalized sheet">旧归一化</button>
           <button data-src="./assets/hero-walk-sheet.png" data-name="Raw alpha sheet">原始 Sheet</button>
         </div>
@@ -36,6 +37,7 @@
           <div><span>Cell</span><b id="cellMetric">-</b></div>
           <div><span>Residue</span><b id="residueMetric">-</b></div>
           <div><span>Max Drift</span><b id="driftMetric">-</b></div>
+          <div><span>Anchor QA</span><b id="anchorMetric">-</b></div>
         </div>
 
         <ol id="pipelineLog"></ol>
@@ -64,6 +66,7 @@
           <label><input id="showAll" type="checkbox" checked /> 原始框</label>
           <label><input id="showResidue" type="checkbox" checked /> 残留</label>
           <label><input id="showFoot" type="checkbox" checked /> 脚底线</label>
+          <label><input id="showAnchor" type="checkbox" checked /> 锚点</label>
         </div>
       </section>
 

@@ -33,6 +33,8 @@ for (const character of roster.characters) {
   const framesDir = path.join(dir, "frames");
   const audited = path.join(dir, `${character.id}-walk-audited.png`);
   const audit = path.join(dir, `${character.id}-walk-audited.json`);
+  const anchored = path.join(dir, `${character.id}-walk-anchored.png`);
+  const anchorAudit = path.join(dir, `${character.id}-walk-anchored.json`);
   const contact = path.join(dir, `${character.id}-walk-contact.png`);
 
   try {
@@ -71,12 +73,28 @@ for (const character of roster.characters) {
     "--cols",
     String(roster.contract.cols)
   ]);
+  run(nodeBin, [
+    path.join(pluginRoot, "scripts/sprite_anchor_audit.mjs"),
+    "--input",
+    audited,
+    "--out",
+    anchored,
+    "--report",
+    anchorAudit,
+    "--contact",
+    contact,
+    "--rows",
+    String(roster.contract.rows),
+    "--cols",
+    String(roster.contract.cols)
+  ]);
 
   const report = JSON.parse(await fs.readFile(audit, "utf8"));
+  const anchorReport = JSON.parse(await fs.readFile(anchorAudit, "utf8"));
   const frameWidth = report.cell.width;
   const frameHeight = report.cell.height;
   characters[character.id] = manifestEntry(character, {
-    sheet: `./assets/characters/${character.id}/${character.id}-walk-audited.png`,
+    sheet: `./assets/characters/${character.id}/${character.id}-walk-anchored.png`,
     frameWidth,
     frameHeight,
     drawWidth: character.drawWidth || roster.contract.drawWidth,
@@ -88,6 +106,9 @@ for (const character of roster.characters) {
     residueAfter: report.residue.afterPixels,
     driftBefore: report.drift.before,
     driftAfter: report.drift.after,
+    anchorBefore: anchorReport.before.global,
+    anchorAfter: anchorReport.after.global,
+    anchorPass: anchorReport.pass,
     contact: path.relative(root, contact)
   });
 }

@@ -15,6 +15,7 @@ This is a Codex workflow plugin, not a hosted SaaS backend. It provides:
 - a deterministic postprocessor at `scripts/auto_sprite_sheet.mjs`
 - frame drift metrics before and after alignment
 - normalized PNG sheet output
+- global foot-anchor audit and correction across all directions
 - optional individual frame PNG export
 - JSON metadata for engine integration
 
@@ -61,9 +62,10 @@ NODE_PATH="/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/
 
 If the bundled runtime paths are different in the current session, call `load_workspace_dependencies` first and use the reported Node.js executable and package directory.
 
-5. Read the metadata. A successful alignment should reduce each row's `xDrift` and `footDrift` close to `0`.
+5. Read the metadata. A successful first-pass alignment should reduce each row's `xDrift` and `footDrift` close to `0`.
 6. Run animation audit before using the sheet in the game. This catches hidden residue pixels, bad frame bounds, cropped feet, and frame wobble that are hard to see on a map.
-7. Use the audited sheet in the game runtime, not the raw AI sheet.
+7. Run global anchor audit. This aligns the foot-contact anchor across all directions, not just within each row.
+8. Use the anchored sheet in the game runtime, not the raw AI sheet.
 
 ## Existing Sheet Workflow
 
@@ -98,6 +100,27 @@ What the audit does:
 - writes before/after drift metrics and residue counts
 - writes a contact sheet for visual review
 
+Then run the global foot-anchor audit:
+
+```bash
+NODE_PATH="/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules" \
+"/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node" \
+"/Users/shangguanchenhuan/plugins/auto-sprite-studio/scripts/sprite_anchor_audit.mjs" \
+  --input <sheet-audited.png> \
+  --out <sheet-anchored.png> \
+  --report <sheet-anchored.json> \
+  --contact <sheet-anchor-contact.png>
+```
+
+What the anchor audit does:
+
+- finds the largest body component in each frame
+- estimates the foot-contact anchor from the lowest opaque pixel band
+- measures `anchorXDrift` and `anchorYDrift` across the entire 4x4 sheet
+- shifts frames so every direction shares the same logical map anchor
+- fails the sheet when post-correction anchor drift is above 2 px
+- writes an overlay contact sheet with crosshair and per-frame anchor dots
+
 For browser projects, also provide a local animation inspector page. It should show:
 
 - four direction playback
@@ -105,6 +128,7 @@ For browser projects, also provide a local animation inspector page. It should s
 - body bounds
 - original alpha bounds
 - foot anchor line
+- global anchor crosshair and PASS/FAIL status
 - residue component overlays
 - source/cleaned sheet switching
 
@@ -139,13 +163,14 @@ NODE_PATH="/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/
 "/Users/shangguanchenhuan/plugins/auto-sprite-studio/scripts/process_character_roster.mjs"
 ```
 
-This runs `auto_sprite_sheet.mjs`, then `sprite_animation_audit.mjs`, then writes `src/assets/characterManifest.js`.
+This runs `auto_sprite_sheet.mjs`, then `sprite_animation_audit.mjs`, then `sprite_anchor_audit.mjs`, then writes `src/assets/characterManifest.js`.
 
 Quality gate:
 
 - residue pixels after audit should be `0`
 - row foot drift should be close to `0`
 - row x drift should be low enough that playback does not wobble
+- global `anchorXDrift` and `anchorYDrift` after anchor audit should be `0`, or at most `2`
 - inspect the generated contact sheets before using sprites in game scenes
 
 The game should consume `characterManifest.js` by `spriteId`; world NPCs and battle units should not hard-code image paths.
@@ -180,7 +205,7 @@ Prefer reusable shared effects over one bespoke attack animation per character i
 
 ## Drift Explanation
 
-When an animation appears to wobble or float, measure the alpha bounding box of each frame. AI-generated sheets often keep the character visually consistent but place each frame at a different center inside its cell. Runtime code then crops fixed cells, so the character appears to drift. This plugin fixes that by aligning each row to a shared bottom-center anchor.
+When an animation appears to wobble or float, measure the alpha body and foot-contact anchor of each frame. AI-generated sheets often keep the character visually consistent but place each direction at a different vertical or horizontal position inside its cell. Runtime code draws fixed cells, so the transparent padding becomes visible motion drift. This plugin fixes that in two passes: first aligning each row, then aligning the global foot-contact anchor across all directions.
 
 ## Output Files
 
@@ -188,8 +213,10 @@ Expected outputs:
 
 - normalized sprite sheet PNG
 - audited sprite sheet PNG
+- anchored sprite sheet PNG
 - metadata JSON containing dimensions, drift metrics, frame bounds, and row/column metadata
 - audit JSON containing body components and residue pixels
+- anchor JSON containing global foot-anchor drift and pass/fail state
 - contact sheet or browser screenshots for QA
 - optional extracted individual frame PNGs
 

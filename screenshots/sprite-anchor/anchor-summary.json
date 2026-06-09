@@ -1,0 +1,146 @@
+[
+  {
+    "id": "duan_yu",
+    "before": {
+      "anchorXDrift": 14,
+      "anchorYDrift": 81,
+      "centroidXDrift": 5,
+      "maxResiduePixels": 0
+    },
+    "after": {
+      "anchorXDrift": 0,
+      "anchorYDrift": 0,
+      "centroidXDrift": 17,
+      "maxResiduePixels": 0
+    },
+    "pass": true
+  },
+  {
+    "id": "a_luo",
+    "before": {
+      "anchorXDrift": 27,
+      "anchorYDrift": 85,
+      "centroidXDrift": 4,
+      "maxResiduePixels": 0
+    },
+    "after": {
+      "anchorXDrift": 0,
+      "anchorYDrift": 0,
+      "centroidXDrift": 26,
+      "maxResiduePixels": 0
+    },
+    "pass": true
+  },
+  {
+    "id": "inn_keeper",
+    "before": {
+      "anchorXDrift": 34,
+      "anchorYDrift": 64,
+      "centroidXDrift": 8,
+      "maxResiduePixels": 0
+    },
+    "after": {
+      "anchorXDrift": 0,
+      "anchorYDrift": 0,
+      "centroidXDrift": 30,
+      "maxResiduePixels": 0
+    },
+    "pass": true
+  },
+  {
+    "id": "masked_scout",
+    "before": {
+      "anchorXDrift": 63,
+      "anchorYDrift": 70,
+      "centroidXDrift": 15,
+      "maxResiduePixels": 0
+    },
+    "after": {
+      "anchorXDrift": 0,
+      "anchorYDrift": 0,
+      "centroidXDrift": 60,
+      "maxResiduePixels": 0
+    },
+    "pass": true
+  },
+  {
+    "id": "medicine_vendor",
+    "before": {
+      "anchorXDrift": 50,
+      "anchorYDrift": 76,
+      "centroidXDrift": 10,
+      "maxResiduePixels": 0
+    },
+    "after": {
+      "anchorXDrift": 0,
+      "anchorYDrift": 0,
+      "centroidXDrift": 41,
+      "maxResiduePixels": 0
+    },
+    "pass": true
+  },
+  {
+    "id": "monk_guard",
+    "before": {
+      "anchorXDrift": 71,
+      "anchorYDrift": 75,
+      "centroidXDrift": 14,
+      "maxResiduePixels": 0
+    },
+    "after": {
+      "anchorXDrift": 0,
+      "anchorYDrift": 0,
+      "centroidXDrift": 61,
+      "maxResiduePixels": 0
+    },
+    "pass": true
+  },
+  {
+    "id": "scout_archer",
+    "before": {
+      "anchorXDrift": 41,
+      "anchorYDrift": 66,
+      "centroidXDrift": 22,
+      "maxResiduePixels": 0
+    },
+    "after": {
+      "anchorXDrift": 0,
+      "anchorYDrift": 0,
+      "centroidXDrift": 56,
+      "maxResiduePixels": 0
+    },
+    "pass": true
+  },
+  {
+    "id": "temple_monk",
+    "before": {
+      "anchorXDrift": 31,
+      "anchorYDrift": 77,
+      "centroidXDrift": 8,
+      "maxResiduePixels": 0
+    },
+    "after": {
+      "anchorXDrift": 0,
+      "anchorYDrift": 0,
+      "centroidXDrift": 27,
+      "maxResiduePixels": 0
+    },
+    "pass": true
+  },
+  {
+    "id": "yipintang_leader",
+    "before": {
+      "anchorXDrift": 110,
+      "anchorYDrift": 67,
+      "centroidXDrift": 34,
+      "maxResiduePixels": 0
+    },
+    "after": {
+      "anchorXDrift": 0,
+      "anchorYDrift": 0,
+      "centroidXDrift": 115,
+      "maxResiduePixels": 0
+    },
+    "pass": true
+  }
+]

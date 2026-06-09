@@ -13,7 +13,9 @@ const state = {
   showBody: true,
   showAll: true,
   showResidue: true,
-  showFoot: true
+  showFoot: true,
+  showAnchor: true,
+  anchor: null
 };
 
 const previewCanvas = document.querySelector("#previewCanvas");
@@ -31,7 +33,7 @@ document.querySelector("#scale").addEventListener("input", (event) => {
   state.scale = Number(event.target.value);
   renderAll();
 });
-for (const id of ["showBody", "showAll", "showResidue", "showFoot"]) {
+for (const id of ["showBody", "showAll", "showResidue", "showFoot", "showAnchor"]) {
   document.querySelector(`#${id}`).addEventListener("change", (event) => {
     state[id] = event.target.checked;
     renderAll();
@@ -70,6 +72,7 @@ function loadImage(src, name) {
     state.image = image;
     state.sourceName = name;
     state.frames = extractFrameMeta(image);
+    state.anchor = measureAnchor(state.frames);
     updateMetrics(image);
     renderAll();
     log([
@@ -102,7 +105,9 @@ function extractFrameMeta(image) {
       const body = components[0] || emptyBounds(cellW, cellH);
       const residue = components.slice(1);
       const all = mergeBounds(components, cellW, cellH);
-      frames.push({ row, col, sx, sy, cellW, cellH, body, all, residue, residuePixels: residue.reduce((sum, item) => sum + item.count, 0) });
+      const anchor = footAnchor(pixels, cellW, cellH, body);
+      const centroid = centroidOf(pixels, cellW, cellH, body);
+      frames.push({ row, col, sx, sy, cellW, cellH, body, all, anchor, centroid, residue, residuePixels: residue.reduce((sum, item) => sum + item.count, 0) });
     }
   }
   return frames;
@@ -160,10 +165,12 @@ function updateMetrics(image) {
   const drift = measureDrift(state.frames);
   const maxX = Math.max(...drift.map((row) => row.xDrift));
   const maxFoot = Math.max(...drift.map((row) => row.footDrift));
+  const anchor = state.anchor;
   document.querySelector("#sourceMetric").textContent = `${image.naturalWidth || image.width}×${image.naturalHeight || image.height}`;
   document.querySelector("#cellMetric").textContent = `${cellW}×${cellH}`;
   document.querySelector("#residueMetric").textContent = `${residue}px`;
   document.querySelector("#driftMetric").textContent = `X ${maxX}px / Foot ${maxFoot}px`;
+  document.querySelector("#anchorMetric").textContent = anchor ? `${anchor.pass ? "PASS" : "FAIL"} X ${anchor.global.anchorXDrift}px / Y ${anchor.global.anchorYDrift}px` : "-";
 }
 
 function measureDrift(frames) {
@@ -177,6 +184,24 @@ function measureDrift(frames) {
       footDrift: Math.max(...ys) - Math.min(...ys)
     };
   });
+}
+
+function measureAnchor(frames) {
+  if (!frames.length) return null;
+  const global = {
+    anchorXDrift: range(frames.map((frame) => frame.anchor.x)),
+    anchorYDrift: range(frames.map((frame) => frame.anchor.y)),
+    centroidXDrift: range(frames.map((frame) => frame.centroid.x))
+  };
+  const target = {
+    x: Math.round(frames[0].cellW / 2),
+    y: Math.max(...frames.map((frame) => frame.anchor.y))
+  };
+  return {
+    target,
+    global,
+    pass: global.anchorXDrift <= 2 && global.anchorYDrift <= 2
+  };
 }
 
 function renderAll() {
@@ -211,6 +236,8 @@ function drawFrameInspector() {
   document.querySelector("#frameReport").innerHTML = `
     <b>${DIRECTIONS[frame.row]} frame ${frame.col}</b>
     <span>主体：${frame.body.width}×${frame.body.height}, bottom ${frame.body.bottom}</span>
+    <span>脚底锚点：${frame.anchor.x}, ${frame.anchor.y}</span>
+    <span>质心：${frame.centroid.x}, ${frame.centroid.y}</span>
     <span>原始框：${frame.all.width}×${frame.all.height}, bottom ${frame.all.bottom}</span>
     <span>残留像素：${frame.residuePixels}</span>
     <span>残留块：${frame.residue.length}</span>
@@ -229,6 +256,7 @@ function drawSheetPreview() {
     const y = frame.sy;
     if (state.showAll) strokeRect(sheetCtx, x + frame.all.left, y + frame.all.top, frame.all.width, frame.all.height, "#d85a40");
     if (state.showBody) strokeRect(sheetCtx, x + frame.body.left, y + frame.body.top, frame.body.width, frame.body.height, "#6fca9f");
+    if (state.showAnchor) drawAnchor(sheetCtx, frame, x, y, 1);
     if (state.showResidue) {
       for (const residue of frame.residue) fillRect(sheetCtx, x + residue.left, y + residue.top, residue.width, residue.height, "rgba(255,0,80,.45)");
     }
@@ -239,6 +267,7 @@ function drawOverlay(ctx, frame, x, y, scale) {
   if (state.showResidue) for (const residue of frame.residue) fillRect(ctx, x + residue.left * scale, y + residue.top * scale, residue.width * scale, residue.height * scale, "rgba(255,0,80,.45)");
   if (state.showAll) strokeRect(ctx, x + frame.all.left * scale, y + frame.all.top * scale, frame.all.width * scale, frame.all.height * scale, "#d85a40");
   if (state.showBody) strokeRect(ctx, x + frame.body.left * scale, y + frame.body.top * scale, frame.body.width * scale, frame.body.height * scale, "#6fca9f");
+  if (state.showAnchor) drawAnchor(ctx, frame, x, y, scale);
   if (state.showFoot) {
     ctx.strokeStyle = "#e2b55d";
     ctx.lineWidth = 2;
@@ -247,6 +276,63 @@ function drawOverlay(ctx, frame, x, y, scale) {
     ctx.lineTo(x + (frame.body.right + 1) * scale, y + (frame.body.bottom + 1) * scale);
     ctx.stroke();
   }
+}
+
+function drawAnchor(ctx, frame, x, y, scale) {
+  const target = state.anchor?.target || { x: Math.round(frame.cellW / 2), y: frame.anchor.y };
+  const tx = x + target.x * scale;
+  const ty = y + target.y * scale;
+  const ax = x + frame.anchor.x * scale;
+  const ay = y + frame.anchor.y * scale;
+  ctx.save();
+  ctx.lineWidth = Math.max(1, Math.round(scale * 0.55));
+  ctx.strokeStyle = "#58d68d";
+  ctx.beginPath();
+  ctx.moveTo(tx, y);
+  ctx.lineTo(tx, y + frame.cellH * scale);
+  ctx.stroke();
+  ctx.strokeStyle = "#f5c542";
+  ctx.beginPath();
+  ctx.moveTo(x, ty);
+  ctx.lineTo(x + frame.cellW * scale, ty);
+  ctx.stroke();
+  ctx.strokeStyle = "#ff4f6d";
+  ctx.beginPath();
+  ctx.arc(ax, ay, Math.max(3, scale * 1.25), 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function footAnchor(imageData, width, height, body) {
+  const band = 14;
+  const xs = [];
+  const data = imageData.data;
+  const startY = Math.max(body.top, body.bottom - band + 1);
+  for (let y = startY; y <= body.bottom; y += 1) {
+    for (let x = body.left; x <= body.right; x += 1) {
+      if (data[(y * width + x) * 4 + 3] >= 24) xs.push(x);
+    }
+  }
+  if (!xs.length) return { x: body.centerX, y: body.bottom };
+  xs.sort((a, b) => a - b);
+  return { x: Math.round(median(xs)), y: body.bottom };
+}
+
+function centroidOf(imageData, width, height, body) {
+  const data = imageData.data;
+  let count = 0;
+  let sumX = 0;
+  let sumY = 0;
+  for (let y = body.top; y <= body.bottom; y += 1) {
+    for (let x = body.left; x <= body.right; x += 1) {
+      if (data[(y * width + x) * 4 + 3] < 24) continue;
+      count += 1;
+      sumX += x;
+      sumY += y;
+    }
+  }
+  if (!count) return { x: body.centerX, y: Math.round((body.top + body.bottom) / 2) };
+  return { x: Math.round(sumX / count), y: Math.round(sumY / count) };
 }
 
 function selectedFrame() {
@@ -287,6 +373,15 @@ function emptyBounds(width, height) {
   return { count: 0, left: 0, top: 0, right: width - 1, bottom: height - 1, width, height, centerX: Math.round(width / 2) };
 }
 
+function range(values) {
+  return Math.max(...values) - Math.min(...values);
+}
+
+function median(values) {
+  const middle = Math.floor(values.length / 2);
+  return values.length % 2 === 0 ? (values[middle - 1] + values[middle]) / 2 : values[middle];
+}
+
 function log(items) {
   logEl.innerHTML = items.map((item) => `<li>${item}</li>`).join("");
 }
@@ -301,5 +396,5 @@ function loop(now) {
   requestAnimationFrame(loop);
 }
 
-loadImage("./assets/hero-walk-sheet-audited.png", "Audited cleaned sheet");
+loadImage("./assets/hero-walk-sheet-anchored.png", "Anchored hero sheet");
 requestAnimationFrame(loop);

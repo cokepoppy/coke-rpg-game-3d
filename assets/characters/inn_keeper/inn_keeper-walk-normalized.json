@@ -1,0 +1,306 @@
+{
+  "input": "/Users/shangguanchenhuan/Documents/home2025/coke-game-rpg/assets/characters/inn_keeper/inn_keeper-walk-raw.png",
+  "output": "/Users/shangguanchenhuan/Documents/home2025/coke-game-rpg/assets/characters/inn_keeper/inn_keeper-walk-normalized.png",
+  "rows": 4,
+  "cols": 4,
+  "width": 1252,
+  "height": 1252,
+  "cell": {
+    "width": 313,
+    "height": 313
+  },
+  "keyColor": [
+    236,
+    22,
+    231
+  ],
+  "drift": {
+    "before": [
+      {
+        "row": 0,
+        "xDrift": 119,
+        "footDrift": 4
+      },
+      {
+        "row": 1,
+        "xDrift": 106,
+        "footDrift": 0
+      },
+      {
+        "row": 2,
+        "xDrift": 118,
+        "footDrift": 3
+      },
+      {
+        "row": 3,
+        "xDrift": 117,
+        "footDrift": 3
+      }
+    ],
+    "after": [
+      {
+        "row": 0,
+        "xDrift": 0,
+        "footDrift": 0
+      },
+      {
+        "row": 1,
+        "xDrift": 0,
+        "footDrift": 0
+      },
+      {
+        "row": 2,
+        "xDrift": 0,
+        "footDrift": 0
+      },
+      {
+        "row": 3,
+        "xDrift": 0,
+        "footDrift": 0
+      }
+    ]
+  },
+  "frames": [
+    {
+      "row": 0,
+      "col": 0,
+      "bounds": {
+        "left": 150,
+        "top": 54,
+        "right": 281,
+        "bottom": 297,
+        "centerX": 216
+      },
+      "offset": {
+        "x": -59,
+        "y": 4
+      }
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "bounds": {
+        "left": 102,
+        "top": 55,
+        "right": 233,
+        "bottom": 301,
+        "centerX": 168
+      },
+      "offset": {
+        "x": -11,
+        "y": 0
+      }
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "bounds": {
+        "left": 75,
+        "top": 55,
+        "right": 205,
+        "bottom": 298,
+        "centerX": 140
+      },
+      "offset": {
+        "x": 17,
+        "y": 3
+      }
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "bounds": {
+        "left": 32,
+        "top": 64,
+        "right": 162,
+        "bottom": 301,
+        "centerX": 97
+      },
+      "offset": {
+        "x": 60,
+        "y": 0
+      }
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "bounds": {
+        "left": 157,
+        "top": 42,
+        "right": 251,
+        "bottom": 265,
+        "centerX": 204
+      },
+      "offset": {
+        "x": -47,
+        "y": 0
+      }
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "bounds": {
+        "left": 113,
+        "top": 45,
+        "right": 219,
+        "bottom": 265,
+        "centerX": 166
+      },
+      "offset": {
+        "x": -9,
+        "y": 0
+      }
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "bounds": {
+        "left": 90,
+        "top": 42,
+        "right": 183,
+        "bottom": 265,
+        "centerX": 137
+      },
+      "offset": {
+        "x": 20,
+        "y": 0
+      }
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "bounds": {
+        "left": 45,
+        "top": 46,
+        "right": 151,
+        "bottom": 265,
+        "centerX": 98
+      },
+      "offset": {
+        "x": 59,
+        "y": 0
+      }
+    },
+    {
+      "row": 2,
+      "col": 0,
+      "bounds": {
+        "left": 158,
+        "top": 31,
+        "right": 254,
+        "bottom": 253,
+        "centerX": 206
+      },
+      "offset": {
+        "x": -49,
+        "y": 3
+      }
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "bounds": {
+        "left": 108,
+        "top": 37,
+        "right": 219,
+        "bottom": 254,
+        "centerX": 164
+      },
+      "offset": {
+        "x": -7,
+        "y": 2
+      }
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "bounds": {
+        "left": 87,
+        "top": 32,
+        "right": 184,
+        "bottom": 254,
+        "centerX": 136
+      },
+      "offset": {
+        "x": 21,
+        "y": 2
+      }
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "bounds": {
+        "left": 37,
+        "top": 37,
+        "right": 139,
+        "bottom": 256,
+        "centerX": 88
+      },
+      "offset": {
+        "x": 69,
+        "y": 0
+      }
+    },
+    {
+      "row": 3,
+      "col": 0,
+      "bounds": {
+        "left": 149,
+        "top": 9,
+        "right": 278,
+        "bottom": 237,
+        "centerX": 214
+      },
+      "offset": {
+        "x": -57,
+        "y": 0
+      }
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "bounds": {
+        "left": 104,
+        "top": 9,
+        "right": 231,
+        "bottom": 234,
+        "centerX": 168
+      },
+      "offset": {
+        "x": -11,
+        "y": 3
+      }
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "bounds": {
+        "left": 72,
+        "top": 9,
+        "right": 201,
+        "bottom": 237,
+        "centerX": 137
+      },
+      "offset": {
+        "x": 20,
+        "y": 0
+      }
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "bounds": {
+        "left": 34,
+        "top": 9,
+        "right": 160,
+        "bottom": 234,
+        "centerX": 97
+      },
+      "offset": {
+        "x": 60,
+        "y": 3
+      }
+    }
+  ],
+  "generatedAt": "2026-06-09T01:29:38.379Z"
+}

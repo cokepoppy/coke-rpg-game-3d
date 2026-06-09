@@ -51,6 +51,42 @@ export const assets = {
           faction: "enemy",
           spriteId: "masked_scout",
           direction: "down"
+        },
+        {
+          id: "training_yard",
+          name: "守寺武僧",
+          x: 3510,
+          y: 1560,
+          faction: "ally",
+          spriteId: "monk_guard",
+          direction: "down"
+        },
+        {
+          id: "medicine_market",
+          name: "药摊老人",
+          x: 3050,
+          y: 2390,
+          faction: "ally",
+          spriteId: "medicine_vendor",
+          direction: "down"
+        },
+        {
+          id: "main_temple",
+          name: "守寺僧",
+          x: 2560,
+          y: 860,
+          faction: "ally",
+          spriteId: "temple_monk",
+          direction: "down"
+        },
+        {
+          id: "inn_room_door",
+          name: "客栈掌柜",
+          x: 2930,
+          y: 2250,
+          faction: "ally",
+          spriteId: "inn_keeper",
+          direction: "down"
         }
       ]
     },

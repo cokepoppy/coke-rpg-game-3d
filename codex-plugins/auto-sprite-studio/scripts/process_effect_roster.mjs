@@ -16,7 +16,11 @@ for (const effect of roster.effects) {
   const dir = path.join(root, "assets/effects", effect.id);
   const raw = path.join(dir, `${effect.id}-raw.png`);
   const out = path.join(dir, `${effect.id}-clean.png`);
-  await fs.access(raw);
+  try {
+    await fs.access(raw);
+  } catch {
+    continue;
+  }
   const source = await sharp(raw).ensureAlpha();
   const { data, info } = await source.raw().toBuffer({ resolveWithObject: true });
   const keyed = Buffer.from(data);

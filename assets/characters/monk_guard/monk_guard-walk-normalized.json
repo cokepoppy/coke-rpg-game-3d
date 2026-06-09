@@ -1,0 +1,306 @@
+{
+  "input": "/Users/shangguanchenhuan/Documents/home2025/coke-game-rpg/assets/characters/monk_guard/monk_guard-walk-raw.png",
+  "output": "/Users/shangguanchenhuan/Documents/home2025/coke-game-rpg/assets/characters/monk_guard/monk_guard-walk-normalized.png",
+  "rows": 4,
+  "cols": 4,
+  "width": 1252,
+  "height": 1252,
+  "cell": {
+    "width": 313,
+    "height": 313
+  },
+  "keyColor": [
+    236,
+    22,
+    235
+  ],
+  "drift": {
+    "before": [
+      {
+        "row": 0,
+        "xDrift": 112,
+        "footDrift": 1
+      },
+      {
+        "row": 1,
+        "xDrift": 112,
+        "footDrift": 0
+      },
+      {
+        "row": 2,
+        "xDrift": 116,
+        "footDrift": 0
+      },
+      {
+        "row": 3,
+        "xDrift": 115,
+        "footDrift": 3
+      }
+    ],
+    "after": [
+      {
+        "row": 0,
+        "xDrift": 0,
+        "footDrift": 0
+      },
+      {
+        "row": 1,
+        "xDrift": 0,
+        "footDrift": 0
+      },
+      {
+        "row": 2,
+        "xDrift": 0,
+        "footDrift": 0
+      },
+      {
+        "row": 3,
+        "xDrift": 0,
+        "footDrift": 0
+      }
+    ]
+  },
+  "frames": [
+    {
+      "row": 0,
+      "col": 0,
+      "bounds": {
+        "left": 144,
+        "top": 69,
+        "right": 286,
+        "bottom": 290,
+        "centerX": 215
+      },
+      "offset": {
+        "x": -58,
+        "y": 1
+      }
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "bounds": {
+        "left": 113,
+        "top": 75,
+        "right": 248,
+        "bottom": 291,
+        "centerX": 181
+      },
+      "offset": {
+        "x": -24,
+        "y": 0
+      }
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "bounds": {
+        "left": 77,
+        "top": 70,
+        "right": 217,
+        "bottom": 291,
+        "centerX": 147
+      },
+      "offset": {
+        "x": 10,
+        "y": 0
+      }
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "bounds": {
+        "left": 36,
+        "top": 75,
+        "right": 169,
+        "bottom": 291,
+        "centerX": 103
+      },
+      "offset": {
+        "x": 54,
+        "y": 0
+      }
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "bounds": {
+        "left": 150,
+        "top": 42,
+        "right": 270,
+        "bottom": 264,
+        "centerX": 210
+      },
+      "offset": {
+        "x": -53,
+        "y": 0
+      }
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "bounds": {
+        "left": 116,
+        "top": 44,
+        "right": 239,
+        "bottom": 264,
+        "centerX": 178
+      },
+      "offset": {
+        "x": -21,
+        "y": 0
+      }
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "bounds": {
+        "left": 90,
+        "top": 44,
+        "right": 202,
+        "bottom": 264,
+        "centerX": 146
+      },
+      "offset": {
+        "x": 11,
+        "y": 0
+      }
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "bounds": {
+        "left": 36,
+        "top": 45,
+        "right": 160,
+        "bottom": 264,
+        "centerX": 98
+      },
+      "offset": {
+        "x": 59,
+        "y": 0
+      }
+    },
+    {
+      "row": 2,
+      "col": 0,
+      "bounds": {
+        "left": 157,
+        "top": 21,
+        "right": 276,
+        "bottom": 312,
+        "centerX": 217
+      },
+      "offset": {
+        "x": -60,
+        "y": 0
+      }
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "bounds": {
+        "left": 113,
+        "top": 26,
+        "right": 236,
+        "bottom": 312,
+        "centerX": 175
+      },
+      "offset": {
+        "x": -18,
+        "y": 0
+      }
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "bounds": {
+        "left": 75,
+        "top": 23,
+        "right": 195,
+        "bottom": 312,
+        "centerX": 135
+      },
+      "offset": {
+        "x": 22,
+        "y": 0
+      }
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "bounds": {
+        "left": 38,
+        "top": 26,
+        "right": 164,
+        "bottom": 312,
+        "centerX": 101
+      },
+      "offset": {
+        "x": 56,
+        "y": 0
+      }
+    },
+    {
+      "row": 3,
+      "col": 0,
+      "bounds": {
+        "left": 148,
+        "top": 0,
+        "right": 271,
+        "bottom": 213,
+        "centerX": 210
+      },
+      "offset": {
+        "x": -53,
+        "y": 3
+      }
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "bounds": {
+        "left": 108,
+        "top": 0,
+        "right": 230,
+        "bottom": 214,
+        "centerX": 169
+      },
+      "offset": {
+        "x": -12,
+        "y": 2
+      }
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "bounds": {
+        "left": 72,
+        "top": 0,
+        "right": 195,
+        "bottom": 215,
+        "centerX": 134
+      },
+      "offset": {
+        "x": 23,
+        "y": 1
+      }
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "bounds": {
+        "left": 34,
+        "top": 0,
+        "right": 156,
+        "bottom": 216,
+        "centerX": 95
+      },
+      "offset": {
+        "x": 62,
+        "y": 0
+      }
+    }
+  ],
+  "generatedAt": "2026-06-09T01:29:32.056Z"
+}

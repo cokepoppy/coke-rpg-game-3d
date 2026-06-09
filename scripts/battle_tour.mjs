@@ -53,7 +53,7 @@ await page.waitForTimeout(180);
 await shot("05-player-moved");
 
 await clickCell(8, 7);
-await page.waitForTimeout(260);
+await page.waitForTimeout(80);
 await shot("06-player-attack");
 
 await page.locator(".battle-end-turn").click();

@@ -35,7 +35,12 @@ for (const character of roster.characters) {
   const audit = path.join(dir, `${character.id}-walk-audited.json`);
   const contact = path.join(dir, `${character.id}-walk-contact.png`);
 
-  await fs.access(raw);
+  try {
+    await fs.access(raw);
+  } catch {
+    reports.push({ id: character.id, status: "missing_raw", expected: path.relative(root, raw) });
+    continue;
+  }
   run(nodeBin, [
     path.join(pluginRoot, "scripts/auto_sprite_sheet.mjs"),
     "--input",

@@ -10,6 +10,7 @@ const sharp = require("sharp");
 const root = process.cwd();
 const outDir = path.join(root, "screenshots/battle-tour");
 const baseUrl = process.env.BASE_URL || "http://localhost:5173";
+await fs.rm(outDir, { recursive: true, force: true });
 await fs.mkdir(outDir, { recursive: true });
 
 const browser = await chromium.launch({
@@ -43,6 +44,14 @@ await shot("02-confirm-battle");
 await clickFirst();
 await page.waitForFunction(() => window.__battleScene?.active);
 await shot("03-battle-start");
+await page.evaluate(() => {
+  const enemies = window.__battleScene.state.living("enemy");
+  enemies[0].hp = 24;
+  for (const enemy of enemies.slice(1)) {
+    enemy.hp = 0;
+    enemy.alive = false;
+  }
+});
 
 await clickCell(5, 7);
 await page.waitForTimeout(120);
@@ -52,15 +61,19 @@ await clickCell(7, 7);
 await page.waitForTimeout(180);
 await shot("05-player-moved");
 
-await clickCell(8, 7);
-await page.waitForTimeout(80);
-await shot("06-player-attack");
+await page.locator('[data-skill="six_meridians"]').click();
+await page.waitForFunction(() => window.__battleScene?.state?.phase === "target");
+await shot("06-skill-targeting");
 
-await page.locator(".battle-end-turn").click();
-await page.waitForFunction(() => window.__battleScene?.state?.side === "enemy");
-await shot("07-enemy-turn");
-await page.waitForFunction(() => window.__battleScene?.state?.side === "player" || window.__battleScene?.state?.finished, null, { timeout: 6000 });
-await shot("08-after-enemy-ai");
+await clickCell(8, 7);
+await page.waitForTimeout(180);
+await shot("07-player-skill-hit");
+await waitDialog();
+await shot("08-victory-dialog");
+await clickFirst();
+await waitHidden();
+await page.waitForFunction(() => !window.__battleScene?.active);
+await shot("09-back-to-world");
 
 const battleLog = await page.evaluate(() => window.__battleScene?.state?.log || []);
 await fs.writeFile(path.join(outDir, "battle-log.json"), JSON.stringify(battleLog, null, 2));

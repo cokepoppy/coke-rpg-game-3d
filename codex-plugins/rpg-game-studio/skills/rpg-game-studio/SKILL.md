@@ -22,6 +22,8 @@ Do not place gameplay architecture rules inside a map asset skill. Map plugins s
 Default to these conventions unless the project already has a stronger local standard:
 
 - Fixed runtime tile size: `64x64`.
+- Treat player/world coordinates as a foot anchor. Keep the visual sprite rectangle separate from the movement collision footprint.
+- Default world player collision footprint: `34x28`, centered under the foot anchor. Tune per game only after the asset contract and map collision layer are updated together.
 - Browser-first rendering: HTML/CSS shell plus Canvas 2D for map/sprite rendering.
 - Keep generated game code as ES modules. Use plain `.js` for no-build prototypes; use `.ts` when the project has or will get a build step.
 - Keep asset paths in one manifest file. Do not hard-code image paths across renderers, entities, and scenes.
@@ -101,6 +103,7 @@ Story scripts should be data-first. Keep dialogue text, choices, conditions, and
 Use this pattern for entering buildings, rooms, caves, dungeons, or interior scenes:
 
 - Put every map in `assets.maps` with `json`, `image`, and `spawns`.
+- Allow `assets.maps[mapId].collision` overlays for hand-authored masks that do not belong in generated art files, such as roofs, stalls, walls, and large props.
 - Use `MapTransitionManager` to load a map, renderer, collision system, and spawn point together.
 - A door trigger should run a story script such as `inn_room_door`; the script emits an `enterMap` action.
 - Room objects should be normal story triggers: `room_wardrobe`, `room_medicine_cabinet`, `room_chest`, `room_scroll_desk`, `room_exit`.
@@ -129,9 +132,24 @@ Workflow:
 4. Load a design-first tactics map JSON with fixed `64x64` cells.
 5. On player click, select own unit, show legal move cells, move to a clicked legal cell, then allow attacks or skills when an enemy is in range.
 6. After the player ends the turn, run enemy AI through the same movement and attack state APIs.
-7. Write a Playwright QA script that screenshots the encounter dialogue, battle start, movement range, move, attack, enemy turn, and post-AI state; also write a JSON battle log for Codex feedback.
+7. Skill buttons should enter a target-selection phase instead of auto-attacking. Highlight valid target cells, then resolve the attack after the player clicks a highlighted enemy.
+8. Set attacker and target facing before damage is applied. Use hit flash, attack effects, and battle logs as machine-readable feedback.
+9. On victory, show a result dialogue and return to the world scene. On defeat, show a game-over dialogue.
+10. Write a Playwright QA script that screenshots the encounter dialogue, battle start, movement range, move, skill targeting, hit feedback, victory dialogue, and return to the world; also write a JSON battle log for Codex feedback.
 
 Battle QA is part of the workflow, not an afterthought. If screenshots or logs show drift, missing highlights, invalid turn transitions, or broken attacks, fix the corresponding module and rerun the tour.
+
+## World Contract QA
+
+Every RPG map pass should include a small automated contract check before visual acceptance:
+
+- runtime tile size is `64`
+- player collision footprint matches the configured contract
+- map collision overlays load through `MapManager`
+- critical roofs/buildings are blocked
+- critical story triggers still exist after collision changes
+
+Keep this check separate from screenshot tours. Screenshot tours prove the player-facing flow; contract checks prove the machine-readable constraints that prevent recurring issues such as walking onto roofs or missing door/battle triggers.
 
 ## Implementation Rules
 

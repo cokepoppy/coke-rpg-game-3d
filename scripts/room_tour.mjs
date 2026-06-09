@@ -9,6 +9,7 @@ const { chromium } = require("playwright");
 const root = process.cwd();
 const outDir = path.join(root, "screenshots/room-tour");
 const baseUrl = process.env.BASE_URL || "http://localhost:5173";
+await fs.rm(outDir, { recursive: true, force: true });
 await fs.mkdir(outDir, { recursive: true });
 
 const browser = await chromium.launch({

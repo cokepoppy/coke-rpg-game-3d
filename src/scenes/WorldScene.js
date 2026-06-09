@@ -61,7 +61,7 @@ export class WorldScene {
       this.player.update(dt, this.input, this.collision);
     }
     this.camera.follow(this.player, this.map);
-    this.activeTrigger = this.map.triggerAt(this.player);
+    this.activeTrigger = this.map.triggerAt(this.player.bounds);
     if (this.activeTrigger && (this.input.consume("enter") || this.input.consume(" "))) {
       this.runScript(this.activeTrigger.name);
     }
@@ -76,6 +76,7 @@ export class WorldScene {
     this.renderer.drawBase();
     this.npcRenderer.draw(assets.maps[this.mapId]?.npcs || [], this.camera);
     this.player.draw(this.context, this.camera);
+    this.drawInteractionHint();
   }
 
   async runScript(scriptId) {
@@ -113,7 +114,7 @@ export class WorldScene {
     this.battleScene = new BattleScene({
       context: this.context,
       config: result.battle,
-      onFinish: (outcome) => {
+      onFinish: async (outcome) => {
         if (outcome === "victory") {
           const rewards = result.battle.rewards || {};
           for (const flag of rewards.flags || []) this.state.setFlag(flag);
@@ -122,6 +123,21 @@ export class WorldScene {
         }
         this.battleScene = null;
         this.camera.follow(this.player, this.map);
+        if (outcome === "victory") {
+          await this.dialogBox.show({
+            speaker: "战斗",
+            text: "敌人已经败退。你整理气息，回到大理城外继续探索。",
+            choices: [{ label: "回到大地图" }]
+          });
+          this.dialogBox.hide();
+        }
+        if (outcome === "defeat") {
+          await this.dialogBox.show({
+            speaker: "战斗",
+            text: "我方全员倒下，江湖路止于此处。",
+            choices: [{ label: "游戏结束" }]
+          });
+        }
       }
     });
     await this.battleScene.load();
@@ -141,6 +157,42 @@ export class WorldScene {
       this.autoWalk = { target, speed, resolve };
     });
   }
+
+  drawInteractionHint() {
+    if (!this.activeTrigger || this.scriptRunner?.running || this.autoWalk) return;
+    const text = `Enter / Space：${triggerLabel(this.activeTrigger)}`;
+    const ctx = this.context;
+    ctx.save();
+    ctx.font = "18px Songti SC, Noto Serif SC, serif";
+    const width = Math.min(520, ctx.measureText(text).width + 52);
+    const x = Math.round((this.camera.width - width) / 2);
+    const y = this.camera.height - 86;
+    ctx.fillStyle = "rgba(25, 18, 12, 0.82)";
+    ctx.strokeStyle = "rgba(238, 205, 139, 0.42)";
+    ctx.lineWidth = 1;
+    ctx.roundRect(x, y, width, 44, 6);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = "#f6ead1";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, x + width / 2, y + 22);
+    ctx.restore();
+  }
+}
+
+function triggerLabel(trigger) {
+  const labels = {
+    bronze_box: "查看青铜箱",
+    inn_room_door: "进入客栈房间",
+    enemy_scout_npc: "挑战一品堂暗哨",
+    encounter_grass: "查看草丛动静",
+    training_yard: "进入演武场",
+    medicine_market: "询问药摊老人",
+    main_temple: "拜访天龙寺",
+    boss_gate: "调查石门"
+  };
+  return labels[trigger.name] || "交互";
 }
 
 function loadImage(url) {

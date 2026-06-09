@@ -24,6 +24,7 @@ export class BattleHud {
     const signature = JSON.stringify({
       side: state.side,
       phase: state.phase,
+      selectedSkillId: state.selectedSkillId,
       selected: selected ? { id: selected.id, hp: selected.hp, qi: selected.qi, moved: selected.moved, acted: selected.acted } : null,
       units: state.units.map((unit) => [unit.id, unit.hp, unit.qi, unit.alive, unit.moved, unit.acted]),
       log: state.log
@@ -40,10 +41,10 @@ export class BattleHud {
       </div>
       <div class="battle-panel">
         <div class="battle-unit">
-          ${selected ? `<strong>${selected.name}</strong><span>HP ${selected.hp}/${selected.maxHp}</span><span>真气 ${selected.qi}/${selected.maxQi}</span>` : "<strong>选择我方角色</strong><span>蓝色格子为可移动范围</span>"}
+          ${selected ? `<strong>${selected.name}</strong><span>HP ${selected.hp}/${selected.maxHp}</span><span>真气 ${selected.qi}/${selected.maxQi}</span><span>${state.phase === "target" ? "选择红色目标格" : "移动或选择技能"}</span>` : "<strong>选择我方角色</strong><span>蓝色格子为可移动范围</span>"}
         </div>
         <div class="battle-skills">
-          ${skills.map((skill) => `<button data-skill="${skill.id}" ${skill.enabled ? "" : "disabled"}>${skill.name} ${skill.cost ? `-${skill.cost}` : ""}</button>`).join("")}
+          ${skills.map((skill) => `<button data-skill="${skill.id}" class="${state.selectedSkillId === skill.id ? "is-selected" : ""}" ${skill.enabled ? "" : "disabled"}>${skill.name} ${skill.cost ? `-${skill.cost}` : ""}</button>`).join("")}
         </div>
         <ol class="battle-log">
           ${state.log.map((item) => `<li>${item}</li>`).join("")}

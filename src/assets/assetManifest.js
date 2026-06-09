@@ -42,6 +42,18 @@ export const assets = {
           properties: [{ name: "event", type: "string", value: "battle" }]
         }
       ],
+      collision: [
+        { name: "temple_roof_mask", type: "collision", x: 2140, y: 520, width: 860, height: 350 },
+        { name: "temple_side_mask", type: "collision", x: 2140, y: 870, width: 220, height: 190 },
+        { name: "temple_side_mask_right", type: "collision", x: 2780, y: 870, width: 220, height: 190 },
+        { name: "inn_roof_mask", type: "collision", x: 2650, y: 1960, width: 690, height: 285 },
+        { name: "medicine_stall_mask", type: "collision", x: 2920, y: 2290, width: 310, height: 150 },
+        { name: "training_dummy_mask", type: "collision", x: 3475, y: 1485, width: 90, height: 105 },
+        { name: "north_rock_wall", type: "collision", x: 0, y: 0, width: 5120, height: 80 },
+        { name: "west_rock_wall", type: "collision", x: 0, y: 0, width: 80, height: 3072 },
+        { name: "south_rock_wall", type: "collision", x: 0, y: 2992, width: 5120, height: 80 },
+        { name: "east_rock_wall", type: "collision", x: 5040, y: 0, width: 80, height: 3072 }
+      ],
       npcs: [
         {
           id: "enemy_scout_npc",

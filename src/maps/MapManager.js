@@ -17,8 +17,8 @@ export class MapManager {
     this.image = image;
     this.width = data.width * this.tileSize;
     this.height = data.height * this.tileSize;
-    this.triggers = [...objectsByType(data, "trigger"), ...(this.asset.triggers || [])];
-    this.collision = objectsByType(data, "collision");
+    this.triggers = [...objectsByType(data, "trigger"), ...normalizeObjects(this.asset.triggers || [])];
+    this.collision = [...objectsByType(data, "collision"), ...normalizeObjects(this.asset.collision || [])];
     return this;
   }
 
@@ -55,6 +55,14 @@ function objectsByType(data, type) {
     .filter((layer) => layer.type === "objectgroup")
     .flatMap((layer) => layer.objects || [])
     .filter((object) => object.type === type);
+}
+
+function normalizeObjects(objects) {
+  return objects.map((object) => ({
+    ...object,
+    width: object.width ?? object.w,
+    height: object.height ?? object.h
+  }));
 }
 
 function intersects(a, b) {

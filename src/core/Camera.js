@@ -7,8 +7,8 @@ export class Camera {
   }
 
   follow(target, world) {
-    this.x = clamp(target.x - this.width / 2, 0, Math.max(0, world.width - this.width));
-    this.y = clamp(target.y - this.height / 2, 0, Math.max(0, world.height - this.height));
+    this.x = Math.round(clamp(target.x - this.width / 2, 0, Math.max(0, world.width - this.width)));
+    this.y = Math.round(clamp(target.y - this.height / 2, 0, Math.max(0, world.height - this.height)));
   }
 }
 

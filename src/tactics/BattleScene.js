@@ -80,21 +80,15 @@ export class BattleScene {
   }
 
   useSkill(skillId) {
-    const selected = this.state.selected;
-    if (!selected) return;
-    const target = this.state.living("enemy").find((enemy) => distanceCells(selected.cell, enemy.cell) <= selected.attackRange + 1);
-    if (target) this.state.attackSelected(target.id, skillId);
+    this.state.beginTargeting(skillId);
   }
 
   tickAnimations(dt) {
     for (const unit of this.state.units) {
+      unit.update(dt);
       if (!unit.animation) continue;
       unit.animation.time -= dt;
       if (unit.animation.time <= 0) unit.animation = null;
     }
   }
-}
-
-function distanceCells(a, b) {
-  return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
 }

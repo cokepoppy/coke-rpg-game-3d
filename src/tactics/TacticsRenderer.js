@@ -65,10 +65,14 @@ export class TacticsRenderer {
     for (const cell of this.state.highlightedMoves) {
       this.fillCell(cell, "rgba(92, 169, 255, 0.34)");
     }
+    for (const cell of this.state.highlightedTargets) {
+      this.fillCell(cell, "rgba(225, 68, 56, 0.28)");
+      this.strokeCell(cell, "rgba(255, 208, 127, 0.95)", 3);
+    }
     const selected = this.state.selected;
     if (selected) this.strokeCell(selected.cell, "rgba(255, 223, 128, 0.9)", 3);
     for (const unit of this.state.living("enemy")) {
-      if (selected && distanceCells(selected.cell, unit.cell) <= selected.attackRange + 2) {
+      if (selected && this.state.phase !== "target" && distanceCells(selected.cell, unit.cell) <= selected.attackRange + 2) {
         this.strokeCell(unit.cell, "rgba(233, 82, 66, 0.74)", 2);
       }
     }
@@ -82,12 +86,14 @@ export class TacticsRenderer {
       const px = this.view.x + center.x;
       const py = this.view.y + center.y;
       const hit = unit.animation?.type === "hit" ? 5 : 0;
-      const movingFrame = unit.moved && !unit.acted ? 1 : 0;
+      const hitFlash = unit.animation?.type === "hit" && Math.floor(unit.animation.time * 28) % 2 === 0;
+      const frame = unit.animation?.type === "attack" ? 2 : unit.frame;
       const drewSprite = this.spriteRenderer.draw(ctx, unit.spriteId || unit.id, {
         x: px,
         y: py + hit + 22,
-        direction: unit.direction || (unit.side === "player" ? "right" : "left"),
-        frame: movingFrame,
+        direction: unit.direction,
+        frame,
+        alpha: hitFlash ? 0.38 : 1,
         acted: unit.acted
       });
       if (drewSprite) {

@@ -12,6 +12,17 @@ export class BattleUnit {
     this.acted = false;
     this.alive = true;
     this.animation = null;
+    this.direction = config.direction || (this.side === "player" ? "right" : "left");
+    this.frame = 0;
+    this.frameClock = 0;
+  }
+
+  update(dt) {
+    this.frameClock += dt;
+    if (this.frameClock >= 0.18) {
+      this.frameClock = 0;
+      this.frame = (this.frame + 1) % 4;
+    }
   }
 
   beginTurn() {

@@ -178,6 +178,11 @@ body {
   padding: 6px 10px;
 }
 
+.battle-skills button.is-selected {
+  border-color: #ffd07f;
+  background: rgba(139, 63, 48, 0.95);
+}
+
 .battle-log {
   margin: 0;
   padding-left: 20px;

@@ -18,6 +18,9 @@ const alphaThreshold = Number(args.alphaThreshold || args["alpha-threshold"] || 
 const minComponentArea = Number(args.minComponentArea || args["min-component-area"] || 40);
 const footBand = Number(args.footBand || args["foot-band"] || 14);
 const maxAnchorDrift = Number(args.maxAnchorDrift || args["max-anchor-drift"] || 2);
+const minTopMargin = Number(args.minTopMargin || args["min-top-margin"] || 8);
+const minSideMargin = Number(args.minSideMargin || args["min-side-margin"] || 10);
+const minVerticalStride = Number(args.minVerticalStride || args["min-vertical-stride"] || 3);
 
 if (!input) {
   console.error("Usage: sprite_anchor_audit.mjs --input sheet.png [--out anchored.png --report report.json --contact contact.png --rows 4 --cols 4]");
@@ -72,6 +75,8 @@ if (out) {
 
 const before = summarize(beforeFrames);
 const after = summarize(afterFrames);
+const contract = validateContract(afterFrames);
+const regenerate = !contract.pass;
 const report = {
   input: path.resolve(input),
   output: out ? path.resolve(out) : null,
@@ -83,11 +88,17 @@ const report = {
     alphaThreshold,
     minComponentArea,
     footBand,
-    maxAnchorDrift
+    maxAnchorDrift,
+    minTopMargin,
+    minSideMargin,
+    minVerticalStride
   },
   before,
   after,
-  pass: after.global.anchorXDrift <= maxAnchorDrift && after.global.anchorYDrift <= maxAnchorDrift,
+  contract,
+  regenerate,
+  regenerationPrompt: regenerate ? buildRegenerationPrompt(contract.failures) : null,
+  pass: after.global.anchorXDrift <= maxAnchorDrift && after.global.anchorYDrift <= maxAnchorDrift && contract.pass,
   frames: beforeFrames.map((frame, index) => ({
     row: frame.row,
     col: frame.col,
@@ -122,6 +133,8 @@ function measureFrames(buffer, imageWidth, cellWidth, cellHeight) {
       frames.push({
         row,
         col,
+        cellWidth,
+        cellHeight,
         body,
         anchor: findFootAnchor(buffer, imageWidth, cellWidth, cellHeight, row, col, body),
         centroid: findCentroid(buffer, imageWidth, cellWidth, cellHeight, row, col, body),
@@ -185,9 +198,10 @@ function findFootAnchor(buffer, imageWidth, cellWidth, cellHeight, row, col, bod
       if (buffer[index + 3] >= alphaThreshold) xs.push(x);
     }
   }
-  if (!xs.length) return { x: body.centerX, y: body.bottom };
+  if (!xs.length) return { x: body.centerX, y: body.bottom, rawX: body.centerX };
   xs.sort((a, b) => a - b);
-  return { x: Math.round(median(xs)), y: body.bottom };
+  const rawX = Math.round(median(xs));
+  return { x: rawX, y: body.bottom, rawX };
 }
 
 function findCentroid(buffer, imageWidth, cellWidth, cellHeight, row, col, body) {
@@ -230,6 +244,64 @@ function summarize(frames) {
       };
     })
   };
+}
+
+function validateContract(frames) {
+  const failures = [];
+  const global = summarize(frames).global;
+  const topMargin = Math.min(...frames.map((frame) => frame.body.top));
+  const leftMargin = Math.min(...frames.map((frame) => frame.body.left));
+  const rightMargin = Math.min(...frames.map((frame) => frame.cellWidth - frame.body.right - 1));
+  const verticalGait = ["down", "up"].map((direction) => verticalStride(frames, direction));
+
+  if (global.anchorXDrift > maxAnchorDrift || global.anchorYDrift > maxAnchorDrift) {
+    failures.push(`global foot anchor drift ${global.anchorXDrift},${global.anchorYDrift}px exceeds ${maxAnchorDrift}px`);
+  }
+  if (topMargin < minTopMargin) {
+    failures.push(`top margin ${topMargin}px is below ${minTopMargin}px; head, hair, or weapon may be cropped`);
+  }
+  if (leftMargin < minSideMargin || rightMargin < minSideMargin) {
+    failures.push(`side margins ${leftMargin}/${rightMargin}px are below ${minSideMargin}px`);
+  }
+  for (const gait of verticalGait) {
+    if (!gait.pass) failures.push(`${gait.direction} walk does not alternate feet: frame1 ${gait.frame1Offset}px, frame3 ${gait.frame3Offset}px`);
+  }
+
+  return {
+    pass: failures.length === 0,
+    failures,
+    margins: { top: topMargin, left: leftMargin, right: rightMargin },
+    verticalGait
+  };
+}
+
+function verticalStride(frames, direction) {
+  const row = ["down", "left", "right", "up"].indexOf(direction);
+  const rowFrames = frames.filter((frame) => frame.row === row);
+  const frame1 = rowFrames.find((frame) => frame.col === 1);
+  const frame3 = rowFrames.find((frame) => frame.col === 3);
+  const offset1 = frame1 ? frame1.anchor.rawX - frame1.body.centerX : 0;
+  const offset3 = frame3 ? frame3.anchor.rawX - frame3.body.centerX : 0;
+  return {
+    direction,
+    frame1Offset: offset1,
+    frame3Offset: offset3,
+    pass: Math.abs(offset1) >= minVerticalStride && Math.abs(offset3) >= minVerticalStride && Math.sign(offset1) !== Math.sign(offset3)
+  };
+}
+
+function buildRegenerationPrompt(failures) {
+  return [
+    "Regenerate this character as a strict 4x4 top-down pixel-art RPG walk sprite sheet.",
+    "Canvas contract: 4 columns x 4 rows; the final asset must normalize cleanly to 128x128 px per frame.",
+    "Runtime contract: character body fits a 64x96 px in-game display on a 64x64 map tile; feet anchor is bottom-center and stable.",
+    "Rows: down, left, right, up. Columns: idle, left-foot step, idle, right-foot step.",
+    "Down and up rows must clearly alternate opposite feet in columns 2 and 4.",
+    "Keep at least 8 px top padding and 10 px side padding in every frame after normalization; do not crop head, hair, robe, weapon, hands, or feet.",
+    "Every frame uses identical scale, consistent identity, and the same foot-contact map anchor.",
+    "Perfectly flat #FF00FF chroma-key background; no shadows, text, labels, grid, UI, or watermark.",
+    `Previous QA failures: ${failures.join("; ")}.`
+  ].join("\n");
 }
 
 async function writeContactSheet(sheetPath, outputPath, reportData, frames) {

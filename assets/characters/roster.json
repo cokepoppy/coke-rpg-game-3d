@@ -7,8 +7,16 @@
     "directions": ["down", "left", "right", "up"],
     "framesPerDirection": 4,
     "background": "#FF00FF",
-    "drawWidth": 88,
-    "drawHeight": 88
+    "sourceFrameWidth": 128,
+    "sourceFrameHeight": 128,
+    "drawWidth": 64,
+    "drawHeight": 96,
+    "anchorX": 64,
+    "anchorY": 112,
+    "minTopMargin": 8,
+    "minSideMargin": 10,
+    "maxAnchorDrift": 2,
+    "minVerticalStride": 3
   },
   "characters": [
     {

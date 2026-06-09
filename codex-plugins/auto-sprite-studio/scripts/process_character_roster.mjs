@@ -109,6 +109,9 @@ for (const character of roster.characters) {
     anchorBefore: anchorReport.before.global,
     anchorAfter: anchorReport.after.global,
     anchorPass: anchorReport.pass,
+    regenerate: anchorReport.regenerate,
+    failures: anchorReport.contract?.failures || [],
+    regenerationPrompt: anchorReport.regenerationPrompt,
     contact: path.relative(root, contact)
   });
 }

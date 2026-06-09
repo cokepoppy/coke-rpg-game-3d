@@ -23,6 +23,11 @@ This is a Codex workflow plugin, not a hosted SaaS backend. It provides:
 
 Default to a 4x4 top-down walker:
 
+- world map tile size: `64x64`
+- final normalized source frame: `128x128`
+- runtime draw size: `64x96`
+- runtime foot anchor: `(64,112)` inside the normalized source frame
+- collision footprint: `34x28`, centered under the foot anchor
 - 4 columns x 4 rows
 - row 1: facing down
 - row 2: facing left
@@ -32,6 +37,8 @@ Default to a 4x4 top-down walker:
 - fixed cell grid
 - solid `#FF00FF` chroma-key background if true transparency is not available
 - stable bottom-center foot anchor in every frame
+- at least 8 px top padding and 10 px side padding after normalization
+- down/up walk rows must alternate opposite feet in columns 2 and 4
 
 ## Workflow
 
@@ -65,7 +72,8 @@ If the bundled runtime paths are different in the current session, call `load_wo
 5. Read the metadata. A successful first-pass alignment should reduce each row's `xDrift` and `footDrift` close to `0`.
 6. Run animation audit before using the sheet in the game. This catches hidden residue pixels, bad frame bounds, cropped feet, and frame wobble that are hard to see on a map.
 7. Run global anchor audit. This aligns the foot-contact anchor across all directions, not just within each row.
-8. Use the anchored sheet in the game runtime, not the raw AI sheet.
+8. If the anchor report says `regenerate: true`, do not keep patching the image. Use `regenerationPrompt` with Codex built-in `image_gen`, copy the new raw sheet into the project, and rerun the pipeline.
+9. Use the anchored sheet in the game runtime only after `pass: true`.
 
 ## Existing Sheet Workflow
 
@@ -119,6 +127,9 @@ What the anchor audit does:
 - measures `anchorXDrift` and `anchorYDrift` across the entire 4x4 sheet
 - shifts frames so every direction shares the same logical map anchor
 - fails the sheet when post-correction anchor drift is above 2 px
+- fails the sheet when top/side padding suggests cropping
+- fails the sheet when down/up walk rows do not alternate opposite stepping feet
+- writes `regenerate: true` plus a ready-to-use `regenerationPrompt` when the problem needs a new image
 - writes an overlay contact sheet with crosshair and per-frame anchor dots
 
 For browser projects, also provide a local animation inspector page. It should show:
@@ -171,6 +182,8 @@ Quality gate:
 - row foot drift should be close to `0`
 - row x drift should be low enough that playback does not wobble
 - global `anchorXDrift` and `anchorYDrift` after anchor audit should be `0`, or at most `2`
+- `regenerate` must be `false`
+- if `regenerate` is `true`, feed `regenerationPrompt` to Codex built-in `image_gen` and repeat the loop
 - inspect the generated contact sheets before using sprites in game scenes
 
 The game should consume `characterManifest.js` by `spriteId`; world NPCs and battle units should not hard-code image paths.

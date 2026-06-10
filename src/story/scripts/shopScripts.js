@@ -26,7 +26,7 @@ export const shopScripts = {
         ]
       },
       leave: {
-        speaker: "主角",
+        speaker: "段誉",
         text: "多谢老人家，我晚些再来。"
       }
     }

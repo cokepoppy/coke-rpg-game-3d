@@ -1,5 +1,9 @@
 export class GameState {
   constructor() {
+    this.reset();
+  }
+
+  reset() {
     this.flags = new Set();
     this.inventory = new Map();
     this.quests = new Map();
@@ -69,5 +73,23 @@ export class GameState {
       at: new Date().toISOString()
     });
     this.log = this.log.slice(0, 20);
+  }
+
+  snapshot() {
+    return {
+      flags: [...this.flags],
+      inventory: [...this.inventory.entries()],
+      quests: [...this.quests.entries()],
+      log: this.log,
+      money: this.money
+    };
+  }
+
+  restore(snapshot = {}) {
+    this.flags = new Set(snapshot.flags || []);
+    this.inventory = new Map(snapshot.inventory || []);
+    this.quests = new Map(snapshot.quests || []);
+    this.log = Array.isArray(snapshot.log) ? snapshot.log.slice(0, 20) : [];
+    this.money = Number.isFinite(snapshot.money) ? snapshot.money : 90;
   }
 }

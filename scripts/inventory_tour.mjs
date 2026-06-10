@@ -30,6 +30,7 @@ page.on("response", (response) => {
 });
 
 await page.goto(`${baseUrl}/index.modular.html`, { waitUntil: "networkidle" });
+await startNewGame();
 await finishOpening();
 
 await page.keyboard.press("b");
@@ -77,6 +78,11 @@ await browser.close();
 
 console.log(JSON.stringify({ outDir, errors, responses, summary }, null, 2));
 if (errors.length || responses.length) process.exit(1);
+
+async function startNewGame() {
+  await page.waitForSelector(".menu-panel", { timeout: 8000 });
+  await page.locator('[data-action="new"]').click();
+}
 
 async function finishOpening() {
   await waitDialog();

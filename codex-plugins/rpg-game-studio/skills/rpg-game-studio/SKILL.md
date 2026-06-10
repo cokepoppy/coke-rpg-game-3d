@@ -55,6 +55,7 @@ src/
   story/storyScripts.js
   ui/DialogBox.js
   ui/InventoryPanel.js
+  ui/MenuSystem.js
   ui/ShopPanel.js
   scenes/WorldScene.js
   main.js
@@ -114,6 +115,29 @@ Use this pattern for entering buildings, rooms, caves, dungeons, or interior sce
 - Room objects should be normal story triggers: `room_wardrobe`, `room_medicine_cabinet`, `room_chest`, `room_scroll_desk`, `room_exit`.
 - Keep search results in `storyScripts.js`; keep inventory/flags in `GameState`; keep map switching in `WorldScene.enterMap`.
 - End-to-end QA should include an automated tour script that walks to triggers, runs scripts, clicks choices, and saves screenshots.
+
+## Collision And Occlusion Workflow
+
+Use this pattern when maps, interiors, NPC placement, or generated scenery need reliable walkability and depth ordering:
+
+- Keep blocking rectangles in map object layers with type `collision` or in `assets.maps[mapId].collision`.
+- Use `collisionTypes` only for object types that are always blocking in the current map. Do not add broad types such as `prop` unless every prop is truly solid; bridges, doors, signs, and decorative props often need different behavior.
+- Keep visual foreground/depth masks in `assets.maps[mapId].occlusion` or map objects with type `occlusion`.
+- Draw order should be map base, NPCs/sprites, then occlusion masks. Occlusion masks can redraw the same map-image rectangle over sprites for roofs, furniture fronts, stall fronts, and screens.
+- Door triggers must be reachable by the player foot collision box. Do not let roof/body collision masks cover the door trigger approach zone.
+- NPC placement must be validated against collision before accepting a map pass. NPCs should appear on reachable ground near likely player routes, not on roofs or hidden in dense grass.
+- Add machine-readable checks to `scripts/world_contract_check.mjs` for every critical map pass: world occlusion count, room occlusion count, reachable door zones, reachable NPC placements, and blocked furniture/roofs.
+
+## Menu System Workflow
+
+Use this when the game needs a reusable main menu, pause menu, settings screen, save/load controls, or future title-screen flow:
+
+- Keep menu rendering and local storage behavior in `src/ui/MenuSystem.js`; do not put menu HTML generation in `Game` or `WorldScene`.
+- `Game` owns global menu hotkeys such as `Esc` and `M` because it coordinates scene updates and overlays.
+- `WorldScene` exposes `startNewGame()`, `snapshot()`, and `restoreSnapshot()` so the menu can start, save, and load without knowing map internals.
+- Startup should show the main menu first. Automated tours must click `data-action="new"` before waiting for opening dialogue.
+- Keep settings controls present even when some settings are placeholders; disabled controls are better than hidden, undocumented future state.
+- Screenshot QA should include main menu, settings, pause menu, save feedback, load-enabled state, and returning to the world.
 
 ## Tactical Battle System Workflow
 
@@ -185,7 +209,9 @@ Every RPG map pass should include a small automated contract check before visual
 - runtime tile size is `64`
 - player collision footprint matches the configured contract
 - map collision overlays load through `MapManager`
+- map occlusion overlays load through `MapManager`
 - critical roofs/buildings are blocked
+- critical door approach zones and NPC foot positions are reachable
 - critical story triggers still exist after collision changes
 
 Keep this check separate from screenshot tours. Screenshot tours prove the player-facing flow; contract checks prove the machine-readable constraints that prevent recurring issues such as walking onto roofs or missing door/battle triggers.

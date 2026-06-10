@@ -22,7 +22,9 @@ This file records pitfalls already found in this RPG prototype. Read it before c
 - Up/down walk can look unnatural when frame 1 and frame 3 do not alternate opposite feet. The sprite audit checks this with vertical gait metrics.
 - Up-facing frames can crop the head if the generated sheet does not preserve enough top margin. The audit must check top contact/margin before accepting the asset.
 - Do not judge sprite animation only inside the map. Use the sprite studio/player page with anchor crosshair and neutral background so clipping and drift are visible.
-- The accepted hero asset is `assets/characters/hero/hero-walk-anchored-v3-gaitfix.png`. It passed anchor, crop, residue, and vertical gait checks on 2026-06-10.
+- The current runtime hero asset is `assets/characters/hero/hero-walk-anchored-v4-motionfix.png`. It is derived from `v3-gaitfix` by stabilizing per-frame body center drift to `0px`; this targets the visible left/right walking stutter reported on 2026-06-10.
+- A sprite can pass foot-anchor checks and still look jittery if body center drift is high between frames. Run `codex-plugins/auto-sprite-studio/scripts/sprite_animation_audit.mjs` when left/right walking looks like it is stuttering.
+- Do not treat `sprite_anchor_audit` and `sprite_animation_audit` as the same acceptance gate. The anchor audit infers foot-contact center and may flag intentional step-foot changes after body-center stabilization. For perceived walk jitter, inspect the animation audit `xDrift` and the sprite player/contact sheet.
 - If image generation produces good identity/art but up/down step frames fail gait sign checks, a controlled post-process can mirror only the fourth frame of the down/up rows from the second frame, then rerun `sprite_anchor_audit`. Do this only after visual inspection confirms identity and framing are otherwise good.
 
 Useful checks:
@@ -34,8 +36,11 @@ node scripts/sprite_anchor_audit.mjs
 ## Map And Collision Pitfalls
 
 - The rendered map image is only visual. Collision must be explicit data.
-- Generated Tiled objects are not all blocking by default. `MapManager` currently treats objects with type `collision` as blocking, plus `assets.maps[mapId].collision` overlays.
+- Generated Tiled objects are not all blocking by default. `MapManager` currently treats objects with type `collision` as blocking, selected `assets.maps[mapId].collisionTypes`, plus `assets.maps[mapId].collision` overlays.
+- Do not make every `prop` object blocking. Bridges, signs, doors, and decorative props can share the same Tiled type but need different collision behavior. Prefer explicit masks or narrow `collisionTypes` such as `supply`, `battle`, and `boss`.
 - Roofs, walls, stalls, beds, cabinets, screens, and large props need collision masks. Otherwise the player can walk onto roofs or through furniture.
+- Occlusion/depth masks are separate from collision. Use `assets.maps[mapId].occlusion` or map objects with type `occlusion`, then draw base map, NPCs/sprites, player, and occlusion masks last.
+- NPCs must be placed on reachable foot-anchor positions and near likely player routes. The contract check should fail if an NPC foot position overlaps collision.
 - Door triggers should be large enough to touch the player foot collision box, but roof/body collision should not cover the reachable trigger zone.
 - Scripted auto-walk is used for QA tours and may bypass some manual navigation friction. Manual movement must still obey `CollisionSystem`.
 
@@ -52,7 +57,17 @@ This verifies:
 - tile size is `64`
 - player collision footprint is `34x28`
 - roof collision masks block movement
+- world and room occlusion masks load
+- door and NPC foot positions are reachable
+- room furniture blocks movement
 - room and battle triggers still exist
+
+## Menu System Pitfalls
+
+- The game now boots to `MenuSystem` first. Automated Playwright tours must click `[data-action="new"]` before waiting for opening dialogue.
+- Keep main/pause/settings/save/load UI in `src/ui/MenuSystem.js`; `Game` should only route global menu hotkeys, and `WorldScene` should only expose `startNewGame`, `snapshot`, and `restoreSnapshot`.
+- Save/load should serialize game state through `GameState.snapshot()` and `GameState.restore()` rather than reading story flags, money, or inventory directly from UI code.
+- Menu QA should capture the title menu, settings panel, pause menu, save feedback, load-enabled state, and loaded world state.
 
 ## Map Rendering Pitfalls
 

@@ -11,7 +11,7 @@ export class NpcMarkerRenderer {
   }
 
   draw(npcs, camera) {
-    for (const npc of npcs) this.drawNpc(npc, camera);
+    for (const npc of [...npcs].sort((a, b) => a.y - b.y)) this.drawNpc(npc, camera);
   }
 
   drawNpc(npc, camera) {

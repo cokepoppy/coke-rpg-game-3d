@@ -27,6 +27,7 @@ export class WorldScene {
     this.npcRenderer = new NpcMarkerRenderer(context);
     this.autoWalk = null;
     this.lastScriptResult = null;
+    this.started = false;
   }
 
   async load() {
@@ -47,7 +48,6 @@ export class WorldScene {
       battleManager: this.battleManager
     });
     window.__rpgScene = this;
-    queueMicrotask(() => this.runScript("opening"));
   }
 
   update(dt) {
@@ -90,7 +90,15 @@ export class WorldScene {
     this.renderer.drawBase();
     this.npcRenderer.draw(assets.maps[this.mapId]?.npcs || [], this.camera);
     this.player.draw(this.context, this.camera);
+    this.renderer.drawOcclusion();
     this.drawInteractionHint();
+  }
+
+  async startNewGame() {
+    this.state.reset();
+    this.started = true;
+    await this.enterMap("world", "start");
+    await this.runScript("opening");
   }
 
   async runScript(scriptId) {
@@ -119,6 +127,35 @@ export class WorldScene {
     this.autoWalk = null;
     await this.loadNpcSprites();
     this.camera.follow(this.player, this.map);
+  }
+
+  async restoreSnapshot(snapshot) {
+    this.state.restore(snapshot.state);
+    this.started = true;
+    await this.enterMap(snapshot.mapId || "world", snapshot.spawn || "start");
+    if (snapshot.player) {
+      this.player.x = snapshot.player.x;
+      this.player.y = snapshot.player.y;
+      this.player.direction = snapshot.player.direction || "down";
+      this.camera.follow(this.player, this.map);
+    }
+  }
+
+  snapshot() {
+    return {
+      version: 1,
+      mapId: this.mapId,
+      player: {
+        x: Math.round(this.player.x),
+        y: Math.round(this.player.y),
+        direction: this.player.direction
+      },
+      state: this.state.snapshot()
+    };
+  }
+
+  hasOverlayOpen() {
+    return Boolean(this.inventoryPanel.opened || this.shopPanel.opened || this.scriptRunner?.running || this.battleScene?.active);
   }
 
   async loadNpcSprites() {

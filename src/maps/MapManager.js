@@ -8,6 +8,7 @@ export class MapManager {
     this.tileSize = TILE_SIZE;
     this.triggers = [];
     this.collision = [];
+    this.occlusion = [];
     this.spawns = asset.spawns || {};
   }
 
@@ -18,7 +19,12 @@ export class MapManager {
     this.width = data.width * this.tileSize;
     this.height = data.height * this.tileSize;
     this.triggers = [...objectsByType(data, "trigger"), ...normalizeObjects(this.asset.triggers || [])];
-    this.collision = [...objectsByType(data, "collision"), ...normalizeObjects(this.asset.collision || [])];
+    this.collision = [
+      ...objectsByType(data, "collision"),
+      ...objectsByTypes(data, this.asset.collisionTypes || []),
+      ...normalizeObjects(this.asset.collision || [])
+    ];
+    this.occlusion = [...objectsByType(data, "occlusion"), ...normalizeObjects(this.asset.occlusion || [])];
     return this;
   }
 
@@ -55,6 +61,15 @@ function objectsByType(data, type) {
     .filter((layer) => layer.type === "objectgroup")
     .flatMap((layer) => layer.objects || [])
     .filter((object) => object.type === type);
+}
+
+function objectsByTypes(data, types) {
+  const wanted = new Set(types);
+  if (!wanted.size) return [];
+  return data.layers
+    .filter((layer) => layer.type === "objectgroup")
+    .flatMap((layer) => layer.objects || [])
+    .filter((object) => wanted.has(object.type));
 }
 
 function normalizeObjects(objects) {

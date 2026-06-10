@@ -194,7 +194,8 @@ body {
 }
 
 .inventory-ui,
-.shop-ui {
+.shop-ui,
+.menu-ui {
   position: fixed;
   inset: 0;
   z-index: 20;
@@ -203,12 +204,14 @@ body {
 }
 
 .inventory-ui[hidden],
-.shop-ui[hidden] {
+.shop-ui[hidden],
+.menu-ui[hidden] {
   display: none;
 }
 
 .inventory-backdrop,
-.shop-backdrop {
+.shop-backdrop,
+.menu-backdrop {
   position: absolute;
   inset: 0;
   background: rgba(8, 9, 8, 0.48);
@@ -289,6 +292,95 @@ body {
 .shop-item button:disabled {
   cursor: default;
   opacity: 0.48;
+}
+
+.menu-ui {
+  z-index: 24;
+}
+
+.menu-backdrop {
+  background: rgba(7, 8, 7, 0.66);
+  backdrop-filter: blur(3px);
+}
+
+.menu-panel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(420px, calc(100vw - 40px));
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+  border: 1px solid rgba(232, 208, 151, 0.44);
+  border-radius: 8px;
+  background: rgba(21, 18, 14, 0.96);
+  box-shadow: 0 28px 86px rgba(0, 0, 0, 0.58);
+}
+
+.menu-header {
+  display: grid;
+  gap: 6px;
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid rgba(232, 208, 151, 0.22);
+  background: rgba(59, 42, 24, 0.78);
+}
+
+.menu-header strong {
+  color: #e8c06b;
+  font-size: 30px;
+  letter-spacing: 0;
+}
+
+.menu-header span {
+  color: #d9c69f;
+  font-size: 14px;
+}
+
+.menu-body {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+}
+
+.menu-body button {
+  min-height: 44px;
+  border: 1px solid rgba(232, 208, 151, 0.42);
+  border-radius: 6px;
+  background: rgba(73, 56, 34, 0.9);
+  color: #f5ead0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.menu-body button:not(:disabled):hover,
+.menu-body button:not(:disabled):focus-visible {
+  outline: none;
+  border-color: #e2b55d;
+  background: rgba(113, 80, 42, 0.94);
+}
+
+.menu-body button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.menu-setting {
+  min-height: 42px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 0 10px;
+  border: 1px solid rgba(232, 208, 151, 0.18);
+  border-radius: 6px;
+  color: #eadbbd;
+}
+
+.menu-footer {
+  padding: 12px 18px;
+  border-top: 1px solid rgba(232, 208, 151, 0.18);
+  color: #d8c49e;
+  font-size: 13px;
+  background: rgba(13, 12, 10, 0.4);
 }
 
 .inventory-list,

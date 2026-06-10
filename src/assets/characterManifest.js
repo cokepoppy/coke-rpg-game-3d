@@ -3,7 +3,7 @@ export const characters = {
     "id": "duan_yu",
     "name": "段誉",
     "role": "player",
-    "sheet": "./assets/hero-walk-sheet-anchored.png",
+    "sheet": "./assets/characters/hero/hero-walk-anchored-v4-motionfix.png",
     "frameWidth": 313,
     "frameHeight": 313,
     "drawWidth": 128,

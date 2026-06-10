@@ -4,6 +4,7 @@ import { InputController } from "./InputController.js";
 import { Camera } from "./Camera.js";
 import { WorldScene } from "../scenes/WorldScene.js";
 import { DialogBox } from "../ui/DialogBox.js";
+import { MenuSystem } from "../ui/MenuSystem.js";
 
 export class Game {
   constructor(canvas) {
@@ -15,11 +16,26 @@ export class Game {
     this.camera = new Camera(VIEWPORT.width, VIEWPORT.height);
     const dialogRoot = document.querySelector("#dialog");
     this.scene = new WorldScene(this.context, this.input, this.camera, new DialogBox(dialogRoot));
-    this.loop = new GameLoop((dt) => this.scene.update(dt), () => this.scene.render());
+    this.menu = new MenuSystem(document.querySelector("#menu-ui"), { scene: this.scene });
+    this.loop = new GameLoop((dt) => this.update(dt), () => this.scene.render());
   }
 
   async start() {
     await this.scene.load();
+    this.menu.openMain();
     this.loop.start();
+  }
+
+  update(dt) {
+    if (this.menu.opened) {
+      if (!this.scene.started) return;
+      if (this.input.consume("escape") || this.input.consume("m")) this.menu.close();
+      return;
+    }
+    if (this.scene.started && !this.scene.hasOverlayOpen() && (this.input.consume("escape") || this.input.consume("m"))) {
+      this.menu.openPause();
+      return;
+    }
+    this.scene.update(dt);
   }
 }

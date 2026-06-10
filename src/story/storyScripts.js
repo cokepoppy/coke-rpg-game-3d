@@ -11,7 +11,7 @@ export const storyScripts = {
         next: "mentor"
       },
       mentor: {
-        speaker: "主角",
+        speaker: "段誉",
         text: "我只记得一阵笛声，醒来时佩剑已经不见了。",
         next: "quest"
       },
@@ -54,7 +54,7 @@ export const storyScripts = {
         ]
       },
       leave: {
-        speaker: "主角",
+        speaker: "段誉",
         text: "现在还不是节外生枝的时候。"
       }
     }
@@ -73,12 +73,12 @@ export const storyScripts = {
         ]
       },
       battle: {
-        speaker: "主角",
+        speaker: "段誉",
         text: "既是冲我来的，那就不用再藏。",
         actions: [{ type: "startBattle", enemyId: "masked_scout" }]
       },
       leave: {
-        speaker: "主角",
+        speaker: "段誉",
         text: "先避开暗哨，另寻时机。"
       }
     }
@@ -115,7 +115,7 @@ export const storyScripts = {
         ]
       },
       leave: {
-        speaker: "主角",
+        speaker: "段誉",
         text: "机关未明，还是先别妄动。"
       }
     }
@@ -147,12 +147,12 @@ export const storyScripts = {
         ]
       },
       enter: {
-        speaker: "主角",
+        speaker: "段誉",
         text: "进去看看。",
         actions: [{ type: "enterMap", mapId: "daliInnRoom", spawn: "entrance" }]
       },
       leave: {
-        speaker: "主角",
+        speaker: "段誉",
         text: "先在外面再查一圈。"
       }
     }
@@ -170,12 +170,12 @@ export const storyScripts = {
         ]
       },
       leave: {
-        speaker: "主角",
+        speaker: "段誉",
         text: "房里该看的地方差不多了。",
         actions: [{ type: "enterMap", mapId: "world", spawn: "innReturn" }]
       },
       stay: {
-        speaker: "主角",
+        speaker: "段誉",
         text: "再检查一下柜子和书桌。"
       }
     }
@@ -205,7 +205,7 @@ export const storyScripts = {
         ]
       },
       leave: {
-        speaker: "主角",
+        speaker: "段誉",
         text: "柜门太旧，硬拉可能惊动别人。"
       }
     }
@@ -273,7 +273,7 @@ export const storyScripts = {
         ]
       },
       leave: {
-        speaker: "主角",
+        speaker: "段誉",
         text: "先别动箱子。"
       }
     }
@@ -291,12 +291,12 @@ export const storyScripts = {
         ]
       },
       copy: {
-        speaker: "主角",
+        speaker: "段誉",
         text: "线索已经连起来了：灯亭铜匣只是引子，真正的入口在寺后。",
         actions: [{ type: "remember", text: "书桌账册提到灯亭、铜匣和寺后密道。" }]
       },
       leave: {
-        speaker: "主角",
+        speaker: "段誉",
         text: "这本账册不像客栈自己的东西。"
       }
     }
@@ -352,7 +352,7 @@ export const storyScripts = {
         text: "铜匣原是段氏旧物。若你找到了，切记先看匣底刻痕，再动锁扣。"
       },
       bye: {
-        speaker: "主角",
+        speaker: "段誉",
         text: "我会再来。"
       }
     }

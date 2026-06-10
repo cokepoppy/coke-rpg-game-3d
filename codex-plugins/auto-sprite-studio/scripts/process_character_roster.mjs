@@ -17,7 +17,7 @@ const reports = [];
 for (const character of roster.characters) {
   if (character.source === "existing") {
     characters[character.id] = manifestEntry(character, {
-      sheet: `./assets/${path.basename(character.sheet)}`,
+      sheet: existingSheetPath(character.sheet),
       frameWidth: character.frameWidth,
       frameHeight: character.frameHeight,
       drawWidth: character.drawWidth,
@@ -137,6 +137,12 @@ function manifestEntry(character, sheet) {
     directions: ["down", "left", "right", "up"],
     framesPerDirection: 4
   };
+}
+
+function existingSheetPath(sheet) {
+  const normalized = sheet.replaceAll("\\", "/");
+  if (normalized.startsWith("../")) return `./assets/${normalized.slice(3)}`;
+  return `./assets/characters/${normalized}`;
 }
 
 function run(command, commandArgs) {

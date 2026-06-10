@@ -112,7 +112,7 @@ export const assets = {
   },
   sprites: {
     hero: {
-      sheet: "./assets/hero-walk-sheet-anchored.png",
+      sheet: "./assets/characters/hero/hero-walk-anchored-v3-gaitfix.png",
       frameWidth: 313,
       frameHeight: 313,
       drawWidth: 128,

@@ -22,7 +22,8 @@ This file records pitfalls already found in this RPG prototype. Read it before c
 - Up/down walk can look unnatural when frame 1 and frame 3 do not alternate opposite feet. The sprite audit checks this with vertical gait metrics.
 - Up-facing frames can crop the head if the generated sheet does not preserve enough top margin. The audit must check top contact/margin before accepting the asset.
 - Do not judge sprite animation only inside the map. Use the sprite studio/player page with anchor crosshair and neutral background so clipping and drift are visible.
-- The current hero asset is usable but still flagged for regeneration by the contract audit because the up/down gait does not alternate enough.
+- The accepted hero asset is `assets/characters/hero/hero-walk-anchored-v3-gaitfix.png`. It passed anchor, crop, residue, and vertical gait checks on 2026-06-10.
+- If image generation produces good identity/art but up/down step frames fail gait sign checks, a controlled post-process can mirror only the fourth frame of the down/up rows from the second frame, then rerun `sprite_anchor_audit`. Do this only after visual inspection confirms identity and framing are otherwise good.
 
 Useful checks:
 
@@ -133,6 +134,7 @@ curl --noproxy '*' -I --max-time 3 http://127.0.0.1:5173/index.modular.html
 - `image_gen` can fail with generic service/server errors. Do not silently replace failed generations with placeholder art when the user specifically asked for GPT image generated assets.
 - When generation fails, keep the asset contract and regeneration prompt in the report so the next run can continue from a precise failure state.
 - Batch character work should generate prompts from roster/config, process all outputs through the same normalization script, then audit anchors/gait/cropping before accepting assets.
+- `process_character_roster.mjs` must preserve subdirectories for `source: "existing"` characters. Taking only `path.basename(character.sheet)` breaks generated hero paths such as `hero/hero-walk-anchored-v3-gaitfix.png`.
 
 ## Workflow Rule
 

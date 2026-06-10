@@ -24,7 +24,7 @@
       "name": "段誉",
       "role": "player",
       "source": "existing",
-      "sheet": "../hero-walk-sheet-anchored.png",
+      "sheet": "hero/hero-walk-anchored-v3-gaitfix.png",
       "frameWidth": 313,
       "frameHeight": 313,
       "drawWidth": 128,

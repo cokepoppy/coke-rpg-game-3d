@@ -129,6 +129,15 @@ NODE_PATH=/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/d
 curl --noproxy '*' -I --max-time 3 http://127.0.0.1:5173/index.modular.html
 ```
 
+- Do not run multiple Playwright tours against the same static server in parallel. The pages are separate, but screenshots, timing, and startup waits become harder to interpret. Run contract/tour scripts sequentially when validating before a commit.
+
+## Inventory / Shop Pitfalls
+
+- Keep item definitions, shop stock, inventory economy logic, shop UI, and vendor story scripts in separate modules.
+- A vendor script should emit an `openShop` action; it should not implement purchase/deduct-money logic inside the dialogue data.
+- Screenshot QA for inventory must include both UI and state: capture the shop screens, then write an `inventory-summary.json` with money and item counts.
+- Item art should be generated as a small atlas when possible. Runtime item IDs must not depend on atlas layout, because atlas generation may need to be retried or replaced.
+
 ## Image Generation Pitfalls
 
 - `image_gen` can fail with generic service/server errors. Do not silently replace failed generations with placeholder art when the user specifically asked for GPT image generated assets.

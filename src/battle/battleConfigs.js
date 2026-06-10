@@ -40,8 +40,12 @@ export const battleConfigs = {
     ],
     rewards: {
       flags: ["masked_scout_defeated"],
-      items: [{ itemId: "yipintang_token", amount: 1 }],
-      memory: "击退一品堂暗哨，缴获一枚令牌。"
+      items: [
+        { itemId: "yipintang_token", amount: 1 },
+        { itemId: "hemostatic_powder", amount: 1 }
+      ],
+      money: 35,
+      memory: "击退一品堂暗哨，缴获一枚令牌、止血散和一些钱。"
     }
   },
   yipintang_leader: {
@@ -67,6 +71,8 @@ export const battleConfigs = {
     ],
     rewards: {
       flags: ["boss_gate_cleared"],
+      items: [{ itemId: "steel_saber", amount: 1 }],
+      money: 80,
       memory: "山门伏击被击退。"
     }
   }

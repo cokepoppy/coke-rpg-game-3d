@@ -39,11 +39,13 @@ export class ScriptRunner {
     for (const action of actions) {
       if (action.type === "setFlag") this.gameState.setFlag(action.flag);
       if (action.type === "addItem") this.gameState.addItem(action.itemId, action.amount);
+      if (action.type === "addMoney") this.gameState.addMoney(action.amount);
       if (action.type === "addQuest") this.gameState.addQuest(action.quest);
       if (action.type === "completeQuest") this.gameState.completeQuest(action.questId);
       if (action.type === "remember") this.gameState.remember(action.text);
       if (action.type === "startBattle") result = this.battleManager.requestBattle(action);
       if (action.type === "enterMap") result = { kind: "map-transition", mapId: action.mapId, spawn: action.spawn };
+      if (action.type === "openShop") result = { kind: "shop-requested", shopId: action.shopId };
     }
     return result;
   }

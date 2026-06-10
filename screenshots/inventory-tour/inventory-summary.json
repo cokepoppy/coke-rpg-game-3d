@@ -1,0 +1,13 @@
+{
+  "money": 50,
+  "items": [
+    {
+      "itemId": "hemostatic_powder",
+      "amount": 1
+    },
+    {
+      "itemId": "qingxin_pill",
+      "amount": 1
+    }
+  ]
+}

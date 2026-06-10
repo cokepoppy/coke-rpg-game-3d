@@ -1,3 +1,5 @@
+import { shopScripts } from "./scripts/shopScripts.js";
+
 export const storyScripts = {
   opening: {
     id: "opening",
@@ -197,6 +199,7 @@ export const storyScripts = {
         actions: [
           { type: "setFlag", flag: "room_wardrobe_opened" },
           { type: "addItem", itemId: "silver_piece", amount: 1 },
+          { type: "addMoney", amount: 25 },
           { type: "addItem", itemId: "unsigned_letter", amount: 1 },
           { type: "remember", text: "在客房木柜里找到碎银和未署名的信。" }
         ]
@@ -364,5 +367,6 @@ export const storyScripts = {
         actions: [{ type: "startBattle", enemyId: "yipintang_leader" }]
       }
     }
-  }
+  },
+  ...shopScripts
 };

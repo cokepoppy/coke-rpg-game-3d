@@ -42,6 +42,9 @@ src/
   core/InputController.js
   entities/Player.js
   entities/SpriteAnimator.js
+  inventory/InventoryManager.js
+  items/itemCatalog.js
+  items/shopCatalog.js
   maps/CollisionSystem.js
   maps/MapManager.js
   maps/MapRenderer.js
@@ -51,6 +54,8 @@ src/
   story/ScriptRunner.js
   story/storyScripts.js
   ui/DialogBox.js
+  ui/InventoryPanel.js
+  ui/ShopPanel.js
   scenes/WorldScene.js
   main.js
 ```
@@ -138,6 +143,40 @@ Workflow:
 10. Write a Playwright QA script that screenshots the encounter dialogue, battle start, movement range, move, skill targeting, hit feedback, victory dialogue, and return to the world; also write a JSON battle log for Codex feedback.
 
 Battle QA is part of the workflow, not an afterthought. If screenshots or logs show drift, missing highlights, invalid turn transitions, or broken attacks, fix the corresponding module and rerun the tour.
+
+## Inventory And Shop Workflow
+
+Use this when the user wants a backpack, item drops, money, equipment, consumables, vendors, shops, or item UI.
+
+Recommended module boundaries:
+
+- `src/items/itemCatalog.js`: item definitions, rarity, type, price, effect, description, and icon metadata.
+- `src/items/shopCatalog.js`: shop stock, item prices, purchase limits, and shop identity.
+- `src/inventory/InventoryManager.js`: buy, add item, add money, item listing, and inventory-facing operations.
+- `src/ui/InventoryPanel.js`: backpack modal/panel only; no item economy math.
+- `src/ui/ShopPanel.js`: vendor stock and purchase UI only; calls `InventoryManager`.
+- `src/story/scripts/shopScripts.js`: vendor dialogue and `openShop` actions; do not fold every shop script into the global `storyScripts.js`.
+- `scripts/inventory_tour.mjs`: screenshot tour for opening backpack, opening vendor shop, buying items, and checking money/items changed.
+
+Keep the item set small until the economy is real: a few healing/qi consumables, a few weapon archetypes, money, and quest items. Do not generate dozens of items before there is gameplay pressure for them.
+
+For AI item art, prefer a single atlas image over one image call per item:
+
+- one atlas prompt
+- fixed grid/cell size
+- flat chroma-key background
+- row-major item order
+- local chroma-key removal or CSS placeholder fallback
+- item IDs in code stay stable regardless of art changes
+
+Inventory QA should capture:
+
+1. empty or starting backpack
+2. vendor dialogue
+3. shop stock list
+4. purchase feedback and money change
+5. backpack after purchase
+6. machine-readable inventory summary JSON
 
 ## World Contract QA
 

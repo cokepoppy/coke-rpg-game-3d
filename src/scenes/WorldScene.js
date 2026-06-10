@@ -8,6 +8,9 @@ import { ScriptRunner } from "../story/ScriptRunner.js";
 import { storyScripts } from "../story/storyScripts.js";
 import { BattleScene } from "../tactics/BattleScene.js";
 import { loadCharacterSprites } from "../assets/characterLoader.js";
+import { InventoryManager } from "../inventory/InventoryManager.js";
+import { InventoryPanel } from "../ui/InventoryPanel.js";
+import { ShopPanel } from "../ui/ShopPanel.js";
 
 export class WorldScene {
   constructor(context, input, camera, dialogBox) {
@@ -16,6 +19,9 @@ export class WorldScene {
     this.camera = camera;
     this.dialogBox = dialogBox;
     this.state = new GameState();
+    this.inventory = new InventoryManager(this.state);
+    this.inventoryPanel = new InventoryPanel(document.querySelector("#inventory-ui"), this.inventory);
+    this.shopPanel = new ShopPanel(document.querySelector("#shop-ui"), this.inventory);
     this.battleManager = new BattleManager();
     this.mapTransitions = new MapTransitionManager(context, camera);
     this.npcRenderer = new NpcMarkerRenderer(context);
@@ -49,6 +55,14 @@ export class WorldScene {
       this.battleScene.update(dt);
       return;
     }
+    if (this.input.consume("escape")) {
+      if (this.inventoryPanel.opened) this.inventoryPanel.close();
+      if (this.shopPanel.opened) this.shopPanel.close();
+    }
+    if (!this.scriptRunner?.running && !this.shopPanel.opened && (this.input.consume("b") || this.input.consume("i"))) {
+      this.inventoryPanel.toggle();
+    }
+    if (this.inventoryPanel.opened || this.shopPanel.opened) return;
     if (this.scriptRunner?.running) return;
     if (this.autoWalk) {
       const arrived = this.player.stepToward(this.autoWalk.target, dt, this.autoWalk.speed);
@@ -88,6 +102,9 @@ export class WorldScene {
     if (result?.kind === "map-transition") {
       await this.enterMap(result.mapId, result.spawn);
     }
+    if (result?.kind === "shop-requested") {
+      await this.openShop(result.shopId);
+    }
     return result;
   }
 
@@ -119,6 +136,7 @@ export class WorldScene {
           const rewards = result.battle.rewards || {};
           for (const flag of rewards.flags || []) this.state.setFlag(flag);
           for (const item of rewards.items || []) this.state.addItem(item.itemId, item.amount);
+          if (rewards.money) this.state.addMoney(rewards.money);
           if (rewards.memory) this.state.remember(rewards.memory);
         }
         this.battleScene = null;
@@ -141,6 +159,10 @@ export class WorldScene {
       }
     });
     await this.battleScene.load();
+  }
+
+  async openShop(shopId) {
+    await this.shopPanel.open(shopId);
   }
 
   walkToTrigger(name, speed = 1400) {

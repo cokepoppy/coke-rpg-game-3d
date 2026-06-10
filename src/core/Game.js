@@ -5,6 +5,8 @@ import { Camera } from "./Camera.js";
 import { WorldScene } from "../scenes/WorldScene.js";
 import { DialogBox } from "../ui/DialogBox.js";
 import { MenuSystem } from "../ui/MenuSystem.js";
+import { AudioManager } from "../audio/AudioManager.js";
+import { assets } from "../assets/assetManifest.js";
 
 export class Game {
   constructor(canvas) {
@@ -16,7 +18,8 @@ export class Game {
     this.camera = new Camera(VIEWPORT.width, VIEWPORT.height);
     const dialogRoot = document.querySelector("#dialog");
     this.scene = new WorldScene(this.context, this.input, this.camera, new DialogBox(dialogRoot));
-    this.menu = new MenuSystem(document.querySelector("#menu-ui"), { scene: this.scene });
+    this.audio = new AudioManager(assets.audio.bgm);
+    this.menu = new MenuSystem(document.querySelector("#menu-ui"), { scene: this.scene, audio: this.audio });
     this.loop = new GameLoop((dt) => this.update(dt), () => this.scene.render());
   }
 

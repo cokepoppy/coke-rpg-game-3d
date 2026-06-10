@@ -31,6 +31,7 @@ page.on("response", (response) => {
 
 await page.goto(`${baseUrl}/index.modular.html`, { waitUntil: "networkidle" });
 await page.evaluate(() => localStorage.removeItem("coke-game-rpg-save-v1"));
+await page.evaluate(() => localStorage.removeItem("coke-game-rpg-music-enabled"));
 await page.reload({ waitUntil: "networkidle" });
 await page.waitForSelector(".menu-panel");
 await shot("01-main-menu");

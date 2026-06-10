@@ -1,9 +1,10 @@
 const SAVE_KEY = "coke-game-rpg-save-v1";
 
 export class MenuSystem {
-  constructor(root, { scene }) {
+  constructor(root, { scene, audio }) {
     this.root = root;
     this.scene = scene;
+    this.audio = audio;
     this.opened = false;
     this.mode = "main";
     this.root.classList.add("menu-ui");
@@ -42,7 +43,7 @@ export class MenuSystem {
           <span>${subtitle}</span>
         </header>
         <div class="menu-body">
-          ${this.mode === "settings" ? settingsHtml() : actionsHtml(this.mode, hasSave)}
+          ${this.mode === "settings" ? settingsHtml(this.audio?.isEnabled()) : actionsHtml(this.mode, hasSave)}
         </div>
         <footer class="menu-footer">Esc / M 打开菜单，B / I 打开背包。</footer>
       </section>
@@ -52,13 +53,18 @@ export class MenuSystem {
 
   bindActions() {
     this.root.querySelector("[data-action='new']")?.addEventListener("click", async () => {
+      this.audio?.play();
       this.close();
       await this.scene.startNewGame();
     });
-    this.root.querySelector("[data-action='continue']")?.addEventListener("click", () => this.close());
+    this.root.querySelector("[data-action='continue']")?.addEventListener("click", () => {
+      this.audio?.play();
+      this.close();
+    });
     this.root.querySelector("[data-action='load']")?.addEventListener("click", async () => {
       const raw = localStorage.getItem(SAVE_KEY);
       if (!raw) return;
+      this.audio?.play();
       this.close();
       await this.scene.restoreSnapshot(JSON.parse(raw));
     });
@@ -75,6 +81,9 @@ export class MenuSystem {
     this.root.querySelector("[data-action='back']")?.addEventListener("click", () => {
       this.mode = this.scene.started ? "pause" : "main";
       this.render();
+    });
+    this.root.querySelector("[data-action='music']")?.addEventListener("change", (event) => {
+      this.audio?.setEnabled(event.target.checked);
     });
   }
 
@@ -95,7 +104,7 @@ function actionsHtml(mode, hasSave) {
   `;
 }
 
-function settingsHtml() {
+function settingsHtml(musicEnabled) {
   return `
     <label class="menu-setting">
       <span>像素渲染</span>
@@ -103,7 +112,7 @@ function settingsHtml() {
     </label>
     <label class="menu-setting">
       <span>音乐</span>
-      <input type="checkbox" disabled />
+      <input type="checkbox" data-action="music" ${musicEnabled ? "checked" : ""} />
     </label>
     <label class="menu-setting">
       <span>文字速度</span>

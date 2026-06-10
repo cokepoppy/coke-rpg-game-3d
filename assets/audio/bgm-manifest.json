@@ -1,0 +1,16 @@
+{
+  "selected": {
+    "id": "temple-road-echoes",
+    "title": "Temple Road Echoes",
+    "file": "./temple-road-echoes.mp3",
+    "source": "Suno",
+    "prompt": "Instrumental only, no vocals. Original wuxia RPG background music for an ancient Dali martial arts adventure: guqin, xiao flute, pipa, soft war drums, cinematic Chinese fantasy, heroic but gentle, wandering through mountain temples and old inns, loopable game BGM, 90 seconds, clean mix, no lyrics."
+  },
+  "alternates": [
+    {
+      "id": "temple-pathways",
+      "title": "Temple Pathways",
+      "file": "./temple-pathways.mp3"
+    }
+  ]
+}

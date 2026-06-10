@@ -1,4 +1,7 @@
 export const assets = {
+  audio: {
+    bgm: "./assets/audio/temple-road-echoes.mp3"
+  },
   maps: {
     world: {
       json: "./maps/dali-temple-route-design-first/dali-temple-route-design-first.tiled.json",

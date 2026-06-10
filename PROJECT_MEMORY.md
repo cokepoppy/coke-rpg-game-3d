@@ -71,6 +71,11 @@ This verifies:
 - Save/load should serialize game state through `GameState.snapshot()` and `GameState.restore()` rather than reading story flags, money, or inventory directly from UI code.
 - Menu QA should capture the title menu, settings panel, pause menu, save feedback, load-enabled state, and loaded world state.
 
+## Audio Pitfalls
+
+- Browser background music must start from a user gesture. Call `AudioManager.play()` from menu button handlers such as New Game, Continue, or Load, not during app boot.
+- Keep generated BGM metadata in `assets/audio/bgm-manifest.json` so later work knows which file is selected, which alternates exist, and what prompt produced the track.
+
 ## Map Rendering Pitfalls
 
 - Pixel maps can look blurry even when `imageSmoothingEnabled = false` if the camera samples the source image at fractional coordinates.

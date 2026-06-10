@@ -75,7 +75,7 @@ export class WorldScene {
       this.player.update(dt, this.input, this.collision);
     }
     this.camera.follow(this.player, this.map);
-    this.activeTrigger = this.map.triggerAt(this.player.bounds);
+    this.activeTrigger = this.map.triggerAt(this.player.bounds) || this.map.triggerNear(this.player.bounds, 96);
     if (this.activeTrigger && (this.input.consume("enter") || this.input.consume(" "))) {
       this.runScript(this.activeTrigger.name);
     }

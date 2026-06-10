@@ -56,7 +56,8 @@ export const assets = {
       occlusion: [
         { name: "temple_roof_overlay", type: "occlusion", x: 2140, y: 520, width: 860, height: 350 },
         { name: "inn_roof_overlay", type: "occlusion", x: 2650, y: 1960, width: 690, height: 285 },
-        { name: "medicine_stall_overlay", type: "occlusion", x: 3008, y: 2368, width: 256, height: 192 }
+        { name: "medicine_stall_roof_overlay", type: "occlusion", x: 3008, y: 2368, width: 256, height: 82 },
+        { name: "medicine_stall_counter_overlay", type: "occlusion", x: 3072, y: 2460, width: 192, height: 64 }
       ],
       npcs: [
         {

@@ -37,7 +37,17 @@ export class MapManager {
   }
 
   triggerAt(rect) {
-    return this.triggers.find((trigger) => intersects(rect, trigger));
+    return nearestTrigger(rect, this.triggers.filter((trigger) => intersects(rect, trigger)));
+  }
+
+  triggerNear(rect, margin = 64) {
+    const expanded = {
+      x: rect.x - margin,
+      y: rect.y - margin,
+      width: rect.width + margin * 2,
+      height: rect.height + margin * 2
+    };
+    return nearestTrigger(rect, this.triggers.filter((trigger) => intersects(expanded, trigger)));
   }
 }
 
@@ -82,4 +92,18 @@ function normalizeObjects(objects) {
 
 function intersects(a, b) {
   return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
+}
+
+function nearestTrigger(rect, triggers) {
+  if (!triggers.length) return null;
+  const center = {
+    x: rect.x + rect.width / 2,
+    y: rect.y + rect.height / 2
+  };
+  return triggers
+    .map((trigger) => ({
+      trigger,
+      distance: Math.hypot(center.x - (trigger.x + trigger.width / 2), center.y - (trigger.y + trigger.height / 2))
+    }))
+    .sort((a, b) => a.distance - b.distance)[0].trigger;
 }

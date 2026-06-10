@@ -40,8 +40,10 @@ node scripts/sprite_anchor_audit.mjs
 - Do not make every `prop` object blocking. Bridges, signs, doors, and decorative props can share the same Tiled type but need different collision behavior. Prefer explicit masks or narrow `collisionTypes` such as `supply`, `battle`, and `boss`.
 - Roofs, walls, stalls, beds, cabinets, screens, and large props need collision masks. Otherwise the player can walk onto roofs or through furniture.
 - Occlusion/depth masks are separate from collision. Use `assets.maps[mapId].occlusion` or map objects with type `occlusion`, then draw base map, NPCs/sprites, player, and occlusion masks last.
+- Do not use one large foreground rectangle for a complex prop near an NPC. The medicine stall needed split occlusion masks for roof/counter; a single `256x192` mask covered the vendor/player area.
 - NPCs must be placed on reachable foot-anchor positions and near likely player routes. The contract check should fail if an NPC foot position overlaps collision.
 - Door triggers should be large enough to touch the player foot collision box, but roof/body collision should not cover the reachable trigger zone.
+- Large generated trigger zones can overlap small hand-authored triggers. `MapManager.triggerAt()` and `triggerNear()` should choose the nearest matching trigger, not the first object in Tiled order; otherwise the inn door can be swallowed by the broad medicine-market trigger.
 - Scripted auto-walk is used for QA tours and may bypass some manual navigation friction. Manual movement must still obey `CollisionSystem`.
 
 Useful check:

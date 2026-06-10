@@ -27,11 +27,13 @@ await page.waitForFunction(() => Boolean(window.__rpgScene?.player?.bounds));
 const report = await page.evaluate(() => {
   const scene = window.__rpgScene;
   const playerFoot = (x, y) => ({ x: x - 17, y: y - 28, width: 34, height: 28 });
+  const overlaps = (a, b) => a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
   const npcPlacement = (scene.map.asset.npcs || []).map((npc) => ({
     id: npc.id,
     x: npc.x,
     y: npc.y,
-    reachable: scene.collision.canMove(playerFoot(npc.x, npc.y))
+    reachable: scene.collision.canMove(playerFoot(npc.x, npc.y)),
+    occluded: scene.map.occlusion.some((mask) => overlaps(playerFoot(npc.x, npc.y), mask))
   }));
   return {
     mapId: scene.mapId,
@@ -43,7 +45,9 @@ const report = await page.evaluate(() => {
     innRoofBlocked: scene.collision.canMove({ x: 2800, y: 2050, width: 34, height: 28 }) === false,
     templeRoofBlocked: scene.collision.canMove({ x: 2520, y: 650, width: 34, height: 28 }) === false,
     innDoorReachable: scene.collision.canMove(playerFoot(2860, 2365)),
+    innDoorNearTrigger: scene.map.triggerNear(playerFoot(2685, 2390), 96)?.name === "inn_room_door",
     medicineVendorReachable: scene.collision.canMove(playerFoot(2940, 2520)),
+    medicineVendorUnoccluded: !scene.map.occlusion.some((mask) => overlaps(playerFoot(2940, 2520), mask)),
     battleNpcReachable: scene.collision.canMove(playerFoot(895, 745)),
     innDoorTriggerExists: Boolean(scene.map.triggerByName("inn_room_door")),
     enemyTriggerExists: Boolean(scene.map.triggerByName("enemy_scout_npc")),
@@ -74,12 +78,15 @@ if (report.occlusionCount < 3) failures.push("world occlusion masks are missing"
 if (!report.innRoofBlocked) failures.push("inn roof collision mask is not blocking");
 if (!report.templeRoofBlocked) failures.push("temple roof collision mask is not blocking");
 if (!report.innDoorReachable) failures.push("inn door reachable zone is blocked");
+if (!report.innDoorNearTrigger) failures.push("inn door proximity trigger does not work");
 if (!report.medicineVendorReachable) failures.push("medicine vendor is placed on blocked ground");
+if (!report.medicineVendorUnoccluded) failures.push("medicine vendor foot position is covered by occlusion");
 if (!report.battleNpcReachable) failures.push("battle NPC is placed on blocked ground");
 if (!report.innDoorTriggerExists) failures.push("inn room trigger is missing");
 if (!report.enemyTriggerExists) failures.push("enemy battle trigger is missing");
 for (const npc of report.npcPlacement) {
   if (!npc.reachable) failures.push(`NPC placement is blocked: ${npc.id}`);
+  if (npc.occluded) failures.push(`NPC placement is occluded at foot position: ${npc.id}`);
 }
 if (roomReport.mapId !== "daliInnRoom") failures.push("room transition contract failed");
 if (roomReport.occlusionCount < 4) failures.push("room occlusion masks are missing");

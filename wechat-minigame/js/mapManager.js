@@ -38,13 +38,18 @@ class MapManager {
   }
 
   draw(context, camera, playRect) {
-    const image = this.images[this.map.image];
     context.save();
     context.beginPath();
     context.rect(playRect.x, playRect.y, playRect.width, playRect.height);
     context.clip();
     context.translate(playRect.x, playRect.y);
-    context.drawImage(image, -Math.round(camera.x), -Math.round(camera.y));
+    if (this.map.images) {
+      for (const layer of this.map.images) {
+        context.drawImage(this.images[layer.id], Math.round(layer.x - camera.x), Math.round(layer.y - camera.y));
+      }
+    } else {
+      context.drawImage(this.images[this.map.image], -Math.round(camera.x), -Math.round(camera.y));
+    }
     context.restore();
   }
 }

@@ -19,11 +19,12 @@ npm run wechat:open
 
 ## 发布前配置
 
-`project.config.json` 里的 `touristappid` 只是仓库占位值。当前微信开发者工具不能用该值启动小游戏模拟器，发布前必须替换为《苍山侠影》自己的微信小游戏 AppID，不要复用其他小游戏的 AppID。
+`project.config.json` 当前配置测试 AppID `wx91b93b31d0145e09`，微信 CLI 预览已通过。AppSecret 不属于客户端配置，禁止写入本目录或提交到 Git。
 
-运行资产被拆成三个分包：
+运行资产被拆成五个分包：
 
-- `map-pack`：无损 WebP 世界地图和室内地图。
+- `world-west-pack` / `world-east-pack`：无损 PNG 世界地图左右半图。
+- `room-pack`：室内地图。
 - `character-pack`：主角与 NPC 精灵表。
 - `audio-pack`：低码率 AAC/M4A 背景音乐。
 

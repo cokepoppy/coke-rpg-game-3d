@@ -20,9 +20,9 @@ class UiRenderer {
     const { width, height } = this.viewport;
     context.fillStyle = "#171510";
     context.fillRect(0, 0, width, height);
-    if (state.images.world) {
+    if (state.images.worldEast) {
       context.globalAlpha = 0.48;
-      context.drawImage(state.images.world, 2450, 1850, 930, 1560, 0, 0, width, height);
+      context.drawImage(state.images.worldEast, 210, 1850, 930, 1560, 0, 0, width, height);
       context.globalAlpha = 1;
     }
     context.fillStyle = "rgba(12, 10, 7, 0.46)";

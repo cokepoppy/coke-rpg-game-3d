@@ -19,8 +19,9 @@ const GAME = {
 };
 
 const ASSETS = {
-  world: "map-pack/world.webp",
-  room: "map-pack/inn-room.png",
+  worldWest: "world-west-pack/world-west.png",
+  worldEast: "world-east-pack/world-east.png",
+  room: "room-pack/inn-room.png",
   hero: "character-pack/hero.png",
   companion: "character-pack/companion.png",
   scout: "character-pack/scout.png",
@@ -32,7 +33,10 @@ const ASSETS = {
 const MAPS = {
   world: {
     id: "world",
-    image: "world",
+    images: [
+      { id: "worldWest", x: 0, y: 0 },
+      { id: "worldEast", x: 2240, y: 0 }
+    ],
     width: 4480,
     height: 3584,
     spawn: { x: 2700, y: 2520 },

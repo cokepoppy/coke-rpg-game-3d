@@ -38,6 +38,12 @@ function createAudio(source) {
   return audio;
 }
 
+function loadAssetPacks() {
+  if (!wx.loadSubpackage) return Promise.resolve();
+  const load = (name) => new Promise((resolve, reject) => wx.loadSubpackage({ name, success: resolve, fail: reject }));
+  return Promise.all([load("worldWestPack"), load("worldEastPack"), load("roomPack"), load("characterPack"), load("audioPack")]);
+}
+
 function readSave(key) {
   try { return wx.getStorageSync(key) || null; } catch { return null; }
 }
@@ -46,4 +52,4 @@ function writeSave(key, value) {
   try { wx.setStorageSync(key, value); } catch (error) { console.warn("Save failed", error); }
 }
 
-module.exports = { createSurface, loadImage, createAudio, readSave, writeSave };
+module.exports = { createSurface, loadImage, createAudio, loadAssetPacks, readSave, writeSave };

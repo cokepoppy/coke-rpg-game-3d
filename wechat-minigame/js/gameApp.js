@@ -1,5 +1,5 @@
 const { GAME, ASSETS } = require("./config");
-const { createSurface, loadImage, createAudio, readSave, writeSave } = require("./platform");
+const { createSurface, loadImage, createAudio, loadAssetPacks, readSave, writeSave } = require("./platform");
 const { Player, drawSprite } = require("./player");
 const { MapManager } = require("./mapManager");
 const { DialogSystem } = require("./dialogSystem");
@@ -27,6 +27,7 @@ class GameApp {
   }
 
   async start() {
+    await loadAssetPacks();
     await this.loadAssets();
     this.mapManager = new MapManager(this.images, this.viewport);
     this.player = new Player(this.images.hero, this.mapManager.map.spawn);

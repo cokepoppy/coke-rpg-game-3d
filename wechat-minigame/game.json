@@ -1,6 +1,28 @@
 {
   "deviceOrientation": "portrait",
   "showStatusBar": false,
+  "subpackages": [
+    {
+      "name": "worldWestPack",
+      "root": "world-west-pack"
+    },
+    {
+      "name": "worldEastPack",
+      "root": "world-east-pack"
+    },
+    {
+      "name": "roomPack",
+      "root": "room-pack"
+    },
+    {
+      "name": "characterPack",
+      "root": "character-pack"
+    },
+    {
+      "name": "audioPack",
+      "root": "audio-pack"
+    }
+  ],
   "networkTimeout": {
     "request": 10000,
     "connectSocket": 10000,

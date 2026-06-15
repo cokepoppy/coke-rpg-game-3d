@@ -8,12 +8,12 @@
     "mapId": "world",
     "x": 2700,
     "y": 2520,
-    "trigger": null
+    "trigger": "inn"
   },
   "afterMove": {
     "mapId": "world",
     "x": 2700,
-    "y": 2326.8400000000056,
+    "y": 2333.0000000000077,
     "trigger": "inn"
   },
   "interaction": {

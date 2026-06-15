@@ -21,6 +21,9 @@ class GameApp {
     this.axis = { x: 0, y: 0 };
     this.lastTime = Date.now();
     this.touchBindings = new Map();
+    this.requestFrame = typeof requestAnimationFrame === "function"
+      ? (callback) => requestAnimationFrame(callback)
+      : (callback) => setTimeout(callback, 16);
   }
 
   async start() {
@@ -43,7 +46,7 @@ class GameApp {
     this.lastTime = now;
     this.update(dt);
     this.render();
-    requestAnimationFrame(() => this.frame());
+    this.requestFrame(() => this.frame());
   }
 
   update(dt) {

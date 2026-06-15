@@ -30,14 +30,20 @@ try {
   });
 
   await page.screenshot({ path: `${output}/01-menu.png` });
-  await page.mouse.click(195, 465);
-  for (let index = 0; index < 3; index += 1) {
-    await page.waitForTimeout(80);
-    await page.mouse.click(195, 794);
+  await clickButton(page, "new");
+  await page.waitForFunction(() => globalThis.__cangshanGame?.mode === "game", null, { timeout: 5000 });
+  for (let index = 0; index < 6; index += 1) {
+    await page.waitForTimeout(120);
+    const dialogActive = await page.evaluate(() => globalThis.__cangshanGame.dialog.active);
+    if (!dialogActive) break;
+    await clickButton(page, "choice:0");
   }
+  const openingClosed = await page.evaluate(() => !globalThis.__cangshanGame.dialog.active);
+  if (!openingClosed) throw new Error("Opening dialog did not finish after six attempts.");
 
   const beforeMove = await playerState(page);
-  await page.mouse.move(104, 743);
+  const up = await buttonCenter(page, "up");
+  await page.mouse.move(up.x, up.y);
   await page.mouse.down();
   await page.waitForTimeout(850);
   await page.mouse.up();
@@ -45,14 +51,14 @@ try {
   const afterMove = await playerState(page);
   await page.screenshot({ path: `${output}/02-world.png` });
 
-  await page.mouse.click(332, 774);
+  await clickButton(page, "interact");
   await page.waitForTimeout(150);
   const interaction = await page.evaluate(() => ({
     speaker: globalThis.__cangshanGame.dialog.page?.speaker,
     choices: globalThis.__cangshanGame.dialog.page?.choices?.map((choice) => choice.label) || []
   }));
   if (interaction.speaker !== "云来客栈") throw new Error(`Expected inn interaction, received ${interaction.speaker}`);
-  await page.mouse.click(195, 746);
+  await clickButton(page, "choice:0");
   await page.waitForTimeout(180);
   await page.screenshot({ path: `${output}/03-room.png` });
 
@@ -76,4 +82,18 @@ async function playerState(page) {
     y: globalThis.__cangshanGame.player.y,
     trigger: globalThis.__cangshanGame.activeTrigger?.id || null
   }));
+}
+
+async function clickButton(page, id) {
+  const point = await buttonCenter(page, id);
+  await page.mouse.click(point.x, point.y);
+}
+
+async function buttonCenter(page, id) {
+  for (let attempt = 0; attempt < 30; attempt += 1) {
+    const button = await page.evaluate((buttonId) => globalThis.__cangshanGame.ui.buttons.find((item) => item.id === buttonId) || null, id);
+    if (button) return { x: button.x + button.width / 2, y: button.y + button.height / 2 };
+    await page.waitForTimeout(50);
+  }
+  throw new Error(`Canvas button not rendered: ${id}`);
 }

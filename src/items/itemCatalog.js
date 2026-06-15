@@ -71,12 +71,12 @@ export const itemCatalog = {
   },
   yipintang_token: {
     id: "yipintang_token",
-    name: "一品堂令牌",
+    name: "西岭门令牌",
     type: "quest",
     rarity: "uncommon",
     price: 0,
     effect: "剧情物品",
-    description: "暗哨身上搜出的令牌，可证明一品堂潜入大理。",
+    description: "暗哨身上搜出的令牌，可证明西岭门潜入大理。",
     icon: { glyph: "令", tone: "black" }
   },
   old_jade: {
@@ -86,7 +86,7 @@ export const itemCatalog = {
     rarity: "rare",
     price: 0,
     effect: "剧情物品",
-    description: "铜匣中取出的旧玉佩，边缘刻着段氏纹样。",
+    description: "铜匣中取出的旧玉佩，边缘刻着前朝纹样。",
     icon: { glyph: "玉", tone: "jade" }
   },
   secret_map_half: {
@@ -96,7 +96,7 @@ export const itemCatalog = {
     rarity: "rare",
     price: 0,
     effect: "剧情物品",
-    description: "泛黄地图只剩半张，指向天龙古寺后山。",
+    description: "泛黄地图只剩半张，指向苍山古寺后山。",
     icon: { glyph: "图", tone: "paper" }
   },
   silver_piece: {
@@ -136,7 +136,7 @@ export const itemCatalog = {
     rarity: "rare",
     price: 0,
     effect: "剧情物品",
-    description: "标出天龙古寺后山密道入口的山道图。",
+    description: "标出苍山古寺后山密道入口的山道图。",
     icon: { glyph: "路", tone: "paper" }
   },
   manual_fragment: {

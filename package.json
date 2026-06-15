@@ -1,0 +1,18 @@
+{
+  "name": "cangshan-rpg",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "wechat:assets": "node scripts/copy-wechat-assets.mjs",
+    "wechat:debug": "npm run wechat:assets && node scripts/start-wechat-debug.mjs",
+    "wechat:test": "node scripts/test-wechat-debug.mjs",
+    "wechat:test": "node scripts/test-wechat-debug.mjs",
+    "wechat:open": "npm run wechat:assets && /Applications/wechatwebdevtools.app/Contents/MacOS/cli open --project $PWD/wechat-minigame --lang zh",
+    "wechat:preview": "npm run wechat:assets && /Applications/wechatwebdevtools.app/Contents/MacOS/cli preview --project $PWD/wechat-minigame --lang zh"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1",
+    "playwright-core": "^1.60.0",
+    "sharp": "^0.35.1"
+  }
+}

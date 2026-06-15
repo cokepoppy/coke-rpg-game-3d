@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>苍山侠影 · 微信小游戏调试</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #10100e; }
+      body { display: grid; place-items: center; }
+      canvas { width: min(100vw, 390px); height: min(100vh, 844px); aspect-ratio: 390 / 844; image-rendering: pixelated; background: #171510; touch-action: none; box-shadow: 0 0 0 1px #413827; }
+      @media (max-width: 390px), (max-height: 844px) { canvas { width: 100vw; height: 100vh; } }
+    </style>
+  </head>
+  <body>
+    <canvas id="game" aria-label="苍山侠影竖屏游戏画面"></canvas>
+    <script src="./.generated/game-debug.js"></script>
+  </body>
+</html>

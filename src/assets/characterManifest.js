@@ -1,7 +1,7 @@
 export const characters = {
   "duan_yu": {
     "id": "duan_yu",
-    "name": "段誉",
+    "name": "沈临川",
     "role": "player",
     "sheet": "./assets/characters/hero/hero-walk-anchored-v4-motionfix.png",
     "frameWidth": 313,
@@ -18,7 +18,7 @@ export const characters = {
   },
   "a_luo": {
     "id": "a_luo",
-    "name": "阿萝",
+    "name": "苏萝",
     "role": "ally",
     "sheet": "./assets/characters/a_luo/a_luo-walk-anchored.png",
     "frameWidth": 313,
@@ -52,7 +52,7 @@ export const characters = {
   },
   "masked_scout": {
     "id": "masked_scout",
-    "name": "一品堂暗哨",
+    "name": "西岭密探",
     "role": "enemy",
     "sheet": "./assets/characters/masked_scout/masked_scout-walk-anchored.png",
     "frameWidth": 313,
@@ -69,7 +69,7 @@ export const characters = {
   },
   "scout_archer": {
     "id": "scout_archer",
-    "name": "一品堂弩手",
+    "name": "西岭弩手",
     "role": "enemy",
     "sheet": "./assets/characters/scout_archer/scout_archer-walk-anchored.png",
     "frameWidth": 313,
@@ -86,7 +86,7 @@ export const characters = {
   },
   "yipintang_leader": {
     "id": "yipintang_leader",
-    "name": "一品堂小头目",
+    "name": "西岭头目",
     "role": "enemy",
     "sheet": "./assets/characters/yipintang_leader/yipintang_leader-walk-anchored.png",
     "frameWidth": 313,

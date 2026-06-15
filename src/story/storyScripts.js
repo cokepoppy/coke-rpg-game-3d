@@ -6,25 +6,25 @@ export const storyScripts = {
     start: "wake",
     nodes: {
       wake: {
-        speaker: "阿萝",
-        text: "你醒啦。这里是苍山旧道，再往上就是天龙古寺。昨夜山门钟声断了三次，像是有人闯进了禁地。",
+        speaker: "苏萝",
+        text: "你醒啦。这里是苍山旧道，再往上就是苍山古寺。昨夜山门钟声断了三次，像是有人闯进了禁地。",
         next: "mentor"
       },
       mentor: {
-        speaker: "段誉",
+        speaker: "沈临川",
         text: "我只记得一阵笛声，醒来时佩剑已经不见了。",
         next: "quest"
       },
       quest: {
-        speaker: "阿萝",
-        text: "先去石阶旁的灯亭查一查。若看到刻着“无量”的铜匣，不要急着打开，里面可能藏着机关。",
+        speaker: "苏萝",
+        text: "先去石阶旁的灯亭查一查。若看到刻着“云纹”的铜匣，不要急着打开，里面可能藏着机关。",
         actions: [
           { type: "setFlag", flag: "intro_seen" },
           {
             type: "addQuest",
             quest: {
               id: "find_bronze_box",
-              title: "寻找无量铜匣",
+              title: "寻找云纹铜匣",
               description: "沿旧道搜寻灯亭和石阶附近，找到被藏起来的铜匣。"
             }
           }
@@ -54,7 +54,7 @@ export const storyScripts = {
         ]
       },
       leave: {
-        speaker: "段誉",
+        speaker: "沈临川",
         text: "现在还不是节外生枝的时候。"
       }
     }
@@ -65,7 +65,7 @@ export const storyScripts = {
     repeatFlag: "masked_scout_defeated",
     nodes: {
       challenge: {
-        speaker: "一品堂暗哨",
+        speaker: "西岭密探",
         text: "少侠止步。寺前这条路，今夜不许外人上山。你若再近一步，刀剑无眼。",
         choices: [
           { label: "拔剑迎战", next: "battle" },
@@ -73,12 +73,12 @@ export const storyScripts = {
         ]
       },
       battle: {
-        speaker: "段誉",
+        speaker: "沈临川",
         text: "既是冲我来的，那就不用再藏。",
         actions: [{ type: "startBattle", enemyId: "masked_scout" }]
       },
       leave: {
-        speaker: "段誉",
+        speaker: "沈临川",
         text: "先避开暗哨，另寻时机。"
       }
     }
@@ -90,7 +90,7 @@ export const storyScripts = {
     nodes: {
       inspect: {
         speaker: "灯亭",
-        text: "石阶旁的灯火照出一只旧铜匣。匣底刻着“无量”二字，锁扣旁有三道细痕。",
+        text: "石阶旁的灯火照出一只旧铜匣。匣底刻着“云纹”二字，锁扣旁有三道细痕。",
         choices: [
           { label: "按刻痕开锁", next: "open" },
           { label: "先收起来", next: "leave" }
@@ -109,13 +109,13 @@ export const storyScripts = {
             quest: {
               id: "temple_secret_path",
               title: "寺后密道",
-              description: "带着铜匣中的半张地图，去天龙古寺询问守寺僧。"
+              description: "带着铜匣中的半张地图，去苍山古寺询问守寺僧。"
             }
           }
         ]
       },
       leave: {
-        speaker: "段誉",
+        speaker: "沈临川",
         text: "机关未明，还是先别妄动。"
       }
     }
@@ -140,19 +140,19 @@ export const storyScripts = {
     nodes: {
       door: {
         speaker: "客栈内室",
-        text: "木门虚掩，里面传来淡淡药香。阿萝说铜匣线索可能和这间客房有关。",
+        text: "木门虚掩，里面传来淡淡药香。苏萝说铜匣线索可能和这间客房有关。",
         choices: [
           { label: "进入房间", next: "enter" },
           { label: "先不进去", next: "leave" }
         ]
       },
       enter: {
-        speaker: "段誉",
+        speaker: "沈临川",
         text: "进去看看。",
         actions: [{ type: "enterMap", mapId: "daliInnRoom", spawn: "entrance" }]
       },
       leave: {
-        speaker: "段誉",
+        speaker: "沈临川",
         text: "先在外面再查一圈。"
       }
     }
@@ -170,12 +170,12 @@ export const storyScripts = {
         ]
       },
       leave: {
-        speaker: "段誉",
+        speaker: "沈临川",
         text: "房里该看的地方差不多了。",
         actions: [{ type: "enterMap", mapId: "world", spawn: "innReturn" }]
       },
       stay: {
-        speaker: "段誉",
+        speaker: "沈临川",
         text: "再检查一下柜子和书桌。"
       }
     }
@@ -205,7 +205,7 @@ export const storyScripts = {
         ]
       },
       leave: {
-        speaker: "段誉",
+        speaker: "沈临川",
         text: "柜门太旧，硬拉可能惊动别人。"
       }
     }
@@ -257,7 +257,7 @@ export const storyScripts = {
       },
       open: {
         speaker: "红漆箱",
-        text: "箱中没有金银，只有一张折好的山道图。图上圈出了天龙古寺后的密道入口。",
+        text: "箱中没有金银，只有一张折好的山道图。图上圈出了苍山古寺后的密道入口。",
         actions: [
           { type: "setFlag", flag: "room_chest_opened" },
           { type: "addItem", itemId: "secret_path_map", amount: 1 },
@@ -267,13 +267,13 @@ export const storyScripts = {
             quest: {
               id: "enter_secret_path",
               title: "进入密道",
-              description: "带着山道图前往天龙古寺，寻找寺后的密道入口。"
+              description: "带着山道图前往苍山古寺，寻找寺后的密道入口。"
             }
           }
         ]
       },
       leave: {
-        speaker: "段誉",
+        speaker: "沈临川",
         text: "先别动箱子。"
       }
     }
@@ -291,12 +291,12 @@ export const storyScripts = {
         ]
       },
       copy: {
-        speaker: "段誉",
+        speaker: "沈临川",
         text: "线索已经连起来了：灯亭铜匣只是引子，真正的入口在寺后。",
         actions: [{ type: "remember", text: "书桌账册提到灯亭、铜匣和寺后密道。" }]
       },
       leave: {
-        speaker: "段誉",
+        speaker: "沈临川",
         text: "这本账册不像客栈自己的东西。"
       }
     }
@@ -341,7 +341,7 @@ export const storyScripts = {
     nodes: {
       abbot: {
         speaker: "守寺僧",
-        text: "施主若为钟声而来，需先证明不是一品堂探子。山下草丛有暗哨，演武场有机关，二者皆可作证。",
+        text: "施主若为钟声而来，需先证明不是西岭探子。山下草丛有暗哨，演武场有机关，二者皆可作证。",
         choices: [
           { label: "询问铜匣", next: "box" },
           { label: "告辞", next: "bye" }
@@ -349,10 +349,10 @@ export const storyScripts = {
       },
       box: {
         speaker: "守寺僧",
-        text: "铜匣原是段氏旧物。若你找到了，切记先看匣底刻痕，再动锁扣。"
+        text: "铜匣原是前朝旧物。若你找到了，切记先看匣底刻痕，再动锁扣。"
       },
       bye: {
-        speaker: "段誉",
+        speaker: "沈临川",
         text: "我会再来。"
       }
     }
@@ -363,7 +363,7 @@ export const storyScripts = {
     nodes: {
       gate: {
         speaker: "红幡",
-        text: "山风卷起红幡，幡下有新鲜马蹄印。再往前，就是一品堂设下的伏击。",
+        text: "山风卷起红幡，幡下有新鲜马蹄印。再往前，就是西岭门设下的伏击。",
         actions: [{ type: "startBattle", enemyId: "yipintang_leader" }]
       }
     }

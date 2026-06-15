@@ -1,4 +1,4 @@
-Generate one 4x4 sprite sheet for a 2D pixel-art wuxia RPG character: 一品堂暗哨.
+Generate one 4x4 sprite sheet for a 2D pixel-art wuxia RPG character: 西岭密探.
 Character: masked Yipintang scout, dark red-black robe, short saber, stealth posture.
 Shared style: Tian Long Ba Bu inspired Dali wuxia pixel RPG, top-down 3/4 compact readable sprites.
 Top-down 3/4 RPG perspective, compact readable game sprite, consistent identity.

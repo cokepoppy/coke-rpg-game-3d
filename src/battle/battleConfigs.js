@@ -1,18 +1,18 @@
 const commonPlayerSkills = [
-  { id: "six_meridians", name: "六脉剑气", cost: 35, damage: 38, range: 2, effectId: "qi_projectile" },
-  { id: "lingbo_step", name: "凌波突刺", cost: 25, damage: 30, range: 1, effectId: "sword_slash" }
+  { id: "six_meridians", name: "归元剑气", cost: 35, damage: 38, range: 2, effectId: "qi_projectile" },
+  { id: "lingbo_step", name: "流云突刺", cost: 25, damage: 30, range: 1, effectId: "sword_slash" }
 ];
 
 export const battleConfigs = {
   masked_scout: {
     id: "masked_scout",
-    title: "一品堂暗哨",
+    title: "西岭密探",
     map: "./maps/dali-battle-courtyard/dali-battle-courtyard.tactics.json",
     introScript: "enemy_scout_npc",
     players: [
       {
         id: "duan_yu",
-        name: "段誉",
+        name: "沈临川",
         spriteId: "duan_yu",
         side: "player",
         hp: 120,
@@ -23,7 +23,7 @@ export const battleConfigs = {
       },
       {
         id: "a_luo",
-        name: "阿萝",
+        name: "苏萝",
         spriteId: "a_luo",
         side: "player",
         hp: 92,
@@ -45,17 +45,17 @@ export const battleConfigs = {
         { itemId: "hemostatic_powder", amount: 1 }
       ],
       money: 35,
-      memory: "击退一品堂暗哨，缴获一枚令牌、止血散和一些钱。"
+      memory: "击退西岭密探，缴获一枚令牌、止血散和一些钱。"
     }
   },
   yipintang_leader: {
     id: "yipintang_leader",
-    title: "一品堂小头目",
+    title: "西岭头目",
     map: "./maps/dali-battle-courtyard/dali-battle-courtyard.tactics.json",
     players: [
       {
         id: "duan_yu",
-        name: "段誉",
+        name: "沈临川",
         spriteId: "duan_yu",
         side: "player",
         hp: 120,

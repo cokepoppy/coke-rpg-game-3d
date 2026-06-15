@@ -48,7 +48,7 @@
     [10, 5],
     [11, 4]
   ],
-  "objectives": ["击败所有一品堂伏兵"],
+  "objectives": ["击败所有西岭门伏兵"],
   "workflow": {
     "mode": "design_first_tactics_map",
     "runtimeTileSize": 64,

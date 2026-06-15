@@ -33,7 +33,7 @@ export class MenuSystem {
 
   render() {
     const hasSave = Boolean(localStorage.getItem(SAVE_KEY));
-    const title = this.mode === "settings" ? "设置" : "天龙八部";
+    const title = this.mode === "settings" ? "设置" : "苍山侠影";
     const subtitle = this.mode === "main" ? "大理旧道 · 江湖初起" : "游戏菜单";
     this.root.innerHTML = `
       <div class="menu-backdrop"></div>

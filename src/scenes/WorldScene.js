@@ -244,11 +244,11 @@ function triggerLabel(trigger) {
   const labels = {
     bronze_box: "查看青铜箱",
     inn_room_door: "进入客栈房间",
-    enemy_scout_npc: "挑战一品堂暗哨",
+    enemy_scout_npc: "挑战西岭密探",
     encounter_grass: "查看草丛动静",
     training_yard: "进入演武场",
     medicine_market: "询问药摊老人",
-    main_temple: "拜访天龙寺",
+    main_temple: "拜访苍山寺",
     boss_gate: "调查石门"
   };
   return labels[trigger.name] || "交互";

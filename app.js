@@ -1,7 +1,7 @@
 const starters = [
   {
     id: "xiaoyao",
-    name: "凌波琴客",
+    name: "流云琴客",
     school: "逍遥一脉",
     trait: "轻功与内力见长",
     color: "#58b99b",
@@ -32,7 +32,7 @@ const starters = [
   {
     id: "dali",
     name: "素袍剑使",
-    school: "大理段氏",
+    school: "苍山剑派",
     trait: "点穴与均衡见长",
     color: "#6fa8dc",
     accent: "#ffffff",
@@ -80,12 +80,12 @@ const recruits = [
 ];
 
 const locations = [
-  { id: "inn", name: "无量客栈", icon: "茶", x: 50, y: 88, w: 16, h: 12, event: "rest", label: "山门石阶" },
-  { id: "lake", name: "无量玉璧", icon: "壁", x: 46, y: 55, w: 13, h: 12, event: "scroll", label: "石井玉璧" },
+  { id: "inn", name: "云来客栈", icon: "茶", x: 50, y: 88, w: 16, h: 12, event: "rest", label: "山门石阶" },
+  { id: "lake", name: "苍山玉璧", icon: "壁", x: 46, y: 55, w: 13, h: 12, event: "scroll", label: "石井玉璧" },
   { id: "market", name: "大理市集", icon: "市", x: 72, y: 61, w: 20, h: 14, event: "supply", label: "竹棚市集" },
   { id: "cliff", name: "苍山断崖", icon: "崖", x: 18, y: 47, w: 24, h: 28, event: "battle", label: "草深处" },
   { id: "forest", name: "松林古道", icon: "林", x: 30, y: 71, w: 19, h: 16, event: "recruit", label: "松林古道" },
-  { id: "temple", name: "天龙古寺", icon: "寺", x: 50, y: 30, w: 20, h: 16, event: "rest", label: "古寺正殿" },
+  { id: "temple", name: "苍山古寺", icon: "寺", x: 50, y: 30, w: 20, h: 16, event: "rest", label: "古寺正殿" },
   { id: "pass", name: "雁门关外", icon: "关", x: 80, y: 42, w: 20, h: 24, event: "battle", label: "演武场" },
   { id: "palace", name: "西夏王帐", icon: "帐", x: 88, y: 70, w: 13, h: 16, event: "boss", label: "王帐入口" }
 ];
@@ -119,7 +119,7 @@ const enemies = {
   },
   palace: {
     id: "boss",
-    name: "西夏一品堂主",
+    name: "西夏西岭门主",
     school: "毒掌宗师",
     color: "#6d4aa1",
     accent: "#55b88d",
@@ -139,7 +139,7 @@ const eventCopy = {
   scroll: ["参悟玉璧", "玉璧月影如剑，队伍攻击与内力上限提升。"],
   recruit: ["林中结伴", "一位江湖同道愿同行，从此队伍多一份照应。"],
   battle: ["狭路相逢", "前方刀光骤起，需要先击退敌人。"],
-  boss: ["王帐决战", "一品堂高手拦住去路，这是此行最险一战。"]
+  boss: ["王帐决战", "西岭高手拦住去路，这是此行最险一战。"]
 };
 
 const state = {
@@ -205,11 +205,11 @@ function renderStarter() {
       <div class="brand">
         <div class="seal">侠</div>
         <div>
-          <h1>天龙群侠录</h1>
+          <h1>苍山侠影</h1>
           <span>Sengoku Era 风格的 JavaScript 武侠 RPG 原型</span>
         </div>
       </div>
-      <p>选择一位初始侠客，穿行大理、苍山、雁门与西夏王帐。每个地点会触发补给、招募、秘籍或战斗事件，最终击败一品堂主。</p>
+      <p>选择一位初始侠客，穿行大理、苍山、雁门与西夏王帐。每个地点会触发补给、招募、秘籍或战斗事件，最终击败西岭门主。</p>
     </section>
     <section class="starter-grid">
       ${starters
@@ -243,7 +243,7 @@ function renderTopbar() {
       <div class="brand">
         <div class="seal">侠</div>
         <div>
-          <h1>天龙群侠录</h1>
+          <h1>苍山侠影</h1>
           <span data-top-place>当前：${loc.name}</span>
         </div>
       </div>
@@ -287,7 +287,7 @@ function renderQuestPanel() {
       <div class="panel-header"><h2>目标</h2></div>
       <div class="quest-list">
         <b>${palaceCleared ? "江湖暂定" : "赶赴西夏王帐"}</b><br />
-        ${palaceCleared ? "一品堂主已败。可以重开尝试不同 starter。" : "沿地图推进，招募同伴并击败沿途强敌。"}
+        ${palaceCleared ? "西岭门主已败。可以重开尝试不同 starter。" : "沿地图推进，招募同伴并击败沿途强敌。"}
       </div>
     </section>
   `;
@@ -347,7 +347,7 @@ function renderMap() {
         <span>${state.party[0].school} · ${state.party[0].name} Lv.${state.party[0].level || 1}</span>
         <button class="ghost-btn" data-action="rest">调息</button>
       </div>
-      <div class="world-scene" tabindex="0" aria-label="天龙江湖场景">
+      <div class="world-scene" tabindex="0" aria-label="苍山江湖场景">
         <div class="terrain grass-left"></div>
         <div class="terrain grass-right"></div>
         <div class="terrain red-maple"></div>
@@ -449,7 +449,7 @@ function bindStarter() {
       state.current = "inn";
       state.world = { x: 50, y: 80, facing: "down", frame: 0, step: 0, lastZone: null };
       state.event = { type: "intro", button: "继续" };
-      pushLog(`${hero.name}加入队伍，江湖路从无量客栈开始。`);
+      pushLog(`${hero.name}加入队伍，江湖路从云来客栈开始。`);
       render();
     });
   });
@@ -507,7 +507,7 @@ function handleAction(action) {
     state.current = "inn";
     state.battle = null;
     healParty(0.5);
-    pushLog("暂避锋芒，撤回无量客栈。");
+    pushLog("暂避锋芒，撤回云来客栈。");
     render();
     return;
   }
@@ -546,7 +546,7 @@ function resolveEvent() {
     });
     state.reputation += 1;
     state.cleared.add(loc.id);
-    pushLog("参悟无量玉璧，队伍攻击 +2，内力上限 +8。");
+    pushLog("参悟苍山玉璧，队伍攻击 +2，内力上限 +8。");
   }
   if (type === "recruit") {
     if (state.party.length < 3) {
@@ -671,7 +671,7 @@ function winBattle() {
   });
   pushLog(`击败${state.battle.enemy.name}，${loc.name}路线已清。`);
   if (loc.event === "boss") {
-    pushLog("西夏王帐一战成名，天龙群侠录暂告一段落。");
+    pushLog("西夏王帐一战成名，苍山侠影暂告一段落。");
   }
   unlockNeighbors(loc.id);
   state.phase = "map";
@@ -681,7 +681,7 @@ function winBattle() {
 }
 
 function loseBattle() {
-  pushLog("队伍力竭，被路人救回无量客栈。");
+  pushLog("队伍力竭，被路人救回云来客栈。");
   state.phase = "map";
   state.current = "inn";
   state.world = { x: 50, y: 80, facing: "down", frame: 0, step: 0, lastZone: null };

@@ -65,7 +65,7 @@ export const assets = {
       npcs: [
         {
           id: "enemy_scout_npc",
-          name: "一品堂暗哨",
+          name: "西岭密探",
           x: 895,
           y: 745,
           faction: "enemy",

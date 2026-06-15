@@ -1,4 +1,4 @@
-# 天龙群侠录 RPG
+# 苍山侠影 RPG
 
 一个参考 `agent-sprite-forge` 思路做的浏览器 RPG 原型：生成风格角色、Starter 选择、键盘操控地图探索、场景事件和回合制战斗 UI。
 
@@ -89,3 +89,20 @@ NODE_PATH=/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/d
 - `auto-map-studio`：地图概念图、64x64 tileset、Tiled JSON 和地图调试预览。
 - `auto-sprite-studio`：人物行走帧生成、切分、锚点漂移检测和重组。
 - `rpg-game-studio`：浏览器 RPG 代码架构、地图管理、角色、对话和剧情脚本系统脚手架。
+
+## 微信小游戏竖屏版
+
+微信小游戏工程位于 `wechat-minigame/`，使用单 Canvas、竖屏触控方向键和微信本地存储。Chrome 调试壳位于 `wechat-debug/`。
+
+```bash
+npm install
+npm run wechat:debug
+```
+
+浏览器访问 `http://127.0.0.1:4174/wechat-debug/`。完成快速调试后执行：
+
+```bash
+npm run wechat:open
+```
+
+`project.config.json` 默认使用 `touristappid`，正式预览和上传前需要替换为该小游戏自己的 AppID。

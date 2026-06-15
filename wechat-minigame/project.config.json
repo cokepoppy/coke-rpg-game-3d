@@ -1,0 +1,19 @@
+{
+  "appid": "touristappid",
+  "compileType": "game",
+  "projectname": "cangshan-rpg",
+  "description": "Cangshan portrait wuxia RPG WeChat Mini Game port",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": false,
+    "minified": true,
+    "newFeature": true,
+    "coverView": true,
+    "showShadowRootInWxmlPanel": false,
+    "scopeDataCheck": false,
+    "minifyWXML": true
+  },
+  "condition": {}
+}

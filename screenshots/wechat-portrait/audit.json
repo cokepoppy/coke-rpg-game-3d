@@ -1,0 +1,33 @@
+{
+  "canvas": {
+    "width": 390,
+    "height": 844,
+    "coloredSamples": 3292
+  },
+  "beforeMove": {
+    "mapId": "world",
+    "x": 2700,
+    "y": 2520,
+    "trigger": null
+  },
+  "afterMove": {
+    "mapId": "world",
+    "x": 2700,
+    "y": 2326.8400000000056,
+    "trigger": "inn"
+  },
+  "interaction": {
+    "speaker": "云来客栈",
+    "choices": [
+      "进入客房",
+      "暂时离开"
+    ]
+  },
+  "room": {
+    "mapId": "room",
+    "x": 610,
+    "y": 650,
+    "trigger": "roomExit"
+  },
+  "errors": []
+}

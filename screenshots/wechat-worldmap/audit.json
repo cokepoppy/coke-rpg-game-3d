@@ -1,0 +1,34 @@
+{
+  "mode": "worldmap",
+  "defeatedScouts": [
+    "scout",
+    "scout_road",
+    "scout_gate"
+  ],
+  "worldMapUnlocked": true,
+  "nodes": [
+    {
+      "id": "cangshan",
+      "name": "苍山旧道",
+      "x": 148,
+      "y": 420,
+      "status": "cleared"
+    },
+    {
+      "id": "erhai",
+      "name": "洱海渡口",
+      "x": 254,
+      "y": 300,
+      "status": "unlocked"
+    },
+    {
+      "id": "jianhu",
+      "name": "剑湖宫道",
+      "x": 124,
+      "y": 204,
+      "status": "locked"
+    }
+  ],
+  "money": 195,
+  "errors": []
+}

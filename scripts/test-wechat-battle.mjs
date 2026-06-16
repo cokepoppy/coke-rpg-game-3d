@@ -56,6 +56,17 @@ try {
   await clickBattleCell(page, 3, 7);
   await page.waitForTimeout(120);
   await page.screenshot({ path: `${output}/05-player-moved.png` });
+  const moveLock = await page.evaluate(() => {
+    const battle = globalThis.__cangshanGame.battle;
+    const point = battle.cellCenter({ x: 2, y: 7 });
+    battle.handleTap(point.x, point.y);
+    const hero = battle.units.find((unit) => unit.id === "hero");
+    return {
+      hero: { x: hero.x, y: hero.y, moved: hero.moved, acted: hero.acted },
+      phase: battle.phase,
+      moves: battle.audit.moves.length
+    };
+  });
 
   await clickButton(page, "battle:skill");
   await page.waitForFunction(() => globalThis.__cangshanGame.battle?.phase === "target", null, { timeout: 3000 });
@@ -75,13 +86,26 @@ try {
       text: globalThis.__cangshanGame.dialog.page?.text
     },
     battle: globalThis.__cangshanGame.lastBattleAudit,
+    money: globalThis.__cangshanGame.money,
+    items: globalThis.__cangshanGame.items,
+    audio: {
+      world: globalThis.__cangshanGame.audio.audit,
+      battle: globalThis.__cangshanGame.battleAudio.audit,
+      hit: globalThis.__cangshanGame.hitSfx.audit
+    },
     errors: []
   }));
+  audit.moveLock = moveLock;
   audit.errors = errors;
   if (audit.viewport.width !== 390 || audit.viewport.height !== 844) throw new Error(`Expected portrait viewport, received ${audit.viewport.width}x${audit.viewport.height}`);
   if (audit.battle?.result !== "victory") throw new Error(`Expected victory, received ${audit.battle?.result}`);
   if (!audit.battle?.moves?.some((event) => event.id === "hero" && event.x === 3 && event.y === 7)) throw new Error("Missing audited hero move.");
+  if (audit.moveLock.hero.x !== 3 || audit.moveLock.hero.y !== 7 || audit.moveLock.moves !== 1) throw new Error("Hero moved more than once in one turn.");
   if (!audit.battle?.attacks?.some((event) => event.attackerId === "hero" && event.targetId === "scoutA" && event.damage === 38)) throw new Error("Missing audited hero attack.");
+  if (!audit.battle?.rewards?.money || audit.money <= 120) throw new Error("Battle rewards did not add money.");
+  if (!audit.items.hemostatic_powder) throw new Error("Guaranteed reward item was not added.");
+  if (audit.audio.battle.playCount < 1 || audit.audio.world.pauseCount < 1) throw new Error("Battle music did not switch on battle start.");
+  if (audit.audio.hit.playCount < 1) throw new Error("Hit sound effect did not play.");
   if (audit.dialog.speaker !== "战斗") throw new Error(`Expected victory dialog, received ${audit.dialog.speaker}`);
   if (errors.length) throw new Error(`Browser errors: ${errors.join(" | ")}`);
   await writeFile(`${output}/audit.json`, `${JSON.stringify(audit, null, 2)}\n`);

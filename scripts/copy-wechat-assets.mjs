@@ -20,6 +20,7 @@ await rm(path.join(root, "wechat-minigame/world-pack"), { recursive: true, force
 await rm(path.join(root, "wechat-minigame/world-west-pack"), { recursive: true, force: true });
 await rm(path.join(root, "wechat-minigame/world-east-pack"), { recursive: true, force: true });
 await rm(path.join(root, "wechat-minigame/room-pack"), { recursive: true, force: true });
+await rm(path.join(root, "wechat-minigame/world-map-pack"), { recursive: true, force: true });
 await rm(path.join(root, "wechat-minigame/character-pack"), { recursive: true, force: true });
 await rm(path.join(root, "wechat-minigame/audio-pack"), { recursive: true, force: true });
 await rm(path.join(root, "wechat-minigame/battle-pack"), { recursive: true, force: true });
@@ -51,6 +52,28 @@ for (const [pack, filename, left] of worldHalves) {
     .toFile(target);
 }
 
+const worldMapTarget = path.join(root, "wechat-minigame/world-map-pack/world-map.png");
+await mkdir(path.dirname(worldMapTarget), { recursive: true });
+await sharp(worldSource)
+  .resize({ width: 780, height: 624, fit: "cover", position: "attention" })
+  .modulate({ saturation: 0.78, brightness: 0.74 })
+  .blur(0.4)
+  .png({ palette: true, quality: 88, compressionLevel: 9 })
+  .toFile(worldMapTarget);
+
+const roomSource = path.join(root, "maps/dali-inn-room/dali-inn-room-rendered.png");
+const roomVariants = [
+  ["apothecary-room.png", { saturation: 0.82, brightness: 0.86, hue: 18 }, { r: 30, g: 74, b: 48, alpha: 0.22 }],
+  ["teahouse-room.png", { saturation: 0.72, brightness: 0.9, hue: -12 }, { r: 78, g: 50, b: 28, alpha: 0.18 }]
+];
+for (const [filename, modulate, tint] of roomVariants) {
+  await sharp(roomSource)
+    .modulate(modulate)
+    .composite([{ input: Buffer.from(`<svg width="1280" height="768"><rect width="1280" height="768" fill="rgba(${tint.r},${tint.g},${tint.b},${tint.alpha})"/></svg>`), blend: "over" }])
+    .png({ palette: true, quality: 92, compressionLevel: 9 })
+    .toFile(path.join(root, "wechat-minigame/room-pack", filename));
+}
+
 const battleTarget = path.join(root, "wechat-minigame/battle-pack/battle-courtyard.png");
 await mkdir(path.dirname(battleTarget), { recursive: true });
 await sharp(path.join(root, "maps/dali-battle-courtyard/dali-battle-courtyard-rendered.png"))
@@ -59,12 +82,13 @@ await sharp(path.join(root, "maps/dali-battle-courtyard/dali-battle-courtyard-re
   .toFile(battleTarget);
 
 await writeHitSfx(path.join(root, "wechat-minigame/audio-pack/hit.wav"));
+await writeBattleLoop(path.join(root, "wechat-minigame/audio-pack/battle-loop.wav"));
 
-for (const pack of ["world-west-pack", "world-east-pack", "room-pack", "character-pack", "audio-pack", "battle-pack"]) {
+for (const pack of ["world-west-pack", "world-east-pack", "world-map-pack", "room-pack", "character-pack", "audio-pack", "battle-pack"]) {
   await writeFile(path.join(root, "wechat-minigame", pack, "game.js"), "module.exports = {};\n");
 }
 
-console.log(`Prepared ${files.length + 4} compressed runtime assets.`);
+console.log(`Prepared ${files.length + 7} compressed runtime assets.`);
 
 async function writeHitSfx(target) {
   await mkdir(path.dirname(target), { recursive: true });
@@ -75,7 +99,7 @@ async function writeHitSfx(target) {
   for (let index = 0; index < samples; index += 1) {
     const t = index / sampleRate;
     const envelope = Math.exp(-t * 18);
-    const tone = Math.sin(Math.PI * 2 * (180 - t * 320) * t) * 0.75 + (Math.random() * 2 - 1) * 0.25;
+    const tone = Math.sin(Math.PI * 2 * (180 - t * 320) * t) * 0.75 + deterministicNoise(index, 11) * 0.25;
     const value = Math.max(-1, Math.min(1, tone * envelope));
     data.writeInt16LE(Math.round(value * 32767), index * 2);
   }
@@ -94,4 +118,48 @@ async function writeHitSfx(target) {
   header.write("data", 36);
   header.writeUInt32LE(data.length, 40);
   await writeFile(target, Buffer.concat([header, data]));
+}
+
+async function writeBattleLoop(target) {
+  await mkdir(path.dirname(target), { recursive: true });
+  const sampleRate = 22050;
+  const duration = 8;
+  const samples = Math.floor(sampleRate * duration);
+  const data = Buffer.alloc(samples * 2);
+  const scale = [0, 2, 3, 7, 10];
+  for (let index = 0; index < samples; index += 1) {
+    const t = index / sampleRate;
+    const beat = Math.floor(t * 4);
+    const note = scale[beat % scale.length];
+    const rootFreq = 110 * Math.pow(2, note / 12);
+    const pulse = Math.sin(Math.PI * 2 * rootFreq * t) * 0.34;
+    const drone = Math.sin(Math.PI * 2 * 55 * t) * 0.22;
+    const drum = (t * 2) % 1 < 0.09 ? deterministicNoise(index, 37) * Math.exp(-((t * 2) % 1) * 24) * 0.32 : 0;
+    const value = Math.max(-1, Math.min(1, pulse + drone + drum));
+    data.writeInt16LE(Math.round(value * 32767), index * 2);
+  }
+  await writeFile(target, Buffer.concat([wavHeader(data.length, sampleRate), data]));
+}
+
+function wavHeader(dataLength, sampleRate) {
+  const header = Buffer.alloc(44);
+  header.write("RIFF", 0);
+  header.writeUInt32LE(36 + dataLength, 4);
+  header.write("WAVE", 8);
+  header.write("fmt ", 12);
+  header.writeUInt32LE(16, 16);
+  header.writeUInt16LE(1, 20);
+  header.writeUInt16LE(1, 22);
+  header.writeUInt32LE(sampleRate, 24);
+  header.writeUInt32LE(sampleRate * 2, 28);
+  header.writeUInt16LE(2, 32);
+  header.writeUInt16LE(16, 34);
+  header.write("data", 36);
+  header.writeUInt32LE(dataLength, 40);
+  return header;
+}
+
+function deterministicNoise(index, salt) {
+  const value = Math.sin(index * 12.9898 + salt * 78.233) * 43758.5453;
+  return (value - Math.floor(value)) * 2 - 1;
 }

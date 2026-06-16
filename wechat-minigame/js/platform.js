@@ -35,6 +35,17 @@ function createAudio(source) {
   audio.src = `${wx.__assetBase || ""}${source}`;
   audio.loop = true;
   audio.volume = 0.38;
+  audio.audit = { source, playCount: 0, pauseCount: 0 };
+  const play = audio.play.bind(audio);
+  const pause = audio.pause.bind(audio);
+  audio.play = () => {
+    audio.audit.playCount += 1;
+    return play();
+  };
+  audio.pause = () => {
+    audio.audit.pauseCount += 1;
+    return pause();
+  };
   return audio;
 }
 
@@ -44,7 +55,9 @@ function createSfx(source) {
   audio.loop = false;
   audio.volume = 0.72;
   return {
+    audit: { source, playCount: 0 },
     play() {
+      this.audit.playCount += 1;
       if (audio.stop) audio.stop();
       audio.play();
     }
@@ -54,7 +67,7 @@ function createSfx(source) {
 function loadAssetPacks() {
   if (!wx.loadSubpackage) return Promise.resolve();
   const load = (name) => new Promise((resolve, reject) => wx.loadSubpackage({ name, success: resolve, fail: reject }));
-  return Promise.all([load("worldWestPack"), load("worldEastPack"), load("roomPack"), load("characterPack"), load("audioPack"), load("battlePack")]);
+  return Promise.all([load("worldWestPack"), load("worldEastPack"), load("worldMapPack"), load("roomPack"), load("characterPack"), load("audioPack"), load("battlePack")]);
 }
 
 function readSave(key) {

@@ -10,6 +10,7 @@ class UiRenderer {
 
   render(context, state) {
     this.buttons = [];
+    this.lastState = state;
     if (state.mode === "menu") return this.renderMenu(context, state);
     this.renderHud(context, state);
     if (state.dialog.active) this.renderDialog(context, state.dialog.page);
@@ -52,7 +53,7 @@ class UiRenderer {
     context.fillText(GAME.heroName, 18, 31);
     context.font = "12px sans-serif";
     context.fillStyle = "#d8bd82";
-    context.fillText(`苍山旧道  ·  HP 88/88  ·  银 120`, 18, 53);
+    context.fillText(`苍山旧道  ·  HP 88/88  ·  银 ${state.money ?? 120}`, 18, 53);
     this.button(context, "menu", width - 54, this.headerHeight - 45, 38, 34, "≡", "icon");
   }
 
@@ -66,12 +67,34 @@ class UiRenderer {
     this.button(context, "down", 78, baseY - 5, 52, 52, "▼", "control");
     this.button(context, "right", 134, baseY - 31, 52, 52, "▶", "control");
     this.button(context, "interact", this.viewport.width - 92, baseY - 38, 68, 68, trigger ? "交互" : "查看", trigger ? "primaryRound" : "disabledRound");
+    if (this.lastState?.worldMapUnlocked) this.button(context, "worldmap", this.viewport.width - 92, baseY - 88, 68, 34, "舆图", "normal");
     if (trigger) {
       context.textAlign = "right";
       context.font = "13px sans-serif";
       context.fillStyle = "#ead5a3";
       context.fillText(trigger.label, this.viewport.width - 104, h - 76);
     }
+  }
+
+  renderWorldMap(context, state) {
+    this.buttons = [];
+    const { width, height } = this.viewport;
+    context.fillStyle = "#171510";
+    context.fillRect(0, 0, width, height);
+    if (state.images.worldMap) {
+      context.drawImage(state.images.worldMap, 0, 0, width, height);
+      context.fillStyle = "rgba(12, 10, 7, 0.28)";
+      context.fillRect(0, 0, width, height);
+    }
+    context.textAlign = "left";
+    context.fillStyle = "#f4e6c6";
+    context.font = "700 22px serif";
+    context.fillText("江湖舆图", 20, this.headerHeight - 46);
+    context.font = "12px sans-serif";
+    context.fillStyle = "#dbc287";
+    context.fillText(`苍山据点 ${state.cleared}/${state.total}`, 20, this.headerHeight - 22);
+    for (const node of state.nodes) this.worldNode(context, node);
+    this.button(context, "closeWorldMap", width - 86, this.headerHeight - 58, 66, 38, "返回", "normal");
   }
 
   renderDialog(context, page) {
@@ -115,6 +138,28 @@ class UiRenderer {
     context.fillText(label, x + width / 2, y + height / 2);
     context.textBaseline = "alphabetic";
     this.buttons.push({ id, x, y, width, height, disabled });
+  }
+
+  worldNode(context, node) {
+    const statusColor = {
+      current: "#e4bc58",
+      cleared: "#75cf86",
+      unlocked: "#79b8ff",
+      locked: "#71695c"
+    }[node.status] || "#71695c";
+    context.save();
+    context.beginPath();
+    context.arc(node.x, node.y, node.status === "locked" ? 7 : 10, 0, Math.PI * 2);
+    context.fillStyle = statusColor;
+    context.fill();
+    context.strokeStyle = "rgba(15, 12, 8, 0.8)";
+    context.lineWidth = 3;
+    context.stroke();
+    context.textAlign = "center";
+    context.font = "700 12px sans-serif";
+    context.fillStyle = node.status === "locked" ? "rgba(224, 212, 188, 0.58)" : "#f8ebce";
+    context.fillText(node.name, node.x, node.y - 18);
+    context.restore();
   }
 
   hit(x, y) {

@@ -65,7 +65,12 @@ lsof -nP -iTCP:4174 -sTCP:LISTEN
 - 截图用于验收结果，不用于驱动主要自动化流程。坐标识图点击慢、脆弱，并且无法可靠断言内部地图、触发器和角色坐标状态。
 - 浏览器截图正常并不等于游戏正确。必须同时保存机器可读的 `screenshots/wechat-portrait/audit.json`，让 AI 能判断位移、触发器、地图 ID 和错误列表。
 - 战斗验收必须使用微信竖屏入口 `4174/wechat-debug` 和 `390x844` 视口。不要拿模块化网页版 `1280x720` 横屏 battle tour 截图当作手机端验收证据。
-- 微信竖屏战斗 E2E 使用 `npm run wechat:battle:test`，输出 `screenshots/wechat-battle/audit.json`，必须断言移动事件、攻击事件、胜利结果和零错误。
+- 微信竖屏战斗 E2E 使用 `npm run wechat:battle:test`，输出 `screenshots/wechat-battle/audit.json`，必须断言移动事件、禁止二次移动、攻击事件、奖励、战斗 BGM 切换、命中音效、胜利结果和零错误。
+- 地图碰撞/触发区验收使用 `npm run wechat:map:debug`，输出 `screenshots/wechat-map-debug/`。红色是 collision，蓝色是 trigger，白线是 64 像素格；调整障碍和入口区域时先看这组图，不要靠肉眼猜坐标。
+- 世界地图/关卡解锁验收使用 `npm run wechat:worldmap:test`，输出 `screenshots/wechat-worldmap/`。密探战斗胜利后必须把对应 trigger id 加入清剿集合，地图触发器和 NPC 渲染都要过滤已清剿 id，避免同一战斗反复触发。
+- 临时脚本生成的 `battle-loop.wav` 只能当占位音轨。用户要求 Suno 正式战斗 BGM 时，不要在最终说明里把这个占位 wav 说成 Suno 成品。
+- 资产脚本生成 WAV 时必须用确定性噪声，不要直接用 `Math.random()`，否则每次 `npm run wechat:assets` 都会产生无意义二进制 diff。
+- 房间入口要配置成“门前触发区 + exitTo 回到原地图坐标”，不要把进入房间逻辑写死在某一个客栈分支里；新增房间后同步扩展地图 debug 截图点。
 
 ## 微信开发者工具踩坑
 

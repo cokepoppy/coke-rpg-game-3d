@@ -52,6 +52,46 @@ class MapManager {
     }
     context.restore();
   }
+
+  drawDebug(context, camera, playRect) {
+    const tile = 64;
+    context.save();
+    context.beginPath();
+    context.rect(playRect.x, playRect.y, playRect.width, playRect.height);
+    context.clip();
+    context.translate(playRect.x - camera.x, playRect.y - camera.y);
+    context.lineWidth = 1;
+    context.strokeStyle = "rgba(245, 234, 208, 0.28)";
+    const startX = Math.floor(camera.x / tile) * tile;
+    const endX = camera.x + playRect.width;
+    const startY = Math.floor(camera.y / tile) * tile;
+    const endY = camera.y + playRect.height;
+    for (let x = startX; x <= endX; x += tile) {
+      context.beginPath();
+      context.moveTo(x + 0.5, camera.y);
+      context.lineTo(x + 0.5, endY);
+      context.stroke();
+    }
+    for (let y = startY; y <= endY; y += tile) {
+      context.beginPath();
+      context.moveTo(camera.x, y + 0.5);
+      context.lineTo(endX, y + 0.5);
+      context.stroke();
+    }
+    for (const wall of this.map.collisions || []) {
+      context.fillStyle = "rgba(220, 54, 42, 0.30)";
+      context.strokeStyle = "rgba(255, 78, 64, 0.92)";
+      context.fillRect(wall.x, wall.y, wall.width, wall.height);
+      context.strokeRect(wall.x + 0.5, wall.y + 0.5, wall.width, wall.height);
+    }
+    for (const trigger of this.map.triggers || []) {
+      context.fillStyle = "rgba(72, 164, 255, 0.24)";
+      context.strokeStyle = "rgba(104, 190, 255, 0.92)";
+      context.fillRect(trigger.x, trigger.y, trigger.width, trigger.height);
+      context.strokeRect(trigger.x + 0.5, trigger.y + 0.5, trigger.width, trigger.height);
+    }
+    context.restore();
+  }
 }
 
 function intersects(a, b) {

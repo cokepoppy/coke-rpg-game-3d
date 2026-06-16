@@ -1,4 +1,4 @@
-const { GAME, ASSETS } = require("./config");
+const { GAME, ASSETS, BATTLE, SCOUT_IDS, WORLD_NODES } = require("./config");
 const { createSurface, loadImage, createAudio, createSfx, loadAssetPacks, readSave, writeSave } = require("./platform");
 const { Player, drawSprite } = require("./player");
 const { MapManager } = require("./mapManager");
@@ -19,6 +19,11 @@ class GameApp {
     this.images = {};
     this.mode = "menu";
     this.musicEnabled = true;
+    this.money = 120;
+    this.items = {};
+    this.defeatedScouts = new Set();
+    this.currentBattleTriggerId = null;
+    this.worldMapUnlocked = false;
     this.axis = { x: 0, y: 0 };
     this.lastTime = Date.now();
     this.touchBindings = new Map();
@@ -33,13 +38,14 @@ class GameApp {
     this.mapManager = new MapManager(this.images, this.viewport);
     this.player = new Player(this.images.hero, this.mapManager.map.spawn);
     this.audio = createAudio(ASSETS.bgm);
+    this.battleAudio = createAudio(ASSETS.battleBgm);
     this.hitSfx = createSfx(ASSETS.hitSfx);
     this.bindTouch();
     this.frame();
   }
 
   async loadAssets() {
-    const entries = Object.entries(ASSETS).filter(([key]) => !["bgm", "hitSfx"].includes(key));
+    const entries = Object.entries(ASSETS).filter(([key]) => !["bgm", "battleBgm", "hitSfx"].includes(key));
     await Promise.all(entries.map(async ([key, source]) => { this.images[key] = await loadImage(this.canvas, source); }));
   }
 
@@ -59,7 +65,7 @@ class GameApp {
     }
     if (this.mode !== "game" || this.dialog.active) return;
     this.player.update(dt, this.axis, (bounds) => this.mapManager.canMove(bounds));
-    this.activeTrigger = this.mapManager.nearby(this.player.boundsAt(this.player.x, this.player.y));
+    this.activeTrigger = this.resolveActiveTrigger();
   }
 
   render() {
@@ -73,7 +79,7 @@ class GameApp {
       ctx.rect(this.ui.playRect.x, this.ui.playRect.y, this.ui.playRect.width, this.ui.playRect.height);
       ctx.clip();
       ctx.translate(this.ui.playRect.x, this.ui.playRect.y);
-      for (const npc of this.mapManager.map.npcs) {
+      for (const npc of this.visibleNpcs()) {
         drawSprite(ctx, this.images[npc.sprite], npc.x - camera.x, npc.y - camera.y, npc.direction, 0, 82, 82);
         ctx.textAlign = "center";
         ctx.font = "12px sans-serif";
@@ -82,7 +88,14 @@ class GameApp {
       }
       this.player.draw(ctx, camera);
       ctx.restore();
+      if (this.debugMap) this.mapManager.drawDebug(ctx, camera, this.ui.playRect);
     }
+    if (this.mode === "worldmap") return this.ui.renderWorldMap(ctx, {
+      images: this.images,
+      nodes: this.worldNodes(),
+      cleared: this.defeatedScouts.size,
+      total: SCOUT_IDS.length
+    });
     if (this.mode === "battle") return this.battle.render(ctx, this.ui);
     this.ui.render(ctx, {
       mode: this.mode,
@@ -90,6 +103,10 @@ class GameApp {
       activeTrigger: this.activeTrigger,
       images: this.images,
       musicEnabled: this.musicEnabled,
+      money: this.money,
+      worldMapUnlocked: this.worldMapUnlocked || this.defeatedScouts.size > 0,
+      defeatedScouts: this.defeatedScouts.size,
+      totalScouts: SCOUT_IDS.length,
       hasSave: Boolean(readSave(SAVE_KEY))
     });
   }
@@ -124,6 +141,8 @@ class GameApp {
     if (button === "continue") return this.loadGame();
     if (button === "music") return this.toggleMusic();
     if (button === "menu") return this.openMenu();
+    if (button === "worldmap") return this.openWorldMap();
+    if (button === "closeWorldMap") return this.closeWorldMap();
     if (button === "interact") return this.interact();
     if (button.startsWith("battle:")) return this.battle?.activate(button);
     if (button.startsWith("choice:")) return this.dialog.advance(Number(button.split(":")[1]));
@@ -131,6 +150,11 @@ class GameApp {
 
   newGame() {
     this.mode = "game";
+    this.money = 120;
+    this.items = {};
+    this.defeatedScouts = new Set();
+    this.currentBattleTriggerId = null;
+    this.worldMapUnlocked = false;
     this.enterMap("world");
     this.playMusic();
     this.dialog.show([
@@ -151,12 +175,23 @@ class GameApp {
     if (!trigger) return;
     if (trigger.id === "inn") {
       this.dialog.show({ speaker: "云来客栈", text: "木门虚掩，屋里传来淡淡药香。", choices: [
-        { label: "进入客房", action: () => this.enterMap("room") },
+        { label: "进入客房", action: () => this.enterRoom("room") },
+        { label: "暂时离开" }
+      ] });
+    } else if (trigger.id === "apothecaryDoor") {
+      this.dialog.show({ speaker: "百草铺", text: "柜台后草药成排，药香盖过了门外山风。", choices: [
+        { label: "进入百草铺", action: () => this.enterRoom("apothecaryRoom") },
+        { label: "暂时离开" }
+      ] });
+    } else if (trigger.id === "teahouseDoor") {
+      this.dialog.show({ speaker: "松风茶肆", text: "竹帘半卷，里面有人低声谈起西岭密探的去向。", choices: [
+        { label: "进入茶肆", action: () => this.enterRoom("teahouseRoom") },
         { label: "暂时离开" }
       ] });
     } else if (trigger.id === "roomExit") {
+      const exit = this.mapManager.map.exitTo || { mapId: "world", spawn: { x: 2700, y: 2520 }, label: "离开房间" };
       this.dialog.show({ speaker: "门口", text: "要回到苍山旧道吗？", choices: [
-        { label: "离开客房", action: () => this.enterMap("world", { x: 2700, y: 2520 }) },
+        { label: exit.label, action: () => this.enterMap(exit.mapId, exit.spawn) },
         { label: "继续搜索" }
       ] });
     } else if (trigger.id === "wardrobe") {
@@ -165,33 +200,59 @@ class GameApp {
       this.dialog.show({ speaker: "账册", text: "夹页反复写着“灯亭、铜匣、寺后”，三处似乎指向同一条密道。" });
     } else if (trigger.id === "vendor") {
       this.dialog.show({ speaker: "药摊老人", text: "少侠气息不稳。这两枚清心丸收好，山风口不宜久留。" });
-    } else if (trigger.id === "scout") {
+    } else if (trigger.id.startsWith("scout")) {
       this.dialog.show({ speaker: "西岭密探", text: "前路封了。若再向前一步，刀剑无眼。", choices: [
-        { label: "拔剑迎战", action: () => this.startBattle() },
+        { label: "拔剑迎战", action: () => this.startBattle(trigger.id) },
         { label: "暂避锋芒" }
       ] });
     }
   }
 
-  startBattle() {
+  startBattle(triggerId) {
     this.axis = { x: 0, y: 0 };
     this.touchBindings.clear();
+    this.currentBattleTriggerId = triggerId;
     this.battle = new BattleScene({
       images: this.images,
       viewport: this.viewport,
       hitSfx: this.hitSfx,
       onFinish: (result, audit) => {
-        this.lastBattleAudit = audit;
+        const rewards = result === "victory" ? this.grantBattleRewards() : { money: 0, items: [] };
+        if (result === "victory" && this.currentBattleTriggerId) this.defeatedScouts.add(this.currentBattleTriggerId);
+        this.worldMapUnlocked = this.defeatedScouts.size >= SCOUT_IDS.length;
+        this.lastBattleAudit = { ...audit, rewards };
         this.mode = "game";
+        this.playMusic();
+        this.activeTrigger = this.resolveActiveTrigger();
+        const clearText = this.worldMapUnlocked ? "沿路密探已清剿，舆图上出现了新的路线。" : `还剩 ${SCOUT_IDS.length - this.defeatedScouts.size} 处密探据点。`;
         this.dialog.show({
           speaker: "战斗",
-          text: result === "victory" ? "伏兵败退。你回到旧道，继续追查短笛线索。" : "我方败退，江湖路止于此处。",
+          text: result === "victory" ? `伏兵败退。你获得 ${rewards.money} 两银子${rewards.items.length ? `，${rewards.items.map((item) => `${item.name}×${item.amount}`).join("、")}` : ""}。${clearText}` : "我方败退，江湖路止于此处。",
           choices: [{ label: result === "victory" ? "回到大地图" : "游戏结束" }]
         });
       }
     });
     this.battle.start();
     this.mode = "battle";
+    this.playBattleMusic();
+  }
+
+  grantBattleRewards() {
+    const reward = BATTLE.rewards || {};
+    const money = randomInt(reward.money?.min || 0, reward.money?.max || 0);
+    this.money += money;
+    const items = [];
+    for (const drop of reward.drops || []) {
+      if (Math.random() > drop.chance) continue;
+      const amount = randomInt(drop.min || 1, drop.max || 1);
+      this.items[drop.itemId] = (this.items[drop.itemId] || 0) + amount;
+      items.push({ itemId: drop.itemId, name: drop.name, amount });
+    }
+    return { money, items };
+  }
+
+  enterRoom(id) {
+    this.enterMap(id);
   }
 
   enterMap(id, spawn) {
@@ -204,13 +265,25 @@ class GameApp {
 
   saveGame() {
     if (!this.player || !this.mapManager) return;
-    writeSave(SAVE_KEY, { mapId: this.mapManager.id, x: Math.round(this.player.x), y: Math.round(this.player.y) });
+    writeSave(SAVE_KEY, {
+      mapId: this.mapManager.id,
+      x: Math.round(this.player.x),
+      y: Math.round(this.player.y),
+      money: this.money,
+      items: this.items,
+      defeatedScouts: [...this.defeatedScouts],
+      worldMapUnlocked: this.worldMapUnlocked
+    });
   }
 
   loadGame() {
     const save = readSave(SAVE_KEY);
     if (!save) return;
     this.mode = "game";
+    this.money = save.money ?? 120;
+    this.items = save.items || {};
+    this.defeatedScouts = new Set(save.defeatedScouts || []);
+    this.worldMapUnlocked = Boolean(save.worldMapUnlocked) || this.defeatedScouts.size >= SCOUT_IDS.length;
     this.enterMap(save.mapId || "world", { x: save.x, y: save.y });
     this.playMusic();
   }
@@ -221,8 +294,47 @@ class GameApp {
   }
 
   playMusic() {
+    this.battleAudio?.pause();
     if (this.musicEnabled) this.audio.play();
   }
+
+  playBattleMusic() {
+    this.audio?.pause();
+    if (this.musicEnabled) this.battleAudio.play();
+  }
+
+  openWorldMap() {
+    if (!(this.worldMapUnlocked || this.defeatedScouts.size > 0)) return;
+    this.axis = { x: 0, y: 0 };
+    this.mode = "worldmap";
+  }
+
+  closeWorldMap() {
+    this.mode = "game";
+  }
+
+  resolveActiveTrigger() {
+    const trigger = this.mapManager.nearby(this.player.boundsAt(this.player.x, this.player.y));
+    if (!trigger) return null;
+    if (this.defeatedScouts.has(trigger.id)) return null;
+    return trigger;
+  }
+
+  visibleNpcs() {
+    return (this.mapManager.map.npcs || []).filter((npc) => !this.defeatedScouts.has(npc.id));
+  }
+
+  worldNodes() {
+    return WORLD_NODES.map((node) => {
+      if (node.id === "cangshan") return { ...node, status: this.worldMapUnlocked ? "cleared" : "current" };
+      if (this.worldMapUnlocked && node.id === "erhai") return { ...node, status: "unlocked" };
+      return node;
+    });
+  }
+}
+
+function randomInt(min, max) {
+  return Math.floor(min + Math.random() * (max - min + 1));
 }
 
 module.exports = { GameApp };

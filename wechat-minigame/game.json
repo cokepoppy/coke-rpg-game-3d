@@ -11,6 +11,10 @@
       "root": "world-east-pack"
     },
     {
+      "name": "worldMapPack",
+      "root": "world-map-pack"
+    },
+    {
       "name": "roomPack",
       "root": "room-pack"
     },

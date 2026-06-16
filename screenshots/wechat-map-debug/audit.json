@@ -1,0 +1,82 @@
+{
+  "audit": [
+    {
+      "name": "01-inn-vendor",
+      "mapId": "world",
+      "player": {
+        "x": 2860,
+        "y": 2440
+      },
+      "trigger": "inn",
+      "collisions": 7,
+      "triggers": 7
+    },
+    {
+      "name": "02-scout",
+      "mapId": "world",
+      "player": {
+        "x": 895,
+        "y": 745
+      },
+      "trigger": "scout",
+      "collisions": 7,
+      "triggers": 7
+    },
+    {
+      "name": "03-apothecary-door",
+      "mapId": "world",
+      "player": {
+        "x": 3440,
+        "y": 2520
+      },
+      "trigger": "apothecaryDoor",
+      "collisions": 7,
+      "triggers": 7
+    },
+    {
+      "name": "04-teahouse-door",
+      "mapId": "world",
+      "player": {
+        "x": 2320,
+        "y": 1250
+      },
+      "trigger": "teahouseDoor",
+      "collisions": 7,
+      "triggers": 7
+    },
+    {
+      "name": "05-room",
+      "mapId": "room",
+      "player": {
+        "x": 610,
+        "y": 650
+      },
+      "trigger": "roomExit",
+      "collisions": 7,
+      "triggers": 3
+    },
+    {
+      "name": "06-apothecary-room",
+      "mapId": "apothecaryRoom",
+      "player": {
+        "x": 610,
+        "y": 650
+      },
+      "trigger": "roomExit",
+      "collisions": 7,
+      "triggers": 3
+    },
+    {
+      "name": "07-teahouse-room",
+      "mapId": "teahouseRoom",
+      "player": {
+        "x": 610,
+        "y": 650
+      },
+      "trigger": "roomExit",
+      "collisions": 7,
+      "triggers": 3
+    }
+  ],
+  "errors": []
+}

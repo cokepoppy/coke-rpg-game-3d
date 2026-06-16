@@ -7,6 +7,7 @@ class BattleScene {
     this.viewport = viewport;
     this.hitSfx = hitSfx;
     this.onFinish = onFinish;
+    this.config = BATTLE;
     this.active = false;
     this.audit = { attacks: [], moves: [], result: null };
   }
@@ -15,6 +16,7 @@ class BattleScene {
     this.units = [...BATTLE.players, ...BATTLE.enemies].map((unit) => ({
       ...unit,
       maxHp: unit.hp,
+      moved: false,
       acted: false,
       alive: true,
       direction: unit.side === "player" ? "right" : "left",
@@ -25,7 +27,7 @@ class BattleScene {
     this.side = "player";
     this.phase = "move";
     this.selectedId = "hero";
-    this.message = "选择我方角色";
+    this.message = `${this.selected.name} 待命`;
     this.highlights = this.movesFor(this.selected);
     this.active = true;
   }
@@ -84,8 +86,8 @@ class BattleScene {
     const unit = this.unitAt(cell.x, cell.y);
     if (unit?.side === "player" && !unit.acted) {
       this.selectedId = unit.id;
-      this.phase = "move";
-      this.highlights = this.movesFor(unit);
+      this.phase = unit.moved ? "act" : "move";
+      this.highlights = unit.moved ? [] : this.movesFor(unit);
       this.message = `${unit.name} 待命`;
       return;
     }
@@ -94,6 +96,7 @@ class BattleScene {
       selected.direction = directionTo(selected, cell);
       selected.x = cell.x;
       selected.y = cell.y;
+      selected.moved = true;
       selected.animation = { type: "move", time: 0.16 };
       this.audit.moves.push({ id: selected.id, x: cell.x, y: cell.y });
       this.phase = "act";
@@ -111,6 +114,7 @@ class BattleScene {
     target.direction = directionTo(target, attacker);
     target.hp = Math.max(0, target.hp - attacker.damage);
     target.alive = target.hp > 0;
+    attacker.moved = true;
     attacker.acted = true;
     attacker.qi = Math.max(0, attacker.qi - 35);
     attacker.animation = { type: "attack", targetX: target.x, targetY: target.y, time: 0.26, duration: 0.26 };
@@ -139,7 +143,10 @@ class BattleScene {
     const enemy = this.living("enemy")[0];
     const target = this.living("player")[0];
     if (enemy && target && distance(enemy, target) <= enemy.range) this.attack(enemy, target);
-    for (const unit of this.living("player")) unit.acted = false;
+    for (const unit of this.living("player")) {
+      unit.moved = false;
+      unit.acted = false;
+    }
     this.side = "player";
     this.phase = "select";
     this.selectedId = this.living("player")[0]?.id || null;
@@ -181,7 +188,7 @@ class BattleScene {
   }
 
   movesFor(unit) {
-    if (!unit) return [];
+    if (!unit || unit.moved) return [];
     const occupied = new Set(this.units.filter((item) => item.alive && item.id !== unit.id).map((item) => `${item.x},${item.y}`));
     const moves = [];
     for (let y = 0; y < BATTLE.rows; y += 1) {

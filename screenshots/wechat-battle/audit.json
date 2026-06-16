@@ -6,7 +6,7 @@
   "mode": "game",
   "dialog": {
     "speaker": "战斗",
-    "text": "伏兵败退。你获得 27 两银子，止血散×1。还剩 2 处密探据点。"
+    "text": "伏兵败退。你获得 34 两银子，止血散×1。还剩 5 处密探据点。"
   },
   "battle": {
     "attacks": [
@@ -26,7 +26,7 @@
     ],
     "result": "victory",
     "rewards": {
-      "money": 27,
+      "money": 34,
       "items": [
         {
           "itemId": "hemostatic_powder",
@@ -36,9 +36,10 @@
       ]
     }
   },
-  "money": 147,
+  "money": 154,
   "items": {
-    "hemostatic_powder": 1
+    "hemostatic_powder": 3,
+    "qingxin_pill": 1
   },
   "audio": {
     "world": {

@@ -67,6 +67,7 @@ class UiRenderer {
     this.button(context, "down", 78, baseY - 5, 52, 52, "▼", "control");
     this.button(context, "right", 134, baseY - 31, 52, 52, "▶", "control");
     this.button(context, "interact", this.viewport.width - 92, baseY - 38, 68, 68, trigger ? "交互" : "查看", trigger ? "primaryRound" : "disabledRound");
+    this.button(context, "inventory", this.viewport.width - 166, baseY - 88, 68, 34, "背包", "normal");
     if (this.lastState?.worldMapUnlocked) this.button(context, "worldmap", this.viewport.width - 92, baseY - 88, 68, 34, "舆图", "normal");
     if (trigger) {
       context.textAlign = "right";
@@ -82,7 +83,7 @@ class UiRenderer {
     context.fillStyle = "#171510";
     context.fillRect(0, 0, width, height);
     if (state.images.worldMap) {
-      context.drawImage(state.images.worldMap, 0, 0, width, height);
+      drawImageCover(context, state.images.worldMap, 0, 0, width, height);
       context.fillStyle = "rgba(12, 10, 7, 0.28)";
       context.fillRect(0, 0, width, height);
     }
@@ -95,6 +96,58 @@ class UiRenderer {
     context.fillText(`苍山据点 ${state.cleared}/${state.total}`, 20, this.headerHeight - 22);
     for (const node of state.nodes) this.worldNode(context, node);
     this.button(context, "closeWorldMap", width - 86, this.headerHeight - 58, 66, 38, "返回", "normal");
+  }
+
+  renderInventory(context, state) {
+    this.buttons = [];
+    const { width, height } = this.viewport;
+    context.fillStyle = "#171510";
+    context.fillRect(0, 0, width, height);
+    context.fillStyle = "rgba(34, 28, 20, 0.98)";
+    roundedRect(context, 12, this.headerHeight - 66, width - 24, height - this.headerHeight + 52, 6);
+    context.fill();
+    context.strokeStyle = "rgba(224, 192, 126, 0.58)";
+    context.stroke();
+    context.textAlign = "left";
+    context.fillStyle = "#f4e6c6";
+    context.font = "700 22px serif";
+    context.fillText("背包", 28, this.headerHeight - 28);
+    context.font = "12px sans-serif";
+    context.fillStyle = "#dbc287";
+    context.fillText(`银两 ${state.money}`, 28, this.headerHeight - 8);
+    this.button(context, "closeInventory", width - 86, this.headerHeight - 58, 66, 38, "返回", "normal");
+
+    const listY = this.headerHeight + 24;
+    const entries = state.entries || [];
+    if (!entries.length) {
+      context.textAlign = "center";
+      context.fillStyle = "rgba(245, 234, 210, 0.66)";
+      context.font = "14px sans-serif";
+      context.fillText("背包里还没有物品", width / 2, listY + 82);
+      return;
+    }
+    entries.slice(0, 8).forEach(({ item, amount }, index) => {
+      const y = listY + index * 68;
+      context.fillStyle = "rgba(18, 15, 10, 0.74)";
+      roundedRect(context, 24, y, width - 48, 56, 5);
+      context.fill();
+      context.strokeStyle = "rgba(224, 192, 126, 0.22)";
+      context.stroke();
+      context.fillStyle = itemColor(item.rarity);
+      roundedRect(context, 36, y + 10, 36, 36, 5);
+      context.fill();
+      context.textAlign = "center";
+      context.fillStyle = "#19140e";
+      context.font = "700 17px serif";
+      context.fillText(item.name.slice(0, 1), 54, y + 34);
+      context.textAlign = "left";
+      context.fillStyle = "#f6ead2";
+      context.font = "700 14px sans-serif";
+      context.fillText(`${item.name} x${amount}`, 84, y + 22);
+      context.fillStyle = "#cdb57d";
+      context.font = "11px sans-serif";
+      context.fillText(`${item.type} · ${item.rarity} · ${item.effect}`, 84, y + 40);
+    });
   }
 
   renderDialog(context, page) {
@@ -190,6 +243,21 @@ function drawWrappedText(context, text, x, y, maxWidth, lineHeight, maxLines) {
     } else line = candidate;
   }
   if (lineNumber < maxLines) context.fillText(line, x, y + lineNumber * lineHeight);
+}
+
+function drawImageCover(context, image, x, y, width, height) {
+  const scale = Math.max(width / image.width, height / image.height);
+  const sourceWidth = width / scale;
+  const sourceHeight = height / scale;
+  const sourceX = (image.width - sourceWidth) / 2;
+  const sourceY = (image.height - sourceHeight) / 2;
+  context.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, x, y, width, height);
+}
+
+function itemColor(rarity) {
+  if (rarity === "精良") return "#83b9d7";
+  if (rarity === "稀有") return "#d5b45f";
+  return "#b9c28c";
 }
 
 module.exports = { UiRenderer };

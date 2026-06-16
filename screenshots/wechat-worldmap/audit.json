@@ -2,7 +2,10 @@
   "mode": "worldmap",
   "defeatedScouts": [
     "scout",
+    "scout_bridge",
+    "scout_archer",
     "scout_road",
+    "scout_monk",
     "scout_gate"
   ],
   "worldMapUnlocked": true,
@@ -10,25 +13,29 @@
     {
       "id": "cangshan",
       "name": "苍山旧道",
-      "x": 148,
-      "y": 420,
+      "x": 168,
+      "y": 610,
       "status": "cleared"
     },
     {
       "id": "erhai",
       "name": "洱海渡口",
-      "x": 254,
-      "y": 300,
+      "x": 292,
+      "y": 430,
       "status": "unlocked"
     },
     {
       "id": "jianhu",
       "name": "剑湖宫道",
-      "x": 124,
-      "y": 204,
+      "x": 122,
+      "y": 176,
       "status": "locked"
     }
   ],
-  "money": 215,
+  "worldMapImage": {
+    "width": 780,
+    "height": 1688
+  },
+  "money": 270,
   "errors": []
 }

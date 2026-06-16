@@ -29,7 +29,7 @@ try {
 
   await page.evaluate(() => {
     const game = globalThis.__cangshanGame;
-    for (const scoutId of ["scout", "scout_road", "scout_gate"]) {
+    for (const scoutId of ["scout", "scout_bridge", "scout_archer", "scout_road", "scout_monk", "scout_gate"]) {
       game.currentBattleTriggerId = scoutId;
       const audit = { attacks: [{ attackerId: "hero", targetId: scoutId, damage: 38 }], moves: [], result: "victory" };
       const rewards = game.grantBattleRewards();
@@ -52,13 +52,15 @@ try {
       defeatedScouts: [...game.defeatedScouts],
       worldMapUnlocked: game.worldMapUnlocked,
       nodes: game.worldNodes(),
+      worldMapImage: { width: game.images.worldMap.width, height: game.images.worldMap.height },
       money: game.money,
       errors: []
     };
   });
   audit.errors = errors;
   if (audit.mode !== "worldmap") throw new Error(`World map did not open, received ${audit.mode}`);
-  if (!audit.worldMapUnlocked || audit.defeatedScouts.length !== 3) throw new Error("World map unlock audit failed.");
+  if (!audit.worldMapUnlocked || audit.defeatedScouts.length !== 6) throw new Error("World map unlock audit failed.");
+  if (audit.worldMapImage.width !== 780 || audit.worldMapImage.height !== 1688) throw new Error(`World map image has wrong aspect: ${audit.worldMapImage.width}x${audit.worldMapImage.height}`);
   if (!audit.nodes.some((node) => node.id === "erhai" && node.status === "unlocked")) throw new Error("Next world node did not unlock.");
   if (audit.money <= 120) throw new Error("Battle reward money was not retained.");
   if (errors.length) throw new Error(`Browser errors: ${errors.join(" | ")}`);

@@ -9,7 +9,7 @@
       },
       "trigger": "inn",
       "collisions": 7,
-      "triggers": 7
+      "triggers": 10
     },
     {
       "name": "02-scout",
@@ -20,7 +20,7 @@
       },
       "trigger": "scout",
       "collisions": 7,
-      "triggers": 7
+      "triggers": 10
     },
     {
       "name": "03-apothecary-door",
@@ -31,7 +31,7 @@
       },
       "trigger": "apothecaryDoor",
       "collisions": 7,
-      "triggers": 7
+      "triggers": 10
     },
     {
       "name": "04-teahouse-door",
@@ -42,10 +42,43 @@
       },
       "trigger": "teahouseDoor",
       "collisions": 7,
-      "triggers": 7
+      "triggers": 10
     },
     {
-      "name": "05-room",
+      "name": "05-scout-bridge",
+      "mapId": "world",
+      "player": {
+        "x": 1620,
+        "y": 2585
+      },
+      "trigger": "scout_bridge",
+      "collisions": 7,
+      "triggers": 10
+    },
+    {
+      "name": "06-scout-archer",
+      "mapId": "world",
+      "player": {
+        "x": 2130,
+        "y": 1925
+      },
+      "trigger": "scout_archer",
+      "collisions": 7,
+      "triggers": 10
+    },
+    {
+      "name": "07-scout-monk",
+      "mapId": "world",
+      "player": {
+        "x": 2970,
+        "y": 1245
+      },
+      "trigger": "scout_monk",
+      "collisions": 7,
+      "triggers": 10
+    },
+    {
+      "name": "08-room",
       "mapId": "room",
       "player": {
         "x": 610,
@@ -56,7 +89,7 @@
       "triggers": 3
     },
     {
-      "name": "06-apothecary-room",
+      "name": "09-apothecary-room",
       "mapId": "apothecaryRoom",
       "player": {
         "x": 610,
@@ -67,7 +100,7 @@
       "triggers": 3
     },
     {
-      "name": "07-teahouse-room",
+      "name": "10-teahouse-room",
       "mapId": "teahouseRoom",
       "player": {
         "x": 610,

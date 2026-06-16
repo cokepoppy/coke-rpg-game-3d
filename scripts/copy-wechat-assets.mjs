@@ -8,6 +8,9 @@ const files = [
   ["assets/characters/hero/hero-walk-anchored-v4-motionfix.png", "wechat-minigame/character-pack/hero.png"],
   ["assets/characters/a_luo/a_luo-walk-anchored.png", "wechat-minigame/character-pack/companion.png"],
   ["assets/characters/masked_scout/masked_scout-walk-anchored.png", "wechat-minigame/character-pack/scout.png"],
+  ["assets/characters/scout_archer/scout_archer-walk-anchored.png", "wechat-minigame/character-pack/scout-archer.png"],
+  ["assets/characters/monk_guard/monk_guard-walk-anchored.png", "wechat-minigame/character-pack/monk-guard.png"],
+  ["assets/characters/yipintang_leader/yipintang_leader-walk-anchored.png", "wechat-minigame/character-pack/yipintang-leader.png"],
   ["assets/characters/medicine_vendor/medicine_vendor-walk-anchored.png", "wechat-minigame/character-pack/vendor.png"],
   ["assets/characters/inn_keeper/inn_keeper-walk-anchored.png", "wechat-minigame/character-pack/keeper.png"],
   ["assets/audio/cangshan-road-mobile.m4a", "wechat-minigame/audio-pack/cangshan-road.m4a"]
@@ -52,11 +55,11 @@ for (const [pack, filename, left] of worldHalves) {
     .toFile(target);
 }
 
-const worldMapSource = path.join(root, "assets/generated/wechat-world-map/wuxia-world-map-imagegen.png");
+const worldMapSource = path.join(root, "assets/generated/wechat-world-map/wuxia-world-map-portrait-imagegen.png");
 const worldMapTarget = path.join(root, "wechat-minigame/world-map-pack/world-map.png");
 await mkdir(path.dirname(worldMapTarget), { recursive: true });
 await sharp(worldMapSource)
-  .resize({ width: 780, height: 624, fit: "cover", position: "attention" })
+  .resize({ width: 780, height: 1688, fit: "cover", position: "attention" })
   .modulate({ saturation: 0.96, brightness: 0.86 })
   .png({ palette: true, quality: 88, compressionLevel: 9 })
   .toFile(worldMapTarget);

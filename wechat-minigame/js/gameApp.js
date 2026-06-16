@@ -5,6 +5,7 @@ const { MapManager } = require("./mapManager");
 const { DialogSystem } = require("./dialogSystem");
 const { UiRenderer } = require("./uiRenderer");
 const { BattleScene } = require("./battleScene");
+const { inventoryEntries } = require("./itemCatalog");
 
 const SAVE_KEY = "cangshan-rpg-save-v1";
 
@@ -96,6 +97,10 @@ class GameApp {
       cleared: this.defeatedScouts.size,
       total: SCOUT_IDS.length
     });
+    if (this.mode === "inventory") return this.ui.renderInventory(ctx, {
+      money: this.money,
+      entries: inventoryEntries(this.items)
+    });
     if (this.mode === "battle") return this.battle.render(ctx, this.ui);
     this.ui.render(ctx, {
       mode: this.mode,
@@ -141,6 +146,8 @@ class GameApp {
     if (button === "continue") return this.loadGame();
     if (button === "music") return this.toggleMusic();
     if (button === "menu") return this.openMenu();
+    if (button === "inventory") return this.openInventory();
+    if (button === "closeInventory") return this.closeInventory();
     if (button === "worldmap") return this.openWorldMap();
     if (button === "closeWorldMap") return this.closeWorldMap();
     if (button === "interact") return this.interact();
@@ -151,7 +158,7 @@ class GameApp {
   newGame() {
     this.mode = "game";
     this.money = 120;
-    this.items = {};
+    this.items = { hemostatic_powder: 2, qingxin_pill: 1 };
     this.defeatedScouts = new Set();
     this.currentBattleTriggerId = null;
     this.worldMapUnlocked = false;
@@ -195,7 +202,10 @@ class GameApp {
         { label: "继续搜索" }
       ] });
     } else if (trigger.id === "wardrobe") {
-      this.dialog.show({ speaker: "木柜", text: "柜门吱呀打开。旧布囊里有碎银和一封未署名的信。", choices: [{ label: "收下线索" }] });
+      this.addItem("silver_piece", 1);
+      this.addItem("unsigned_letter", 1);
+      this.money += 12;
+      this.dialog.show({ speaker: "木柜", text: "柜门吱呀打开。旧布囊里有碎银和一封未署名的信。已放入背包。", choices: [{ label: "收下线索" }] });
     } else if (trigger.id === "desk") {
       this.dialog.show({ speaker: "账册", text: "夹页反复写着“灯亭、铜匣、寺后”，三处似乎指向同一条密道。" });
     } else if (trigger.id === "vendor") {
@@ -311,6 +321,19 @@ class GameApp {
 
   closeWorldMap() {
     this.mode = "game";
+  }
+
+  openInventory() {
+    this.axis = { x: 0, y: 0 };
+    this.mode = "inventory";
+  }
+
+  closeInventory() {
+    this.mode = "game";
+  }
+
+  addItem(itemId, amount = 1) {
+    this.items[itemId] = (this.items[itemId] || 0) + amount;
   }
 
   resolveActiveTrigger() {

@@ -31,9 +31,12 @@ try {
     ["02-scout", "world", { x: 895, y: 745 }],
     ["03-apothecary-door", "world", { x: 3440, y: 2520 }],
     ["04-teahouse-door", "world", { x: 2320, y: 1250 }],
-    ["05-room", "room", { x: 610, y: 650 }],
-    ["06-apothecary-room", "apothecaryRoom", { x: 610, y: 650 }],
-    ["07-teahouse-room", "teahouseRoom", { x: 610, y: 650 }]
+    ["05-scout-bridge", "world", { x: 1620, y: 2585 }],
+    ["06-scout-archer", "world", { x: 2130, y: 1925 }],
+    ["07-scout-monk", "world", { x: 2970, y: 1245 }],
+    ["08-room", "room", { x: 610, y: 650 }],
+    ["09-apothecary-room", "apothecaryRoom", { x: 610, y: 650 }],
+    ["10-teahouse-room", "teahouseRoom", { x: 610, y: 650 }]
   ];
   const audit = [];
   for (const [name, mapId, point] of points) {

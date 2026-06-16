@@ -28,6 +28,9 @@ const ASSETS = {
   hero: "character-pack/hero.png",
   companion: "character-pack/companion.png",
   scout: "character-pack/scout.png",
+  scoutArcher: "character-pack/scout-archer.png",
+  monkGuard: "character-pack/monk-guard.png",
+  yipintangLeader: "character-pack/yipintang-leader.png",
   vendor: "character-pack/vendor.png",
   keeper: "character-pack/keeper.png",
   battleMap: "battle-pack/battle-courtyard.png",
@@ -47,23 +50,25 @@ const BATTLE = {
   ],
   enemies: [
     { id: "scoutA", name: "暗哨甲", sprite: "scout", side: "enemy", x: 4, y: 7, hp: 38, qi: 40, move: 2, range: 1, damage: 18, skill: "短刀" },
-    { id: "scoutB", name: "暗哨乙", sprite: "scout", side: "enemy", x: 5, y: 5, hp: 46, qi: 40, move: 2, range: 1, damage: 18, skill: "短刀" }
+    { id: "scoutB", name: "竹林弩手", sprite: "scoutArcher", side: "enemy", x: 5, y: 5, hp: 46, qi: 40, move: 2, range: 1, damage: 18, skill: "袖弩" }
   ],
   rewards: {
     money: { min: 18, max: 35 },
     drops: [
       { itemId: "hemostatic_powder", name: "止血散", chance: 1, min: 1, max: 1 },
-      { itemId: "scout_token", name: "密探令牌", chance: 0.35, min: 1, max: 1 }
+      { itemId: "qingxin_pill", name: "清心丸", chance: 0.42, min: 1, max: 1 },
+      { itemId: "scout_token", name: "密探令牌", chance: 0.35, min: 1, max: 1 },
+      { itemId: "steel_saber", name: "雁翎刀", chance: 0.12, min: 1, max: 1 }
     ]
   }
 };
 
-const SCOUT_IDS = ["scout", "scout_road", "scout_gate"];
+const SCOUT_IDS = ["scout", "scout_bridge", "scout_archer", "scout_road", "scout_monk", "scout_gate"];
 
 const WORLD_NODES = [
-  { id: "cangshan", name: "苍山旧道", x: 148, y: 420, status: "current" },
-  { id: "erhai", name: "洱海渡口", x: 254, y: 300, status: "locked" },
-  { id: "jianhu", name: "剑湖宫道", x: 124, y: 204, status: "locked" }
+  { id: "cangshan", name: "苍山旧道", x: 168, y: 610, status: "current" },
+  { id: "erhai", name: "洱海渡口", x: 292, y: 430, status: "locked" },
+  { id: "jianhu", name: "剑湖宫道", x: 122, y: 176, status: "locked" }
 ];
 
 const ROOM_COLLISIONS = [
@@ -151,15 +156,21 @@ const MAPS = {
       { id: "teahouseDoor", x: 2220, y: 1120, width: 230, height: 180, label: "进入松风茶肆" },
       { id: "vendor", x: 3260, y: 2500, width: 220, height: 220, label: "询问药摊老人" },
       { id: "scout", x: 790, y: 660, width: 210, height: 190, label: "挑战西岭密探" },
+      { id: "scout_bridge", x: 1510, y: 2500, width: 220, height: 190, label: "挑战桥头暗哨" },
+      { id: "scout_archer", x: 2020, y: 1840, width: 220, height: 190, label: "挑战竹林弩手" },
       { id: "scout_road", x: 2320, y: 1440, width: 210, height: 190, label: "挑战拦路密探" },
+      { id: "scout_monk", x: 2860, y: 1160, width: 220, height: 190, label: "挑战寺前护卫" },
       { id: "scout_gate", x: 3380, y: 1660, width: 210, height: 190, label: "挑战山门密探" }
     ],
     npcs: [
       { id: "keeper", name: "客栈掌柜", sprite: "keeper", x: 2735, y: 2525, direction: "right" },
       { id: "vendor", name: "药摊老人", sprite: "vendor", x: 3370, y: 2600, direction: "down" },
       { id: "scout", name: "西岭密探", sprite: "scout", x: 895, y: 745, direction: "down" },
+      { id: "scout_bridge", name: "桥头暗哨", sprite: "scout", x: 1730, y: 2520, direction: "left" },
+      { id: "scout_archer", name: "竹林弩手", sprite: "scoutArcher", x: 2240, y: 1845, direction: "left" },
       { id: "scout_road", name: "拦路密探", sprite: "scout", x: 2425, y: 1525, direction: "down" },
-      { id: "scout_gate", name: "山门密探", sprite: "scout", x: 3485, y: 1745, direction: "down" }
+      { id: "scout_monk", name: "寺前护卫", sprite: "monkGuard", x: 3080, y: 1180, direction: "left" },
+      { id: "scout_gate", name: "山门首领", sprite: "yipintangLeader", x: 3485, y: 1745, direction: "down" }
     ]
   },
   room: {

@@ -1,0 +1,16 @@
+{
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "mode": "inventory",
+  "money": 120,
+  "items": {
+    "hemostatic_powder": 2,
+    "qingxin_pill": 1
+  },
+  "buttons": [
+    "closeInventory"
+  ],
+  "errors": []
+}

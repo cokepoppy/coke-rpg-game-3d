@@ -1,9 +1,10 @@
 const { GAME, ASSETS } = require("./config");
-const { createSurface, loadImage, createAudio, loadAssetPacks, readSave, writeSave } = require("./platform");
+const { createSurface, loadImage, createAudio, createSfx, loadAssetPacks, readSave, writeSave } = require("./platform");
 const { Player, drawSprite } = require("./player");
 const { MapManager } = require("./mapManager");
 const { DialogSystem } = require("./dialogSystem");
 const { UiRenderer } = require("./uiRenderer");
+const { BattleScene } = require("./battleScene");
 
 const SAVE_KEY = "cangshan-rpg-save-v1";
 
@@ -32,12 +33,13 @@ class GameApp {
     this.mapManager = new MapManager(this.images, this.viewport);
     this.player = new Player(this.images.hero, this.mapManager.map.spawn);
     this.audio = createAudio(ASSETS.bgm);
+    this.hitSfx = createSfx(ASSETS.hitSfx);
     this.bindTouch();
     this.frame();
   }
 
   async loadAssets() {
-    const entries = Object.entries(ASSETS).filter(([key]) => key !== "bgm");
+    const entries = Object.entries(ASSETS).filter(([key]) => !["bgm", "hitSfx"].includes(key));
     await Promise.all(entries.map(async ([key, source]) => { this.images[key] = await loadImage(this.canvas, source); }));
   }
 
@@ -51,6 +53,10 @@ class GameApp {
   }
 
   update(dt) {
+    if (this.mode === "battle") {
+      this.battle.update(dt);
+      return;
+    }
     if (this.mode !== "game" || this.dialog.active) return;
     this.player.update(dt, this.axis, (bounds) => this.mapManager.canMove(bounds));
     this.activeTrigger = this.mapManager.nearby(this.player.boundsAt(this.player.x, this.player.y));
@@ -77,6 +83,7 @@ class GameApp {
       this.player.draw(ctx, camera);
       ctx.restore();
     }
+    if (this.mode === "battle") return this.battle.render(ctx, this.ui);
     this.ui.render(ctx, {
       mode: this.mode,
       dialog: this.dialog,
@@ -102,6 +109,7 @@ class GameApp {
         continue;
       }
       const button = this.ui.hit(touch.clientX ?? touch.x, touch.clientY ?? touch.y);
+      if (this.mode === "battle" && pressed && !button) this.battle.handleTap(touch.clientX ?? touch.x, touch.clientY ?? touch.y);
       const previous = this.touchBindings.get(id);
       this.touchBindings.set(id, button);
       if (button && button !== previous) this.activate(button);
@@ -117,6 +125,7 @@ class GameApp {
     if (button === "music") return this.toggleMusic();
     if (button === "menu") return this.openMenu();
     if (button === "interact") return this.interact();
+    if (button.startsWith("battle:")) return this.battle?.activate(button);
     if (button.startsWith("choice:")) return this.dialog.advance(Number(button.split(":")[1]));
   }
 
@@ -157,8 +166,32 @@ class GameApp {
     } else if (trigger.id === "vendor") {
       this.dialog.show({ speaker: "药摊老人", text: "少侠气息不稳。这两枚清心丸收好，山风口不宜久留。" });
     } else if (trigger.id === "scout") {
-      this.dialog.show({ speaker: "西岭密探", text: "前路封了。若再向前一步，刀剑无眼。", choices: [{ label: "拔剑迎战" }, { label: "暂避锋芒" }] });
+      this.dialog.show({ speaker: "西岭密探", text: "前路封了。若再向前一步，刀剑无眼。", choices: [
+        { label: "拔剑迎战", action: () => this.startBattle() },
+        { label: "暂避锋芒" }
+      ] });
     }
+  }
+
+  startBattle() {
+    this.axis = { x: 0, y: 0 };
+    this.touchBindings.clear();
+    this.battle = new BattleScene({
+      images: this.images,
+      viewport: this.viewport,
+      hitSfx: this.hitSfx,
+      onFinish: (result, audit) => {
+        this.lastBattleAudit = audit;
+        this.mode = "game";
+        this.dialog.show({
+          speaker: "战斗",
+          text: result === "victory" ? "伏兵败退。你回到旧道，继续追查短笛线索。" : "我方败退，江湖路止于此处。",
+          choices: [{ label: result === "victory" ? "回到大地图" : "游戏结束" }]
+        });
+      }
+    });
+    this.battle.start();
+    this.mode = "battle";
   }
 
   enterMap(id, spawn) {

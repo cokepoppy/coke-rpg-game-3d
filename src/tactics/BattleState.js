@@ -16,6 +16,7 @@ export class BattleState {
     this.highlightedTargets = [];
     this.selectedSkillId = null;
     this.log = [`${battle.title}：${map.config.objectives[0]}`];
+    this.events = [];
     this.finished = false;
     this.result = null;
   }
@@ -96,7 +97,19 @@ export class BattleState {
     attacker.moved = true;
     target.takeDamage(skill.damage);
     attacker.animation = { type: "attack", target: { ...target.cell }, time: 0.28, duration: 0.28, effectId: skill.effectId || "sword_slash" };
-    target.animation = { type: "hit", time: 0.34, duration: 0.34 };
+    target.animation = { type: "hit", time: 0.34, duration: 0.34, damage: skill.damage };
+    this.events.push({
+      type: "attack",
+      attackerId: attacker.id,
+      attackerName: attacker.name,
+      targetId: target.id,
+      targetName: target.name,
+      skillId: skill.id,
+      skillName: skill.name,
+      effectId: skill.effectId || "sword_slash",
+      damage: skill.damage,
+      targetDefeated: !target.alive
+    });
     this.logEvent(`${attacker.name} 使用${skill.name}，${target.name} 受到 ${skill.damage} 点伤害。`);
     if (!target.alive) this.logEvent(`${target.name} 倒下了。`);
     this.checkResult();
@@ -178,6 +191,10 @@ export class BattleState {
   logEvent(text) {
     this.log.push(text);
     if (this.log.length > 8) this.log.shift();
+  }
+
+  consumeEvents() {
+    return this.events.splice(0, this.events.length);
   }
 }
 

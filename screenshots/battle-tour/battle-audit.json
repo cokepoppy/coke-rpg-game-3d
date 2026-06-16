@@ -1,0 +1,27 @@
+{
+  "phase": "select",
+  "result": "victory",
+  "attacker": {
+    "id": "duan_yu",
+    "direction": "right",
+    "acted": true,
+    "qi": 65
+  },
+  "target": {
+    "id": "scout_1",
+    "direction": "left",
+    "hp": 0,
+    "alive": false
+  },
+  "sfxEvents": [
+    {
+      "type": "attack",
+      "skillId": "six_meridians",
+      "attackerId": "duan_yu",
+      "targetId": "scout_1",
+      "damage": 38,
+      "at": 18198
+    }
+  ],
+  "impactTimer": 0
+}

@@ -27,7 +27,24 @@ const ASSETS = {
   scout: "character-pack/scout.png",
   vendor: "character-pack/vendor.png",
   keeper: "character-pack/keeper.png",
-  bgm: "audio-pack/cangshan-road.m4a"
+  battleMap: "battle-pack/battle-courtyard.png",
+  bgm: "audio-pack/cangshan-road.m4a",
+  hitSfx: "audio-pack/hit.wav"
+};
+
+const BATTLE = {
+  title: "西岭密探",
+  cols: 7,
+  rows: 9,
+  objective: "击退伏兵",
+  players: [
+    { id: "hero", name: GAME.heroName, sprite: "hero", side: "player", x: 2, y: 7, hp: 88, qi: 100, move: 3, range: 2, damage: 38, skill: "归元剑气" },
+    { id: "companion", name: GAME.companionName, sprite: "companion", side: "player", x: 1, y: 7, hp: 72, qi: 70, move: 3, range: 1, damage: 24, skill: "短剑" }
+  ],
+  enemies: [
+    { id: "scoutA", name: "暗哨甲", sprite: "scout", side: "enemy", x: 4, y: 7, hp: 38, qi: 40, move: 2, range: 1, damage: 18, skill: "短刀" },
+    { id: "scoutB", name: "暗哨乙", sprite: "scout", side: "enemy", x: 5, y: 5, hp: 46, qi: 40, move: 2, range: 1, damage: 18, skill: "短刀" }
+  ]
 };
 
 const MAPS = {
@@ -84,4 +101,4 @@ const MAPS = {
   }
 };
 
-module.exports = { GAME, ASSETS, MAPS };
+module.exports = { GAME, ASSETS, MAPS, BATTLE };

@@ -5,6 +5,7 @@ import { TacticsRenderer } from "./TacticsRenderer.js";
 import { loadCharacterSprites } from "../assets/characterLoader.js";
 import { loadEffects } from "../assets/effectLoader.js";
 import { BattleHud } from "../ui/BattleHud.js";
+import { BattleSfx } from "../audio/BattleSfx.js";
 
 export class BattleScene {
   constructor({ context, config, onFinish }) {
@@ -13,6 +14,8 @@ export class BattleScene {
     this.onFinish = onFinish;
     this.active = false;
     this.enemyThinking = false;
+    this.impactTimer = 0;
+    this.sfx = new BattleSfx();
     this.pointerHandler = (event) => this.handlePointer(event);
   }
 
@@ -36,7 +39,10 @@ export class BattleScene {
 
   update(dt) {
     if (!this.active) return;
+    this.impactTimer = Math.max(0, this.impactTimer - dt);
+    this.renderer.impactTimer = this.impactTimer;
     this.tickAnimations(dt);
+    this.consumeBattleEvents();
     if (this.state.side === "enemy" && !this.enemyThinking && !this.state.finished) {
       this.enemyThinking = true;
       this.enemyAI.runTurn().finally(() => {
@@ -81,6 +87,16 @@ export class BattleScene {
 
   useSkill(skillId) {
     this.state.beginTargeting(skillId);
+  }
+
+  consumeBattleEvents() {
+    for (const event of this.state.consumeEvents()) {
+      if (event.type === "attack") {
+        this.impactTimer = Math.max(this.impactTimer, 0.18);
+        this.renderer.impactTimer = this.impactTimer;
+        this.sfx.play("attack", event);
+      }
+    }
   }
 
   tickAnimations(dt) {

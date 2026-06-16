@@ -22,6 +22,7 @@ await rm(path.join(root, "wechat-minigame/world-east-pack"), { recursive: true, 
 await rm(path.join(root, "wechat-minigame/room-pack"), { recursive: true, force: true });
 await rm(path.join(root, "wechat-minigame/character-pack"), { recursive: true, force: true });
 await rm(path.join(root, "wechat-minigame/audio-pack"), { recursive: true, force: true });
+await rm(path.join(root, "wechat-minigame/battle-pack"), { recursive: true, force: true });
 
 for (const [source, destination] of files) {
   const target = path.join(root, destination);
@@ -50,8 +51,47 @@ for (const [pack, filename, left] of worldHalves) {
     .toFile(target);
 }
 
-for (const pack of ["world-west-pack", "world-east-pack", "room-pack", "character-pack", "audio-pack"]) {
+const battleTarget = path.join(root, "wechat-minigame/battle-pack/battle-courtyard.png");
+await mkdir(path.dirname(battleTarget), { recursive: true });
+await sharp(path.join(root, "maps/dali-battle-courtyard/dali-battle-courtyard-rendered.png"))
+  .resize({ width: 1024, height: 640, fit: "cover" })
+  .png({ palette: true, quality: 92, compressionLevel: 9 })
+  .toFile(battleTarget);
+
+await writeHitSfx(path.join(root, "wechat-minigame/audio-pack/hit.wav"));
+
+for (const pack of ["world-west-pack", "world-east-pack", "room-pack", "character-pack", "audio-pack", "battle-pack"]) {
   await writeFile(path.join(root, "wechat-minigame", pack, "game.js"), "module.exports = {};\n");
 }
 
-console.log(`Prepared ${files.length + 2} compressed runtime assets.`);
+console.log(`Prepared ${files.length + 4} compressed runtime assets.`);
+
+async function writeHitSfx(target) {
+  await mkdir(path.dirname(target), { recursive: true });
+  const sampleRate = 22050;
+  const duration = 0.18;
+  const samples = Math.floor(sampleRate * duration);
+  const data = Buffer.alloc(samples * 2);
+  for (let index = 0; index < samples; index += 1) {
+    const t = index / sampleRate;
+    const envelope = Math.exp(-t * 18);
+    const tone = Math.sin(Math.PI * 2 * (180 - t * 320) * t) * 0.75 + (Math.random() * 2 - 1) * 0.25;
+    const value = Math.max(-1, Math.min(1, tone * envelope));
+    data.writeInt16LE(Math.round(value * 32767), index * 2);
+  }
+  const header = Buffer.alloc(44);
+  header.write("RIFF", 0);
+  header.writeUInt32LE(36 + data.length, 4);
+  header.write("WAVE", 8);
+  header.write("fmt ", 12);
+  header.writeUInt32LE(16, 16);
+  header.writeUInt16LE(1, 20);
+  header.writeUInt16LE(1, 22);
+  header.writeUInt32LE(sampleRate, 24);
+  header.writeUInt32LE(sampleRate * 2, 28);
+  header.writeUInt16LE(2, 32);
+  header.writeUInt16LE(16, 34);
+  header.write("data", 36);
+  header.writeUInt32LE(data.length, 40);
+  await writeFile(target, Buffer.concat([header, data]));
+}

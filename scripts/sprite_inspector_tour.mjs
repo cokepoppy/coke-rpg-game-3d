@@ -4,7 +4,7 @@ import path from "node:path";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { chromium } = require("playwright");
+const { chromium } = require("playwright-core");
 const sharp = require("sharp");
 
 const outDir = path.join(process.cwd(), "screenshots/sprite-inspector");

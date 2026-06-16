@@ -21,6 +21,10 @@
     {
       "name": "audioPack",
       "root": "audio-pack"
+    },
+    {
+      "name": "battlePack",
+      "root": "battle-pack"
     }
   ],
   "networkTimeout": {

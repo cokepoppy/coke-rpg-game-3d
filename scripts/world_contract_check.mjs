@@ -2,7 +2,7 @@
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { chromium } = require("playwright");
+const { chromium } = require("playwright-core");
 
 const baseUrl = process.env.BASE_URL || "http://localhost:5173";
 const browser = await chromium.launch({

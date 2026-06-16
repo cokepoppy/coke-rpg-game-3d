@@ -9,9 +9,10 @@ const browser = await chromium.launch({
   executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
   args: ["--autoplay-policy=no-user-gesture-required"]
 });
+let page;
 
 try {
-  const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
+  page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
   const errors = [];
   page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
   page.on("pageerror", (error) => errors.push(error.message));
@@ -71,8 +72,16 @@ try {
   if (errors.length) throw new Error(`Browser errors: ${errors.join(" | ")}`);
   await writeFile(`${output}/audit.json`, `${JSON.stringify(audit, null, 2)}\n`);
   console.log(JSON.stringify(audit, null, 2));
+  setTimeout(() => globalThis.process.exit(0), 2000);
 } finally {
-  await browser.close();
+  await Promise.race([
+    page?.evaluate(() => globalThis.__cangshanGame?.audio?.pause?.()).catch(() => {}),
+    new Promise((resolve) => setTimeout(resolve, 500))
+  ]);
+  await Promise.race([page?.close().catch(() => {}), new Promise((resolve) => setTimeout(resolve, 800))]);
+  await Promise.race([browser.close().catch(() => {}), new Promise((resolve) => setTimeout(resolve, 1500))]);
+  const process = browser.process?.();
+  if (process && !process.killed) process.kill("SIGKILL");
 }
 
 async function playerState(page) {

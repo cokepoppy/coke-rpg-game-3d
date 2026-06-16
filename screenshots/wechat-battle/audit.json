@@ -1,0 +1,30 @@
+{
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "mode": "game",
+  "dialog": {
+    "speaker": "战斗",
+    "text": "伏兵败退。你回到旧道，继续追查短笛线索。"
+  },
+  "battle": {
+    "attacks": [
+      {
+        "attackerId": "hero",
+        "targetId": "scoutA",
+        "damage": 38,
+        "targetHp": 0
+      }
+    ],
+    "moves": [
+      {
+        "id": "hero",
+        "x": 3,
+        "y": 7
+      }
+    ],
+    "result": "victory"
+  },
+  "errors": []
+}

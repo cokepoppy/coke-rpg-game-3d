@@ -14,6 +14,7 @@ export class TacticsRenderer {
       width: map.pixelWidth,
       height: map.pixelHeight
     };
+    this.impactTimer = 0;
   }
 
   draw() {
@@ -22,10 +23,16 @@ export class TacticsRenderer {
     ctx.fillStyle = "#0f1410";
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.imageSmoothingEnabled = false;
+    ctx.save();
+    if (this.impactTimer > 0) {
+      const shake = Math.round(Math.sin(this.impactTimer * 115) * 4);
+      ctx.translate(shake, 0);
+    }
     ctx.drawImage(this.map.image, this.view.x, this.view.y, this.view.width, this.view.height);
     this.drawGrid();
     this.drawHighlights();
     this.drawUnits();
+    ctx.restore();
   }
 
   cellFromCanvasPoint(point) {
@@ -80,7 +87,7 @@ export class TacticsRenderer {
 
   drawUnits() {
     const ctx = this.context;
-    const units = this.state.units.filter((unit) => unit.alive).sort((a, b) => a.cell.y - b.cell.y);
+    const units = this.state.units.filter((unit) => unit.alive || unit.animation).sort((a, b) => a.cell.y - b.cell.y);
     for (const unit of units) {
       const center = this.map.cellCenter(unit.cell);
       const px = this.view.x + center.x;
@@ -98,6 +105,7 @@ export class TacticsRenderer {
       });
       if (drewSprite) {
         this.drawUnitLabels(unit, px, py);
+        if (unit.animation?.type === "hit") this.drawDamageText(unit, px, py);
         if (unit.animation?.type === "attack") this.drawAttackArc(unit);
         continue;
       }
@@ -134,8 +142,28 @@ export class TacticsRenderer {
         ctx.fill();
       }
       ctx.restore();
+      if (unit.animation?.type === "hit") this.drawDamageText(unit, px, py);
       if (unit.animation?.type === "attack") this.drawAttackArc(unit);
     }
+  }
+
+  drawDamageText(unit, px, py) {
+    const damage = unit.animation?.damage;
+    if (!damage) return;
+    const duration = unit.animation.duration || 0.34;
+    const progress = Math.max(0, Math.min(1, 1 - unit.animation.time / duration));
+    const ctx = this.context;
+    ctx.save();
+    ctx.globalAlpha = Math.max(0.1, 1 - progress * 0.45);
+    ctx.font = "bold 18px Songti SC, serif";
+    ctx.textAlign = "center";
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = "rgba(28, 12, 8, 0.9)";
+    ctx.fillStyle = "#ffd36b";
+    const y = py - 46 - progress * 24;
+    ctx.strokeText(`-${damage}`, px, y);
+    ctx.fillText(`-${damage}`, px, y);
+    ctx.restore();
   }
 
   drawUnitLabels(unit, px, py) {

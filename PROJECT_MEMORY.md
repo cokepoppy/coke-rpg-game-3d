@@ -109,16 +109,17 @@ screenshots/room-tour/room-tour-contact.png
 - After a move, the selected unit should be able to attack or use a skill if a target is in range.
 - Before applying damage, set attacker direction toward the target and target direction toward the attacker.
 - Hit feedback needs a visible animation, such as flash/alpha flicker, not only a small y-offset.
+- A defeated unit must stay renderable until its hit animation finishes. Removing it from the render list immediately makes damage text, flash, and impact frames invisible.
+- Attack feedback must produce both visual evidence and a machine-readable event. `BattleState` should emit attack events, `BattleScene` should consume them for SFX/impact, and the tour should assert the recorded SFX event.
 - Idle units should animate through frames so the battlefield does not look frozen.
 - Victory must show a result dialog, apply rewards, then return to the world map. Defeat must show a game-over dialog.
 - Battle QA should force a small deterministic victory case when the goal is to test UI flow, not full combat balance.
+- The battle tour writes both screenshots and `screenshots/battle-tour/battle-audit.json`; treat the audit as the source of truth for direction, damage, SFX events, and result state.
 
 Useful check:
 
 ```bash
-NO_PROXY='*' NODE_PATH=/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules \
-BASE_URL=http://127.0.0.1:5173 \
-/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node scripts/battle_tour.mjs
+BASE_URL=http://127.0.0.1:5173 node scripts/battle_tour.mjs
 ```
 
 Output contact sheet:
@@ -129,7 +130,7 @@ screenshots/battle-tour/battle-tour-contact.png
 
 ## Local Dev / QA Pitfalls
 
-- This repo is currently a static HTML/JS prototype without `package.json`.
+- This repo is currently a static HTML/JS prototype with lightweight npm scripts for the WeChat build and test helpers.
 - Use a static server, not direct file open, for normal testing:
 
 ```bash
@@ -138,12 +139,7 @@ python3 -m http.server 5173 --bind 127.0.0.1
 
 - A stale Python server on port `5173` can stay alive but return `ERR_EMPTY_RESPONSE` or `502`. If curl fails, restart the server.
 - Always test with `127.0.0.1` and `NO_PROXY='*'` when running Playwright/curl locally; proxy settings can produce misleading `502` results.
-- The system Node may not have `playwright` or `sharp`. Use the Codex bundled runtime:
-
-```bash
-NODE_PATH=/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules \
-/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node <script>
-```
+- Tour scripts should use the installed `playwright-core` package and the explicit Chrome executable path. Do not switch them back to `playwright` unless the dependency is intentionally added.
 
 - Before trusting a browser failure, first confirm the local server:
 

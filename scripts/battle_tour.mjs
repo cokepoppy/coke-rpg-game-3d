@@ -4,7 +4,7 @@ import path from "node:path";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { chromium } = require("playwright");
+const { chromium } = require("playwright-core");
 const sharp = require("sharp");
 
 const root = process.cwd();
@@ -69,6 +69,29 @@ await shot("06-skill-targeting");
 await clickCell(8, 7);
 await page.waitForTimeout(180);
 await shot("07-player-skill-hit");
+const attackAudit = await page.evaluate(() => {
+  const scene = window.__battleScene;
+  const attacker = scene.state.units.find((unit) => unit.id === "duan_yu");
+  const target = scene.state.units.find((unit) => unit.id === "scout_1");
+  return {
+    phase: scene.state.phase,
+    result: scene.state.result,
+    attacker: {
+      id: attacker.id,
+      direction: attacker.direction,
+      acted: attacker.acted,
+      qi: attacker.qi
+    },
+    target: {
+      id: target.id,
+      direction: target.direction,
+      hp: target.hp,
+      alive: target.alive
+    },
+    sfxEvents: scene.sfx.played,
+    impactTimer: scene.renderer.impactTimer
+  };
+});
 await waitDialog();
 await shot("08-victory-dialog");
 await clickFirst();
@@ -78,13 +101,26 @@ await shot("09-back-to-world");
 
 const battleLog = await page.evaluate(() => window.__battleScene?.state?.log || []);
 await fs.writeFile(path.join(outDir, "battle-log.json"), JSON.stringify(battleLog, null, 2));
+await fs.writeFile(path.join(outDir, "battle-audit.json"), JSON.stringify(attackAudit, null, 2));
 await makeContactSheet(outDir);
 await browser.close();
 
-console.log(JSON.stringify({ outDir, errors, responses, battleLog }, null, 2));
+const failures = [];
+if (!attackAudit.sfxEvents.some((event) => event.type === "attack" && event.skillId === "six_meridians")) failures.push("attack sfx event was not recorded");
+if (attackAudit.attacker.direction !== "right") failures.push(`attacker did not face target: ${attackAudit.attacker.direction}`);
+if (attackAudit.target.direction !== "left") failures.push(`target did not face attacker: ${attackAudit.target.direction}`);
+if (attackAudit.target.hp !== 0 || attackAudit.target.alive) failures.push("target was not defeated by audited skill hit");
+if (attackAudit.result !== "victory") failures.push(`expected victory after audited hit, received ${attackAudit.result}`);
+
+console.log(JSON.stringify({ outDir, errors, responses, battleLog, attackAudit, failures }, null, 2));
+if (failures.length || errors.length || responses.length) process.exit(1);
 
 async function startNewGame() {
-  await page.waitForSelector(".menu-panel", { timeout: 8000 });
+  await page.waitForFunction(
+    () => Boolean(window.__rpgScene && document.querySelector(".menu-panel")),
+    null,
+    { timeout: 20000 }
+  );
   await page.locator('[data-action="new"]').click();
 }
 

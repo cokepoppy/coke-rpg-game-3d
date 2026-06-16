@@ -38,10 +38,23 @@ function createAudio(source) {
   return audio;
 }
 
+function createSfx(source) {
+  const audio = wx.createInnerAudioContext();
+  audio.src = `${wx.__assetBase || ""}${source}`;
+  audio.loop = false;
+  audio.volume = 0.72;
+  return {
+    play() {
+      if (audio.stop) audio.stop();
+      audio.play();
+    }
+  };
+}
+
 function loadAssetPacks() {
   if (!wx.loadSubpackage) return Promise.resolve();
   const load = (name) => new Promise((resolve, reject) => wx.loadSubpackage({ name, success: resolve, fail: reject }));
-  return Promise.all([load("worldWestPack"), load("worldEastPack"), load("roomPack"), load("characterPack"), load("audioPack")]);
+  return Promise.all([load("worldWestPack"), load("worldEastPack"), load("roomPack"), load("characterPack"), load("audioPack"), load("battlePack")]);
 }
 
 function readSave(key) {
@@ -52,4 +65,4 @@ function writeSave(key, value) {
   try { wx.setStorageSync(key, value); } catch (error) { console.warn("Save failed", error); }
 }
 
-module.exports = { createSurface, loadImage, createAudio, loadAssetPacks, readSave, writeSave };
+module.exports = { createSurface, loadImage, createAudio, createSfx, loadAssetPacks, readSave, writeSave };

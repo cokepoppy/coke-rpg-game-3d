@@ -82,6 +82,50 @@ const ROOM_TRIGGERS = [
   { id: "desk", x: 650, y: 100, width: 285, height: 190, label: "查看账册" }
 ];
 
+const APOTHECARY_COLLISIONS = [
+  { x: 0, y: 0, width: 1280, height: 78 },
+  { x: 0, y: 0, width: 40, height: 768 },
+  { x: 1240, y: 0, width: 40, height: 768 },
+  { x: 0, y: 704, width: 520, height: 64 },
+  { x: 760, y: 704, width: 520, height: 64 },
+  { x: 48, y: 84, width: 292, height: 460 },
+  { x: 350, y: 84, width: 590, height: 150 },
+  { x: 340, y: 260, width: 560, height: 104 },
+  { x: 980, y: 84, width: 230, height: 420 },
+  { x: 820, y: 430, width: 240, height: 176 },
+  { x: 430, y: 650, width: 96, height: 80 },
+  { x: 760, y: 650, width: 96, height: 80 }
+];
+
+const APOTHECARY_TRIGGERS = [
+  { id: "roomExit", x: 520, y: 650, width: 240, height: 118, label: "离开百草铺" },
+  { id: "wardrobe", x: 970, y: 105, width: 230, height: 260, label: "搜索药柜" },
+  { id: "desk", x: 580, y: 210, width: 300, height: 160, label: "查看药方" }
+];
+
+const TEAHOUSE_COLLISIONS = [
+  { x: 0, y: 0, width: 1280, height: 78 },
+  { x: 0, y: 0, width: 40, height: 768 },
+  { x: 1240, y: 0, width: 40, height: 768 },
+  { x: 0, y: 704, width: 520, height: 64 },
+  { x: 760, y: 704, width: 520, height: 64 },
+  { x: 60, y: 82, width: 340, height: 250 },
+  { x: 415, y: 110, width: 560, height: 168 },
+  { x: 1040, y: 84, width: 170, height: 440 },
+  { x: 250, y: 320, width: 180, height: 120 },
+  { x: 535, y: 300, width: 180, height: 118 },
+  { x: 820, y: 320, width: 180, height: 118 },
+  { x: 335, y: 500, width: 184, height: 130 },
+  { x: 690, y: 500, width: 184, height: 130 },
+  { x: 920, y: 595, width: 255, height: 130 }
+];
+
+const TEAHOUSE_TRIGGERS = [
+  { id: "roomExit", x: 520, y: 650, width: 240, height: 118, label: "离开茶肆" },
+  { id: "wardrobe", x: 100, y: 255, width: 180, height: 120, label: "搜索茶箱" },
+  { id: "desk", x: 850, y: 100, width: 220, height: 170, label: "查看告示" }
+];
+
 const MAPS = {
   world: {
     id: "world",
@@ -136,8 +180,8 @@ const MAPS = {
     height: 768,
     spawn: { x: 610, y: 650 },
     exitTo: { mapId: "world", spawn: { x: 3370, y: 2580 }, label: "离开百草铺" },
-    collisions: ROOM_COLLISIONS,
-    triggers: ROOM_TRIGGERS,
+    collisions: APOTHECARY_COLLISIONS,
+    triggers: APOTHECARY_TRIGGERS,
     npcs: [{ id: "vendor", name: "药摊老人", sprite: "vendor", x: 540, y: 260, direction: "down" }]
   },
   teahouseRoom: {
@@ -147,8 +191,8 @@ const MAPS = {
     height: 768,
     spawn: { x: 610, y: 650 },
     exitTo: { mapId: "world", spawn: { x: 2320, y: 1320 }, label: "离开松风茶肆" },
-    collisions: ROOM_COLLISIONS,
-    triggers: ROOM_TRIGGERS,
+    collisions: TEAHOUSE_COLLISIONS,
+    triggers: TEAHOUSE_TRIGGERS,
     npcs: [{ id: "keeper", name: "茶肆掌柜", sprite: "keeper", x: 540, y: 260, direction: "down" }]
   }
 };

@@ -52,24 +52,22 @@ for (const [pack, filename, left] of worldHalves) {
     .toFile(target);
 }
 
+const worldMapSource = path.join(root, "assets/generated/wechat-world-map/wuxia-world-map-imagegen.png");
 const worldMapTarget = path.join(root, "wechat-minigame/world-map-pack/world-map.png");
 await mkdir(path.dirname(worldMapTarget), { recursive: true });
-await sharp(worldSource)
+await sharp(worldMapSource)
   .resize({ width: 780, height: 624, fit: "cover", position: "attention" })
-  .modulate({ saturation: 0.78, brightness: 0.74 })
-  .blur(0.4)
+  .modulate({ saturation: 0.96, brightness: 0.86 })
   .png({ palette: true, quality: 88, compressionLevel: 9 })
   .toFile(worldMapTarget);
 
-const roomSource = path.join(root, "maps/dali-inn-room/dali-inn-room-rendered.png");
 const roomVariants = [
-  ["apothecary-room.png", { saturation: 0.82, brightness: 0.86, hue: 18 }, { r: 30, g: 74, b: 48, alpha: 0.22 }],
-  ["teahouse-room.png", { saturation: 0.72, brightness: 0.9, hue: -12 }, { r: 78, g: 50, b: 28, alpha: 0.18 }]
+  ["assets/generated/wechat-rooms/apothecary-room-imagegen.png", "apothecary-room.png"],
+  ["assets/generated/wechat-rooms/teahouse-room-imagegen.png", "teahouse-room.png"]
 ];
-for (const [filename, modulate, tint] of roomVariants) {
-  await sharp(roomSource)
-    .modulate(modulate)
-    .composite([{ input: Buffer.from(`<svg width="1280" height="768"><rect width="1280" height="768" fill="rgba(${tint.r},${tint.g},${tint.b},${tint.alpha})"/></svg>`), blend: "over" }])
+for (const [source, filename] of roomVariants) {
+  await sharp(path.join(root, source))
+    .resize({ width: 1280, height: 768, fit: "cover", position: "attention" })
     .png({ palette: true, quality: 92, compressionLevel: 9 })
     .toFile(path.join(root, "wechat-minigame/room-pack", filename));
 }

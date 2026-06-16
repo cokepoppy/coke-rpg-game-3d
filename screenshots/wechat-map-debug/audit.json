@@ -63,7 +63,7 @@
         "y": 650
       },
       "trigger": "roomExit",
-      "collisions": 7,
+      "collisions": 12,
       "triggers": 3
     },
     {
@@ -74,7 +74,7 @@
         "y": 650
       },
       "trigger": "roomExit",
-      "collisions": 7,
+      "collisions": 14,
       "triggers": 3
     }
   ],

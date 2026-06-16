@@ -1,0 +1,27 @@
+{
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "mode": "shop",
+  "money": 98,
+  "items": {
+    "hemostatic_powder": 2,
+    "qingxin_pill": 2
+  },
+  "shopAudit": {
+    "ok": true,
+    "itemId": "qingxin_pill",
+    "price": 22,
+    "money": 98,
+    "owned": 2
+  },
+  "buttons": [
+    "closeShop",
+    "shop:buy:hemostatic_powder",
+    "shop:buy:qingxin_pill",
+    "shop:buy:iron_sword",
+    "shop:buy:steel_saber"
+  ],
+  "errors": []
+}

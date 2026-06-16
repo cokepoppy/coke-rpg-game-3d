@@ -57,6 +57,20 @@ const ITEM_CATALOG = {
   }
 };
 
+const SHOP_CATALOG = {
+  apothecary: {
+    id: "apothecary",
+    name: "百草铺",
+    keeper: "药摊老人",
+    stock: [
+      { itemId: "hemostatic_powder", price: 18 },
+      { itemId: "qingxin_pill", price: 22 },
+      { itemId: "iron_sword", price: 120, limit: 1 },
+      { itemId: "steel_saber", price: 160, limit: 1 }
+    ]
+  }
+};
+
 function itemById(id) {
   return ITEM_CATALOG[id] || {
     id,
@@ -68,10 +82,26 @@ function itemById(id) {
   };
 }
 
+function shopById(id) {
+  return SHOP_CATALOG[id] || null;
+}
+
 function inventoryEntries(items) {
   return Object.entries(items || {})
     .filter(([, amount]) => amount > 0)
     .map(([itemId, amount]) => ({ item: itemById(itemId), amount }));
 }
 
-module.exports = { ITEM_CATALOG, itemById, inventoryEntries };
+function shopEntries(shopId, items) {
+  const shop = shopById(shopId);
+  return (shop?.stock || []).map((entry) => {
+    const item = itemById(entry.itemId);
+    return {
+      ...entry,
+      item,
+      owned: (items || {})[entry.itemId] || 0
+    };
+  });
+}
+
+module.exports = { ITEM_CATALOG, SHOP_CATALOG, itemById, shopById, inventoryEntries, shopEntries };

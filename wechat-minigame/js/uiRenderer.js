@@ -150,6 +150,60 @@ class UiRenderer {
     });
   }
 
+  renderShop(context, state) {
+    this.buttons = [];
+    const { width, height } = this.viewport;
+    const shop = state.shop || { name: "店铺", keeper: "掌柜" };
+    context.fillStyle = "#171510";
+    context.fillRect(0, 0, width, height);
+    context.fillStyle = "rgba(34, 28, 20, 0.98)";
+    roundedRect(context, 12, this.headerHeight - 66, width - 24, height - this.headerHeight + 52, 6);
+    context.fill();
+    context.strokeStyle = "rgba(224, 192, 126, 0.58)";
+    context.stroke();
+    context.textAlign = "left";
+    context.fillStyle = "#f4e6c6";
+    context.font = "700 22px serif";
+    context.fillText(shop.name, 28, this.headerHeight - 30);
+    context.font = "12px sans-serif";
+    context.fillStyle = "#dbc287";
+    context.fillText(`${shop.keeper} · 银两 ${state.money}`, 28, this.headerHeight - 8);
+    this.button(context, "closeShop", width - 86, this.headerHeight - 58, 66, 38, "返回", "normal");
+
+    const entries = state.entries || [];
+    const listY = this.headerHeight + 20;
+    entries.slice(0, 6).forEach((entry, index) => {
+      const { item, owned, price, limit } = entry;
+      const y = listY + index * 76;
+      const disabled = state.money < price || (limit && owned >= limit);
+      context.fillStyle = disabled ? "rgba(18, 15, 10, 0.48)" : "rgba(18, 15, 10, 0.78)";
+      roundedRect(context, 24, y, width - 48, 64, 5);
+      context.fill();
+      context.strokeStyle = "rgba(224, 192, 126, 0.22)";
+      context.stroke();
+      context.fillStyle = itemColor(item.rarity);
+      roundedRect(context, 36, y + 14, 36, 36, 5);
+      context.fill();
+      context.textAlign = "center";
+      context.fillStyle = "#19140e";
+      context.font = "700 17px serif";
+      context.fillText(item.name.slice(0, 1), 54, y + 38);
+      context.textAlign = "left";
+      context.fillStyle = disabled ? "rgba(246, 234, 210, 0.48)" : "#f6ead2";
+      context.font = "700 14px sans-serif";
+      context.fillText(`${item.name} · ${price} 两`, 84, y + 22);
+      context.fillStyle = disabled ? "rgba(205, 181, 125, 0.46)" : "#cdb57d";
+      context.font = "11px sans-serif";
+      context.fillText(`${item.type} · ${item.effect}${limit ? ` · 已有 ${owned}/${limit}` : ` · 已有 ${owned}`}`, 84, y + 40);
+      this.button(context, `shop:buy:${item.id}`, width - 82, y + 18, 48, 30, disabled ? "不可" : "购买", disabled ? "disabled" : "primary");
+    });
+
+    context.textAlign = "left";
+    context.fillStyle = "#d9c28f";
+    context.font = "12px sans-serif";
+    drawWrappedText(context, state.message || "", 28, height - 58, width - 56, 20, 2);
+  }
+
   renderDialog(context, page) {
     const width = this.viewport.width;
     const choices = page.choices || [{ label: "继续" }];

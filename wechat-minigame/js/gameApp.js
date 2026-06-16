@@ -5,7 +5,7 @@ const { MapManager } = require("./mapManager");
 const { DialogSystem } = require("./dialogSystem");
 const { UiRenderer } = require("./uiRenderer");
 const { BattleScene } = require("./battleScene");
-const { inventoryEntries } = require("./itemCatalog");
+const { inventoryEntries, itemById, shopById, shopEntries } = require("./itemCatalog");
 
 const SAVE_KEY = "cangshan-rpg-save-v1";
 
@@ -25,6 +25,9 @@ class GameApp {
     this.defeatedScouts = new Set();
     this.currentBattleTriggerId = null;
     this.worldMapUnlocked = false;
+    this.activeShopId = null;
+    this.shopMessage = "";
+    this.lastShopAudit = null;
     this.axis = { x: 0, y: 0 };
     this.lastTime = Date.now();
     this.touchBindings = new Map();
@@ -101,6 +104,12 @@ class GameApp {
       money: this.money,
       entries: inventoryEntries(this.items)
     });
+    if (this.mode === "shop") return this.ui.renderShop(ctx, {
+      money: this.money,
+      shop: shopById(this.activeShopId),
+      entries: shopEntries(this.activeShopId, this.items),
+      message: this.shopMessage
+    });
     if (this.mode === "battle") return this.battle.render(ctx, this.ui);
     this.ui.render(ctx, {
       mode: this.mode,
@@ -148,6 +157,8 @@ class GameApp {
     if (button === "menu") return this.openMenu();
     if (button === "inventory") return this.openInventory();
     if (button === "closeInventory") return this.closeInventory();
+    if (button === "closeShop") return this.closeShop();
+    if (button.startsWith("shop:buy:")) return this.buyItem(button.split(":")[2]);
     if (button === "worldmap") return this.openWorldMap();
     if (button === "closeWorldMap") return this.closeWorldMap();
     if (button === "interact") return this.interact();
@@ -162,6 +173,9 @@ class GameApp {
     this.defeatedScouts = new Set();
     this.currentBattleTriggerId = null;
     this.worldMapUnlocked = false;
+    this.activeShopId = null;
+    this.shopMessage = "";
+    this.lastShopAudit = null;
     this.enterMap("world");
     this.playMusic();
     this.dialog.show([
@@ -209,7 +223,10 @@ class GameApp {
     } else if (trigger.id === "desk") {
       this.dialog.show({ speaker: "账册", text: "夹页反复写着“灯亭、铜匣、寺后”，三处似乎指向同一条密道。" });
     } else if (trigger.id === "vendor") {
-      this.dialog.show({ speaker: "药摊老人", text: "少侠气息不稳。这两枚清心丸收好，山风口不宜久留。" });
+      this.dialog.show({ speaker: "药摊老人", text: "少侠气息不稳。若要补药或兵刃，我这摊上还有几样可用。", choices: [
+        { label: "查看货物", action: () => this.openShop("apothecary") },
+        { label: "暂时离开" }
+      ] });
     } else if (trigger.id.startsWith("scout")) {
       this.dialog.show({ speaker: "西岭密探", text: "前路封了。若再向前一步，刀剑无眼。", choices: [
         { label: "拔剑迎战", action: () => this.startBattle(trigger.id) },
@@ -330,6 +347,45 @@ class GameApp {
 
   closeInventory() {
     this.mode = "game";
+  }
+
+  openShop(shopId) {
+    this.axis = { x: 0, y: 0 };
+    this.activeShopId = shopId;
+    this.shopMessage = "选择要购买的物品";
+    this.mode = "shop";
+  }
+
+  closeShop() {
+    this.mode = "game";
+    this.activeShopId = null;
+    this.shopMessage = "";
+  }
+
+  buyItem(itemId) {
+    const shop = shopById(this.activeShopId);
+    const entry = shop?.stock.find((item) => item.itemId === itemId);
+    const item = itemById(itemId);
+    if (!shop || !entry) {
+      this.shopMessage = "店里没有这个物品";
+      return;
+    }
+    const owned = this.items[itemId] || 0;
+    if (entry.limit && owned >= entry.limit) {
+      this.shopMessage = `${item.name}已经买过了`;
+      this.lastShopAudit = { ok: false, reason: "limit", itemId, money: this.money, owned };
+      return;
+    }
+    const price = entry.price ?? item.price ?? 0;
+    if (this.money < price) {
+      this.shopMessage = "银两不够";
+      this.lastShopAudit = { ok: false, reason: "money", itemId, price, money: this.money, owned };
+      return;
+    }
+    this.money -= price;
+    this.addItem(itemId, 1);
+    this.shopMessage = `买到${item.name}，花费 ${price} 两`;
+    this.lastShopAudit = { ok: true, itemId, price, money: this.money, owned: this.items[itemId] };
   }
 
   addItem(itemId, amount = 1) {

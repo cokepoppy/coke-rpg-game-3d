@@ -10,6 +10,7 @@
     "wechat:map:debug": "node scripts/test-wechat-map-debug.mjs",
     "wechat:worldmap:test": "node scripts/test-wechat-worldmap.mjs",
     "wechat:inventory:test": "node scripts/test-wechat-inventory.mjs",
+    "wechat:shop:test": "node scripts/test-wechat-shop.mjs",
     "wechat:open": "npm run wechat:assets && /Applications/wechatwebdevtools.app/Contents/MacOS/cli open --project $PWD/wechat-minigame --lang zh",
     "wechat:preview": "npm run wechat:assets && /Applications/wechatwebdevtools.app/Contents/MacOS/cli preview --project $PWD/wechat-minigame --lang zh"
   },

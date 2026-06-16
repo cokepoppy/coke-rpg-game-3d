@@ -73,6 +73,7 @@ lsof -nP -iTCP:4174 -sTCP:LISTEN
 - 房间入口要配置成“门前触发区 + exitTo 回到原地图坐标”，不要把进入房间逻辑写死在某一个客栈分支里；新增房间后同步扩展地图 debug 截图点。
 - imagegen 生成的正式地图/房间原图要先保存到 `assets/generated/...`，再由 `scripts/copy-wechat-assets.mjs` 压缩到 `wechat-minigame/*-pack/`。不要只手动覆盖微信运行包，否则下一次 `npm run wechat:assets` 会把图刷回旧版本。
 - 微信竖屏舆图必须按 `390x844` 同比例设计，运行包用 `780x1688`。不要把横图或宽图压成 `780x624` 后再画到竖屏 canvas，那会产生非等比拉伸。
+- 微信小游戏没有 DOM 面板，背包/商店都要做 canvas 版 UI。商店购买验收用 `npm run wechat:shop:test`，必须断言扣银两、物品数量增加、`lastShopAudit.ok` 为 true，并保存 `screenshots/wechat-shop/`。
 
 ## 微信开发者工具踩坑
 

@@ -156,6 +156,9 @@ curl --noproxy '*' -I --max-time 3 http://127.0.0.1:5173/index.modular.html
 - A vendor script should emit an `openShop` action; it should not implement purchase/deduct-money logic inside the dialogue data.
 - Screenshot QA for inventory must include both UI and state: capture the shop screens, then write an `inventory-summary.json` with money and item counts.
 - Item art should be generated as a small atlas when possible. Runtime item IDs must not depend on atlas layout, because atlas generation may need to be retried or replaced.
+- Purchases need explicit feedback beyond a changing money count. Render a short
+  in-shop toast or dialog for success/failure so phone users can tell that the
+  tap landed.
 
 ## Image Generation Pitfalls
 
@@ -213,6 +216,24 @@ curl --noproxy '*' -I --max-time 3 http://127.0.0.1:5173/index.modular.html
 - NPC placement requires rendered-map inspection. Coordinate-only placement can
   put a character on a roof, stall, lantern, or rock even when collision data
   says the location is reachable.
+
+## WeChat Mobile UI / Battle Pitfalls
+
+- Place HUD text and top-right game buttons below `wx.getMenuButtonBoundingClientRect()`.
+  The simulator can look fine while a real WeChat phone capsule overlaps the
+  same area.
+- Do not render D-pad arrows with text glyphs such as `◀` / `▶`; some mobile
+  fonts render them as colored emoji. Draw the triangles on canvas and make the
+  hit boxes larger than 64 px for thumb input.
+- Battle must always expose a no-cost adjacent basic attack and a wait action.
+  Skill-only controls break when qi is exhausted or when a moved unit has no
+  target in range.
+- Validate combat feel with machine-readable audit and screenshots: SFX
+  `playCount`/`playEvents`, attack log, target hit animation, damage number,
+  and side transition after all player units act.
+- Keep combat NPCs on the main road or near intended choke points. Hidden
+  battle triggers make mobile exploration feel broken even when the trigger
+  technically exists.
 
 ## Workflow Rule
 

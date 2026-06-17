@@ -20,6 +20,7 @@ class CutscenePlayer {
       result: null,
       error: null
     };
+    this.loggedFirstFrame = false;
   }
 
   play() {
@@ -29,6 +30,7 @@ class CutscenePlayer {
     const resolvedSource = this.resolveSource();
     this.audit.resolvedSource = resolvedSource;
     this.audit.sourceKind = /^https?:\/\//.test(resolvedSource) ? "remote" : "package";
+    console.info?.("[cutscene] create video", { source: this.source, resolvedSource, sourceKind: this.audit.sourceKind });
     this.video = wx.createVideo({
       x: 0,
       y: 54,
@@ -43,11 +45,25 @@ class CutscenePlayer {
       showCenterPlayBtn: false,
       backgroundColor: "#080806"
     });
-    this.video.onPlay?.(() => { this.audit.playEvent = true; });
-    this.video.onTimeUpdate?.(() => { this.audit.timeUpdates += 1; });
+    this.video.onPlay?.(() => {
+      this.audit.playEvent = true;
+      console.info?.("[cutscene] video play", { source: this.audit.resolvedSource });
+    });
+    this.video.onTimeUpdate?.((event) => {
+      this.audit.timeUpdates += 1;
+      if (!this.loggedFirstFrame) {
+        this.loggedFirstFrame = true;
+        console.info?.("[cutscene] first video frame", { source: this.audit.resolvedSource, event });
+      }
+    });
+    this.video.onWaiting?.(() => {
+      this.audit.waitingCount = (this.audit.waitingCount || 0) + 1;
+      console.warn?.("[cutscene] video waiting", { source: this.audit.resolvedSource, waitingCount: this.audit.waitingCount });
+    });
     this.video.onEnded?.(() => this.finish("ended"));
     this.video.onError?.((error) => {
       this.audit.error = error?.errMsg || error?.message || "video playback failed";
+      console.warn?.("[cutscene] video error", { source: this.audit.resolvedSource, error: this.audit.error, raw: error });
       this.startFallback("error");
     });
     this.video.show?.();
@@ -55,6 +71,7 @@ class CutscenePlayer {
     this.watchdog = setTimeout(() => {
       if (this.finished || !this.active || this.audit.timeUpdates > 0) return;
       this.audit.error = this.audit.playEvent ? "video did not emit time updates" : "video did not start";
+      console.warn?.("[cutscene] video watchdog fallback", { source: this.audit.resolvedSource, audit: this.audit });
       this.startFallback("watchdog");
     }, this.fallbackDelayMs);
   }
@@ -72,6 +89,7 @@ class CutscenePlayer {
     if (this.finished || !this.active || this.audit.fallback) return;
     this.audit.fallback = true;
     this.audit.fallbackReason = reason;
+    console.warn?.("[cutscene] fallback storyboard", { reason, audit: this.audit });
     this.destroyVideo();
     this.onFallback?.(reason, { ...this.audit });
     this.fallbackTimer = setTimeout(() => this.finish("fallback"), this.fallbackDurationMs);

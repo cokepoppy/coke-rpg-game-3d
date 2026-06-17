@@ -53,12 +53,25 @@ function createSfx(source) {
   const audio = wx.createInnerAudioContext();
   audio.src = `${wx.__assetBase || ""}${source}`;
   audio.loop = false;
-  audio.volume = 0.72;
+  audio.volume = 1;
+  audio.obeyMuteSwitch = false;
+  const audit = { source, playCount: 0, playEvents: 0, errors: [] };
+  audio.onPlay?.(() => {
+    audit.playEvents += 1;
+    console.info?.("[sfx] play", { source, playEvents: audit.playEvents });
+  });
+  audio.onError?.((error) => {
+    const message = error?.errMsg || error?.message || "sfx playback failed";
+    audit.errors.push(message);
+    console.warn?.("[sfx] error", { source, error: message, raw: error });
+  });
   return {
-    audit: { source, playCount: 0 },
+    audit,
     play() {
-      this.audit.playCount += 1;
+      audit.playCount += 1;
+      console.info?.("[sfx] trigger", { source, playCount: audit.playCount });
       if (audio.stop) audio.stop();
+      if (audio.seek) audio.seek(0);
       audio.play();
     }
   };

@@ -1,0 +1,40 @@
+{
+  "side": "enemy",
+  "phase": "enemy",
+  "hero": {
+    "qi": 0,
+    "moved": true,
+    "acted": true
+  },
+  "companion": {
+    "moved": true,
+    "acted": true
+  },
+  "scout": {
+    "hp": 6,
+    "animation": "hit"
+  },
+  "attacks": [
+    {
+      "attackerId": "hero",
+      "targetId": "scoutA",
+      "skillId": "basic_attack",
+      "damage": 32,
+      "targetHp": 6,
+      "status": null
+    }
+  ],
+  "waits": [
+    {
+      "id": "companion",
+      "wait": true
+    }
+  ],
+  "hitSfx": {
+    "source": "audio-pack/hit.wav",
+    "playCount": 1,
+    "playEvents": 1,
+    "errors": []
+  },
+  "errors": []
+}

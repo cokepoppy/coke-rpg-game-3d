@@ -30,6 +30,7 @@ class BattleScene {
         damage: unit.damage + (equipment.attack || 0),
         bonusAttack: equipment.attack || 0,
         defense: equipment.defense || 0,
+        displayHp: unit.hp,
         status: {},
         moved: false,
         acted: false,
@@ -65,6 +66,7 @@ class BattleScene {
         unit.animation.time -= dt;
         if (unit.animation.time <= 0) unit.animation = null;
       }
+      unit.displayHp += (unit.hp - unit.displayHp) * Math.min(1, dt * 7.5);
     }
     if (this.side === "enemy" && !this.enemyThinking) {
       this.enemyThinking = true;
@@ -82,6 +84,8 @@ class BattleScene {
 
   activate(button) {
     if (this.finished) return;
+    if (button === "battle:attack") return this.chooseBasicAttack();
+    if (button === "battle:wait") return this.waitSelected();
     if (button === "battle:skill" || button.startsWith("battle:skill:")) {
       if (!this.selected || this.selected.acted) return;
       const skillId = button.split(":")[2] || this.skillsFor(this.selected)[0]?.id;
@@ -107,6 +111,34 @@ class BattleScene {
     if (button === "battle:end") this.endPlayerTurn();
   }
 
+  chooseBasicAttack() {
+    if (!this.selected || this.selected.acted) return;
+    const skill = this.skillById("basic_attack");
+    const targets = this.targetable(this.selected, skill);
+    if (!targets.length) {
+      this.message = "相邻格没有敌人，可移动后待命";
+      return;
+    }
+    this.selectedSkillId = skill.id;
+    this.phase = "target";
+    this.highlights = targets.map((unit) => ({ x: unit.x, y: unit.y, kind: "target" }));
+    this.message = "选择普通攻击目标";
+  }
+
+  waitSelected() {
+    const unit = this.selected;
+    if (!unit || unit.acted) return;
+    unit.moved = true;
+    unit.acted = true;
+    unit.animation = { type: "wait", time: 0.24 };
+    this.audit.moves.push({ id: unit.id, wait: true });
+    this.message = `${unit.name} 待命`;
+    this.phase = "select";
+    this.highlights = [];
+    this.selectedId = null;
+    this.advanceAfterPlayerAction();
+  }
+
   handleTap(x, y) {
     if (this.side !== "player" || !this.active || this.finished) return;
     const cell = this.cellFromPoint(x, y);
@@ -129,7 +161,7 @@ class BattleScene {
       this.audit.moves.push({ id: selected.id, x: cell.x, y: cell.y });
       this.phase = "act";
       this.highlights = [];
-      this.message = "移动完成，选择技能";
+      this.message = "移动完成，选择攻击、技能或待命";
       return;
     }
     if (this.phase === "target" && this.selected && unit?.side === "enemy" && this.isHighlighted(cell.x, cell.y, "target")) {
@@ -154,7 +186,7 @@ class BattleScene {
     this.highlights = [];
     this.selectedId = null;
     this.checkResult();
-    if (attacker.side === "player" && !this.finished && this.living("player").every((unit) => unit.acted)) this.endPlayerTurn();
+    if (attacker.side === "player") this.advanceAfterPlayerAction();
   }
 
   applyDamage(attacker, target, skill) {
@@ -165,7 +197,7 @@ class BattleScene {
     target.hp = Math.max(0, target.hp - damage);
     target.alive = target.hp > 0;
     if (skill.status) target.status[skill.status] = skill.statusTurns || 1;
-    target.animation = { type: "hit", damage, time: 0.42, duration: 0.42, skill };
+    target.animation = { type: "hit", damage, time: 0.56, duration: 0.56, skill, fromHp: target.displayHp, toHp: target.hp };
     this.audit.attacks.push({ attackerId: attacker.id, targetId: target.id, skillId: skill.id, damage, targetHp: target.hp, status: skill.status || null });
   }
 
@@ -187,7 +219,19 @@ class BattleScene {
     this.phase = "select";
     this.highlights = [];
     this.selectedId = null;
-    if (attacker.side === "player" && this.living("player").every((unit) => unit.acted)) this.endPlayerTurn();
+    if (attacker.side === "player") this.advanceAfterPlayerAction();
+  }
+
+  advanceAfterPlayerAction() {
+    if (this.finished || this.side !== "player") return;
+    const next = this.living("player").find((unit) => !unit.acted);
+    if (!next) {
+      this.endPlayerTurn();
+      return;
+    }
+    this.selectedId = next.id;
+    this.phase = next.moved ? "act" : "move";
+    this.highlights = next.moved ? [] : this.movesFor(next);
   }
 
   endPlayerTurn() {
@@ -296,8 +340,8 @@ class BattleScene {
   }
 
   layout() {
-    const top = 88;
-    const panelHeight = 210;
+    const top = Math.max(112, (this.viewport.menuButton?.bottom || 44) + 76);
+    const panelHeight = 236;
     const field = { x: 0, y: top, width: this.viewport.width, height: this.viewport.height - top - panelHeight };
     const tile = Math.floor(Math.min(field.width / BATTLE.cols, field.height / BATTLE.rows));
     const gridWidth = tile * BATTLE.cols;
@@ -328,15 +372,18 @@ class BattleScene {
 
   drawHeader(context, ui) {
     context.fillStyle = "rgba(25, 20, 14, 0.96)";
-    context.fillRect(0, 0, this.viewport.width, 88);
+    const top = this.layout().field.y;
+    context.fillRect(0, 0, this.viewport.width, top);
+    const titleY = Math.max(42, (this.viewport.safeArea?.top || 0) + 42);
     context.textAlign = "left";
     context.fillStyle = "#f2e5c8";
-    context.font = "700 18px serif";
-    context.fillText(BATTLE.title, 18, 31);
-    context.font = "12px sans-serif";
+    context.font = "700 20px serif";
+    context.fillText(BATTLE.title, 18, titleY);
+    context.font = "14px sans-serif";
     context.fillStyle = "#d8bd82";
-    context.fillText(`${this.side === "player" ? "我方回合" : "敌方回合"}  ·  ${BATTLE.objective}`, 18, 53);
-    ui.button(context, "battle:end", this.viewport.width - 92, 24, 74, 38, "结束回合", this.side === "player" ? "normal" : "disabled");
+    context.fillText(`${this.side === "player" ? "我方回合" : "敌方回合"}  ·  ${BATTLE.objective}`, 18, titleY + 30);
+    const buttonTop = Math.max((this.viewport.menuButton?.bottom || 44) + 10, titleY + 56);
+    ui.button(context, "battle:end", this.viewport.width - 112, buttonTop, 90, 42, "结束回合", this.side === "player" ? "normal" : "disabled");
   }
 
   drawField(context) {
@@ -377,11 +424,18 @@ class BattleScene {
     const units = this.units.filter((unit) => unit.alive || unit.animation).sort((a, b) => a.y - b.y);
     for (const unit of units) {
       const center = this.cellCenter(unit);
-      const hit = unit.animation?.type === "hit" ? Math.sin(unit.animation.time * 70) * 4 : 0;
-      const alpha = unit.animation?.type === "hit" && Math.floor(unit.animation.time * 30) % 2 === 0 ? 0.45 : 1;
+      const hit = unit.animation?.type === "hit" ? Math.sin(unit.animation.time * 92) * 7 : 0;
+      const lunge = unit.animation?.type === "attack" ? attackLunge(unit) : { x: 0, y: 0 };
+      const alpha = unit.animation?.type === "hit" && Math.floor(unit.animation.time * 34) % 2 === 0 ? 0.32 : 1;
       context.globalAlpha = alpha;
-      drawSprite(context, this.images[unit.sprite], center.x, center.y + 22 + hit, unit.direction, unit.animation?.type === "attack" ? 2 : unit.frame, 70, 70);
+      drawSprite(context, this.images[unit.sprite], center.x + hit + lunge.x, center.y + 22 + lunge.y, unit.direction, unit.animation?.type === "attack" ? 2 : unit.frame, 70, 70);
       context.globalAlpha = 1;
+      if (unit.animation?.type === "hit") {
+        context.fillStyle = "rgba(255, 246, 210, 0.35)";
+        context.beginPath();
+        context.arc(center.x, center.y + 2, 34, 0, Math.PI * 2);
+        context.fill();
+      }
       context.fillStyle = "#f5ead2";
       context.font = "12px sans-serif";
       context.textAlign = "center";
@@ -389,7 +443,13 @@ class BattleScene {
       context.fillStyle = "rgba(20, 14, 10, 0.86)";
       context.fillRect(center.x - 24, center.y + 29, 48, 5);
       context.fillStyle = unit.side === "player" ? "#65d28c" : "#e65d50";
-      context.fillRect(center.x - 24, center.y + 29, 48 * Math.max(0, unit.hp / unit.maxHp), 5);
+      context.fillRect(center.x - 24, center.y + 29, 48 * Math.max(0, unit.displayHp / unit.maxHp), 5);
+      if (unit.animation?.type === "hit" && unit.animation.fromHp > unit.hp) {
+        const fromWidth = 48 * Math.max(0, unit.animation.fromHp / unit.maxHp);
+        const toWidth = 48 * Math.max(0, unit.hp / unit.maxHp);
+        context.fillStyle = "#ffd36b";
+        context.fillRect(center.x - 24 + toWidth, center.y + 29, Math.max(0, fromWidth - toWidth), 5);
+      }
       if (unit.status?.stunned || unit.status?.exposed) {
         context.fillStyle = unit.status.stunned ? "#ffd36b" : "#9bd1ff";
         context.font = "700 11px sans-serif";
@@ -415,12 +475,22 @@ class BattleScene {
   drawAttackLine(context, unit) {
     const from = this.cellCenter(unit);
     const to = this.cellCenter({ x: unit.animation.targetX, y: unit.animation.targetY });
-    context.strokeStyle = unit.animation.skill?.status === "stunned" ? "#ffd36b" : unit.animation.skill?.kind === "aoe" ? "#ff8b4a" : "#bd63ff";
-    context.lineWidth = 4;
+    const progress = 1 - Math.max(0, unit.animation.time) / (unit.animation.duration || 0.26);
+    const color = unit.animation.skill?.status === "stunned" ? "#ffd36b" : unit.animation.skill?.kind === "aoe" ? "#ff8b4a" : "#f4e6c6";
+    context.strokeStyle = color;
+    context.lineWidth = unit.animation.skill?.kind === "basic" ? 7 : 5;
+    context.lineCap = "round";
     context.beginPath();
-    context.moveTo(from.x, from.y - 6);
-    context.lineTo(to.x, to.y - 6);
+    const midX = from.x + (to.x - from.x) * progress;
+    const midY = from.y + (to.y - from.y) * progress - 8;
+    context.moveTo(from.x, from.y - 8);
+    context.lineTo(midX, midY);
     context.stroke();
+    context.fillStyle = "rgba(255, 236, 180, 0.28)";
+    context.beginPath();
+    context.arc(to.x, to.y - 8, 18 + Math.sin(progress * Math.PI) * 18, 0, Math.PI * 2);
+    context.fill();
+    context.lineCap = "butt";
   }
 
   drawPanel(context, ui) {
@@ -438,16 +508,19 @@ class BattleScene {
     context.font = "13px sans-serif";
     const stats = selected ? `${selected.name}  HP ${selected.hp}/${selected.maxHp}  气 ${selected.qi}` : "点击我方角色选择行动";
     context.fillText(stats, 24, panel.y + 62);
+    const actionDisabled = !selected || selected.acted;
+    ui.button(context, "battle:attack", 24, panel.y + 78, Math.floor((panel.width - 58) / 2), 34, "普通攻击", actionDisabled ? "disabled" : "primary");
+    ui.button(context, "battle:wait", panel.width / 2 + 5, panel.y + 78, Math.floor((panel.width - 58) / 2), 34, "待命", actionDisabled ? "disabled" : "normal");
     const skills = this.skillsFor(selected);
     skills.forEach((skill, index) => {
-      const y = panel.y + 82 + index * 38;
+      const y = panel.y + 120 + index * 32;
       const disabled = !selected || selected.acted || selected.qi < skill.cost;
-      ui.button(context, `battle:skill:${skill.id}`, 24, y, panel.width - 48, 32, `${skill.name}  -${skill.cost}`, disabled ? "disabled" : index === 0 ? "primary" : "normal");
+      ui.button(context, `battle:skill:${skill.id}`, 24, y, panel.width - 48, 28, `${skill.name}  -${skill.cost}`, disabled ? "disabled" : "normal");
     });
     context.textAlign = "left";
     context.fillStyle = "rgba(246, 234, 209, 0.68)";
     context.font = "12px sans-serif";
-    context.fillText("蓝格移动，点技能后选择红格目标；装备会影响移动/攻击/防御。", 24, panel.y + 188);
+    context.fillText("普通攻击不耗气；移动后可攻击、放技能或待命。", 24, panel.y + 218);
   }
 }
 
@@ -460,6 +533,15 @@ function directionTo(from, to) {
   const dy = to.y - from.y;
   if (Math.abs(dx) >= Math.abs(dy)) return dx < 0 ? "left" : "right";
   return dy < 0 ? "up" : "down";
+}
+
+function attackLunge(unit) {
+  const progress = 1 - Math.max(0, unit.animation.time) / (unit.animation.duration || 0.26);
+  const distance = Math.sin(Math.min(1, progress) * Math.PI) * 8;
+  if (unit.direction === "left") return { x: -distance, y: 0 };
+  if (unit.direction === "right") return { x: distance, y: 0 };
+  if (unit.direction === "up") return { x: 0, y: -distance };
+  return { x: 0, y: distance };
 }
 
 function drawImageCover(context, image, x, y, width, height) {

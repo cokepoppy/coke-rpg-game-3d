@@ -60,6 +60,7 @@ const BATTLE = {
     { id: "scoutB", name: "竹林弩手", sprite: "scoutArcher", side: "enemy", x: 5, y: 5, hp: 46, qi: 40, move: 2, range: 2, damage: 16, skillIds: ["arrow_shot"] }
   ],
   skills: {
+    basic_attack: { id: "basic_attack", name: "普通攻击", cost: 0, range: 1, kind: "basic", effect: "相邻格物理攻击" },
     quick_slash: { id: "quick_slash", name: "疾斩", cost: 0, range: 1, damage: 24, kind: "single", effect: "近身攻击" },
     guiyuan_sword: { id: "guiyuan_sword", name: "归元剑气", cost: 35, range: 2, damage: 38, kind: "single", effect: "远距剑气" },
     daze: { id: "daze", name: "点穴", cost: 45, range: 3, damage: 18, kind: "single", status: "stunned", statusTurns: 1, effect: "伤害并晕眩一回合" },
@@ -169,28 +170,28 @@ const MAPS = {
       { x: 3008, y: 2368, width: 256, height: 156 }
     ],
     triggers: [
-      { id: "inn", x: 2750, y: 2320, width: 230, height: 178, label: "进入云来客栈" },
-      { id: "apothecaryDoor", x: 3350, y: 2380, width: 210, height: 180, label: "进入百草铺" },
-      { id: "teahouseDoor", x: 2220, y: 1120, width: 230, height: 180, label: "进入松风茶肆" },
+      { id: "inn", x: 2680, y: 2260, width: 360, height: 260, label: "进入云来客栈" },
+      { id: "apothecaryDoor", x: 3290, y: 2320, width: 340, height: 260, label: "进入百草铺" },
+      { id: "teahouseDoor", x: 2160, y: 1060, width: 360, height: 260, label: "进入松风茶肆" },
       { id: "vendor", x: 3260, y: 2500, width: 220, height: 220, label: "询问药摊老人" },
       { id: "daoist_master", x: 2580, y: 2740, width: 360, height: 300, label: "拜会逍遥道人" },
-      { id: "scout", x: 790, y: 660, width: 210, height: 190, label: "挑战西岭密探" },
-      { id: "scout_bridge", x: 1510, y: 2500, width: 220, height: 190, label: "挑战桥头暗哨" },
-      { id: "scout_archer", x: 2020, y: 1840, width: 220, height: 190, label: "挑战竹林弩手" },
-      { id: "scout_road", x: 2320, y: 1440, width: 210, height: 190, label: "挑战拦路密探" },
-      { id: "scout_monk", x: 2860, y: 1160, width: 220, height: 190, label: "挑战寺前护卫" },
-      { id: "scout_gate", x: 3380, y: 1660, width: 210, height: 190, label: "挑战山门密探" }
+      { id: "scout", x: 2520, y: 2500, width: 260, height: 230, label: "挑战西岭密探" },
+      { id: "scout_bridge", x: 2240, y: 2220, width: 260, height: 230, label: "挑战桥头暗哨" },
+      { id: "scout_archer", x: 2040, y: 1840, width: 260, height: 230, label: "挑战竹林弩手" },
+      { id: "scout_road", x: 2380, y: 1500, width: 260, height: 230, label: "挑战拦路密探" },
+      { id: "scout_monk", x: 2700, y: 1320, width: 280, height: 230, label: "挑战寺前护卫" },
+      { id: "scout_gate", x: 3100, y: 1640, width: 280, height: 230, label: "挑战山门密探" }
     ],
     npcs: [
       { id: "keeper", name: "客栈掌柜", sprite: "keeper", x: 2735, y: 2525, direction: "right" },
       { id: "vendor", name: "药摊老人", sprite: "vendor", x: 3370, y: 2600, direction: "down" },
       { id: "daoist_master", name: "逍遥道人", sprite: "daoistMaster", x: 2780, y: 2890, direction: "down" },
-      { id: "scout", name: "西岭密探", sprite: "scout", x: 895, y: 745, direction: "down" },
-      { id: "scout_bridge", name: "桥头暗哨", sprite: "scout", x: 1730, y: 2520, direction: "left" },
-      { id: "scout_archer", name: "竹林弩手", sprite: "scoutArcher", x: 2240, y: 1845, direction: "left" },
-      { id: "scout_road", name: "拦路密探", sprite: "scout", x: 2425, y: 1525, direction: "down" },
-      { id: "scout_monk", name: "寺前护卫", sprite: "monkGuard", x: 3080, y: 1180, direction: "left" },
-      { id: "scout_gate", name: "山门首领", sprite: "yipintangLeader", x: 3485, y: 1745, direction: "down" }
+      { id: "scout", name: "西岭密探", sprite: "scout", x: 2648, y: 2590, direction: "down" },
+      { id: "scout_bridge", name: "桥头暗哨", sprite: "scout", x: 2368, y: 2310, direction: "down" },
+      { id: "scout_archer", name: "竹林弩手", sprite: "scoutArcher", x: 2168, y: 1930, direction: "down" },
+      { id: "scout_road", name: "拦路密探", sprite: "scout", x: 2508, y: 1590, direction: "down" },
+      { id: "scout_monk", name: "寺前护卫", sprite: "monkGuard", x: 2840, y: 1410, direction: "down" },
+      { id: "scout_gate", name: "山门首领", sprite: "yipintangLeader", x: 3240, y: 1730, direction: "down" }
     ]
   },
   room: {

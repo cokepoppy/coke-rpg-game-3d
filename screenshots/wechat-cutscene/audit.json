@@ -22,7 +22,8 @@
     "timeUpdates": 20,
     "fallback": false,
     "result": "ended",
-    "error": null
+    "error": null,
+    "waitingCount": 1
   },
   "skippedCutscene": {
     "source": "video-pack/fuyao-teaching.m4v",
@@ -33,7 +34,8 @@
     "timeUpdates": 0,
     "fallback": false,
     "result": "skipped",
-    "error": null
+    "error": null,
+    "waitingCount": 1
   },
   "fallbackCutscene": {
     "source": "video-pack/fuyao-teaching.m4v",

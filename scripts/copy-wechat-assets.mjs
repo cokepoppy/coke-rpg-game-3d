@@ -109,14 +109,17 @@ console.log(`Prepared ${files.length + 9} compressed runtime assets.`);
 async function writeHitSfx(target) {
   await mkdir(path.dirname(target), { recursive: true });
   const sampleRate = 22050;
-  const duration = 0.18;
+  const duration = 0.28;
   const samples = Math.floor(sampleRate * duration);
   const data = Buffer.alloc(samples * 2);
   for (let index = 0; index < samples; index += 1) {
     const t = index / sampleRate;
-    const envelope = Math.exp(-t * 18);
-    const tone = Math.sin(Math.PI * 2 * (180 - t * 320) * t) * 0.75 + deterministicNoise(index, 11) * 0.25;
-    const value = Math.max(-1, Math.min(1, tone * envelope));
+    const impactA = Math.exp(-t * 38);
+    const impactB = t > 0.055 ? Math.exp(-(t - 0.055) * 28) : 0;
+    const metal = Math.sin(Math.PI * 2 * 840 * t) * Math.exp(-t * 12) * 0.22;
+    const low = Math.sin(Math.PI * 2 * (145 - t * 240) * t) * 0.86 * impactA;
+    const snap = deterministicNoise(index, 11) * (0.62 * impactA + 0.48 * impactB);
+    const value = Math.max(-1, Math.min(1, low + snap + metal));
     data.writeInt16LE(Math.round(value * 32767), index * 2);
   }
   const header = Buffer.alloc(44);

@@ -36,9 +36,13 @@ window.wx = {
       set src(value) { audio.src = value; },
       set loop(value) { audio.loop = value; },
       set volume(value) { audio.volume = value; },
+      set obeyMuteSwitch(_value) {},
       play: () => audio.play().catch(() => {}),
       pause: () => audio.pause(),
-      stop: () => { audio.pause(); audio.currentTime = 0; }
+      stop: () => { audio.pause(); audio.currentTime = 0; },
+      seek: (time) => { audio.currentTime = time; },
+      onPlay: (handler) => audio.addEventListener("play", handler),
+      onError: (handler) => audio.addEventListener("error", () => handler({ errMsg: "browser audio error" }))
     };
   },
   createVideo: (options) => createBrowserVideo(options)

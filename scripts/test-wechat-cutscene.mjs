@@ -105,6 +105,7 @@ try {
   if (errors.length) throw new Error(`Browser errors: ${errors.join(" | ")}`);
   await writeFile(`${output}/audit.json`, `${JSON.stringify(audit, null, 2)}\n`);
   console.log(JSON.stringify(audit, null, 2));
+  setTimeout(() => globalThis.process.exit(0), 1200);
 } finally {
   await page?.evaluate(() => {
     globalThis.__cangshanGame?.cutscene?.finish?.("test-cleanup");

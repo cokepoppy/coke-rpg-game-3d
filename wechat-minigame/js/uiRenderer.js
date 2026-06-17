@@ -4,7 +4,8 @@ class UiRenderer {
   constructor(viewport) {
     this.viewport = viewport;
     this.buttons = [];
-    this.headerHeight = Math.max(82, (viewport.menuButton?.bottom || 44) + 48);
+    const capsuleBottom = viewport.menuButton?.bottom || 44;
+    this.headerHeight = Math.max(126, capsuleBottom + 78);
     this.playRect = { x: 0, y: this.headerHeight, width: viewport.width, height: viewport.height - this.headerHeight - 122 };
   }
 
@@ -86,25 +87,27 @@ class UiRenderer {
     const width = this.viewport.width;
     context.fillStyle = "rgba(25, 20, 14, 0.94)";
     context.fillRect(0, 0, width, this.headerHeight);
+    const titleY = Math.max(42, (this.viewport.safeArea?.top || 0) + 42);
     context.textAlign = "left";
     context.fillStyle = "#f2e5c8";
-    context.font = "700 18px serif";
-    context.fillText(GAME.heroName, 18, 31);
-    context.font = "12px sans-serif";
+    context.font = "700 20px serif";
+    context.fillText(GAME.heroName, 18, titleY);
+    context.font = "14px sans-serif";
     context.fillStyle = "#d8bd82";
-    context.fillText(`苍山旧道  ·  HP 88/88  ·  银 ${state.money ?? 120}`, 18, 53);
-    this.button(context, "menu", width - 54, this.headerHeight - 45, 38, 34, "≡", "icon");
+    context.fillText(`苍山旧道  ·  HP 88/88  ·  银 ${state.money ?? 120}`, 18, titleY + 30);
+    const menuTop = Math.max((this.viewport.menuButton?.bottom || 44) + 10, titleY + 56);
+    this.button(context, "menu", width - 70, menuTop, 48, 44, "≡", "icon");
   }
 
   renderControls(context, trigger) {
     const h = this.viewport.height;
     context.fillStyle = "#171510";
     context.fillRect(0, this.playRect.y + this.playRect.height, this.viewport.width, h);
-    const baseY = h - 66;
-    this.button(context, "left", 22, baseY - 31, 52, 52, "◀", "control");
-    this.button(context, "up", 78, baseY - 61, 52, 52, "▲", "control");
-    this.button(context, "down", 78, baseY - 5, 52, 52, "▼", "control");
-    this.button(context, "right", 134, baseY - 31, 52, 52, "▶", "control");
+    const baseY = h - 72;
+    this.directionButton(context, "left", 18, baseY - 34, 68, "left");
+    this.directionButton(context, "up", 88, baseY - 70, 68, "up");
+    this.directionButton(context, "down", 88, baseY + 2, 68, "down");
+    this.directionButton(context, "right", 158, baseY - 34, 68, "right");
     this.button(context, "interact", this.viewport.width - 92, baseY - 38, 68, 68, trigger ? "交互" : "查看", trigger ? "primaryRound" : "disabledRound");
     this.button(context, "inventory", this.viewport.width - 166, baseY - 88, 68, 34, "背包", "normal");
     if (this.lastState?.worldMapUnlocked) this.button(context, "worldmap", this.viewport.width - 92, baseY - 88, 68, 34, "舆图", "normal");
@@ -114,6 +117,39 @@ class UiRenderer {
       context.fillStyle = "#ead5a3";
       context.fillText(trigger.label, this.viewport.width - 104, h - 76);
     }
+  }
+
+  directionButton(context, id, x, y, size, direction) {
+    context.fillStyle = "rgba(50, 43, 32, 0.92)";
+    context.strokeStyle = "rgba(224, 192, 126, 0.58)";
+    roundedRect(context, x, y, size, size, 7);
+    context.fill();
+    context.stroke();
+    const cx = x + size / 2;
+    const cy = y + size / 2;
+    const radius = 15;
+    context.beginPath();
+    if (direction === "left") {
+      context.moveTo(cx - radius, cy);
+      context.lineTo(cx + radius * 0.75, cy - radius);
+      context.lineTo(cx + radius * 0.75, cy + radius);
+    } else if (direction === "right") {
+      context.moveTo(cx + radius, cy);
+      context.lineTo(cx - radius * 0.75, cy - radius);
+      context.lineTo(cx - radius * 0.75, cy + radius);
+    } else if (direction === "up") {
+      context.moveTo(cx, cy - radius);
+      context.lineTo(cx - radius, cy + radius * 0.75);
+      context.lineTo(cx + radius, cy + radius * 0.75);
+    } else {
+      context.moveTo(cx, cy + radius);
+      context.lineTo(cx - radius, cy - radius * 0.75);
+      context.lineTo(cx + radius, cy - radius * 0.75);
+    }
+    context.closePath();
+    context.fillStyle = "#f5ead2";
+    context.fill();
+    this.buttons.push({ id, x, y, width: size, height: size, disabled: false });
   }
 
   renderWorldMap(context, state) {
@@ -241,6 +277,26 @@ class UiRenderer {
     context.fillStyle = "#d9c28f";
     context.font = "12px sans-serif";
     drawWrappedText(context, state.message || "", 28, height - 58, width - 56, 20, 2);
+    if (state.notice) this.toast(context, state.notice.text, state.notice.kind);
+  }
+
+  toast(context, text, kind = "success") {
+    const width = this.viewport.width;
+    const boxWidth = Math.min(width - 48, 286);
+    const boxHeight = 54;
+    const x = (width - boxWidth) / 2;
+    const y = this.viewport.height * 0.46;
+    context.fillStyle = kind === "success" ? "rgba(33, 70, 45, 0.94)" : "rgba(88, 58, 28, 0.94)";
+    roundedRect(context, x, y, boxWidth, boxHeight, 8);
+    context.fill();
+    context.strokeStyle = kind === "success" ? "rgba(142, 224, 160, 0.72)" : "rgba(240, 195, 115, 0.72)";
+    context.stroke();
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillStyle = "#f5ead2";
+    context.font = "700 16px sans-serif";
+    context.fillText(text, width / 2, y + boxHeight / 2);
+    context.textBaseline = "alphabetic";
   }
 
   renderDialog(context, page) {

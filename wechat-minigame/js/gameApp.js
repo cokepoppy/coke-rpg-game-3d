@@ -33,6 +33,7 @@ class GameApp {
     this.worldMapUnlocked = false;
     this.activeShopId = null;
     this.shopMessage = "";
+    this.shopNotice = null;
     this.lastShopAudit = null;
     this.axis = { x: 0, y: 0 };
     this.lastTime = Date.now();
@@ -78,6 +79,10 @@ class GameApp {
       this.battle.update(dt);
       return;
     }
+    if (this.shopNotice) {
+      this.shopNotice.time -= dt;
+      if (this.shopNotice.time <= 0) this.shopNotice = null;
+    }
     if (this.mode !== "game" || this.dialog.active) return;
     this.player.update(dt, this.axis, (bounds) => this.mapManager.canMove(bounds));
     this.activeTrigger = this.resolveActiveTrigger();
@@ -119,7 +124,8 @@ class GameApp {
       money: this.money,
       shop: shopById(this.activeShopId),
       entries: shopEntries(this.activeShopId, this.items),
-      message: this.shopMessage
+      message: this.shopMessage,
+      notice: this.shopNotice
     });
     if (this.mode === "battle") return this.battle.render(ctx, this.ui);
     if (this.mode === "cutscene") return this.ui.renderCutscene(ctx, {
@@ -194,6 +200,7 @@ class GameApp {
     this.worldMapUnlocked = false;
     this.activeShopId = null;
     this.shopMessage = "";
+    this.shopNotice = null;
     this.lastShopAudit = null;
     this.enterMap("world");
     this.playMusic();
@@ -432,6 +439,7 @@ class GameApp {
     this.axis = { x: 0, y: 0 };
     this.activeShopId = shopId;
     this.shopMessage = "选择要购买的物品";
+    this.shopNotice = null;
     this.mode = "shop";
   }
 
@@ -439,6 +447,7 @@ class GameApp {
     this.mode = "game";
     this.activeShopId = null;
     this.shopMessage = "";
+    this.shopNotice = null;
   }
 
   buyItem(itemId) {
@@ -452,18 +461,21 @@ class GameApp {
     const owned = this.items[itemId] || 0;
     if (entry.limit && owned >= entry.limit) {
       this.shopMessage = `${item.name}已经买过了`;
+      this.shopNotice = { text: `${item.name}已经买过了`, time: 1.4, kind: "warn" };
       this.lastShopAudit = { ok: false, reason: "limit", itemId, money: this.money, owned };
       return;
     }
     const price = entry.price ?? item.price ?? 0;
     if (this.money < price) {
       this.shopMessage = "银两不够";
+      this.shopNotice = { text: "银两不够，无法购买", time: 1.4, kind: "warn" };
       this.lastShopAudit = { ok: false, reason: "money", itemId, price, money: this.money, owned };
       return;
     }
     this.money -= price;
     this.addItem(itemId, 1);
     this.shopMessage = `买到${item.name}，花费 ${price} 两`;
+    this.shopNotice = { text: `购买成功：${item.name}`, time: 1.8, kind: "success" };
     this.lastShopAudit = { ok: true, itemId, price, money: this.money, owned: this.items[itemId] };
   }
 

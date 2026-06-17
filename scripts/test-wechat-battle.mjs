@@ -18,7 +18,7 @@ try {
   page.on("pageerror", (error) => errors.push(error.message));
 
   await page.goto("http://127.0.0.1:4174/wechat-debug/", { waitUntil: "networkidle" });
-  await page.waitForFunction(() => globalThis.__cangshanGame?.images?.battleMap, null, { timeout: 15000 });
+  await page.waitForFunction(() => globalThis.__cangshanGame?.images?.battleTemple, null, { timeout: 15000 });
   await page.screenshot({ path: `${output}/01-menu.png` });
 
   await clickButton(page, "new");
@@ -68,7 +68,7 @@ try {
     };
   });
 
-  await clickButton(page, "battle:skill");
+  await clickButton(page, "battle:skill:guiyuan_sword");
   await page.waitForFunction(() => globalThis.__cangshanGame.battle?.phase === "target", null, { timeout: 3000 });
   await page.screenshot({ path: `${output}/06-targeting.png` });
 
@@ -101,7 +101,7 @@ try {
   if (audit.battle?.result !== "victory") throw new Error(`Expected victory, received ${audit.battle?.result}`);
   if (!audit.battle?.moves?.some((event) => event.id === "hero" && event.x === 3 && event.y === 7)) throw new Error("Missing audited hero move.");
   if (audit.moveLock.hero.x !== 3 || audit.moveLock.hero.y !== 7 || audit.moveLock.moves !== 1) throw new Error("Hero moved more than once in one turn.");
-  if (!audit.battle?.attacks?.some((event) => event.attackerId === "hero" && event.targetId === "scoutA" && event.damage === 38)) throw new Error("Missing audited hero attack.");
+  if (!audit.battle?.attacks?.some((event) => event.attackerId === "hero" && event.targetId === "scoutA" && event.skillId === "guiyuan_sword" && event.damage === 38)) throw new Error("Missing audited hero skill attack.");
   if (!audit.battle?.rewards?.money || audit.money <= 120) throw new Error("Battle rewards did not add money.");
   if (!audit.items.hemostatic_powder) throw new Error("Guaranteed reward item was not added.");
   if (audit.audio.battle.playCount < 1 || audit.audio.world.pauseCount < 1) throw new Error("Battle music did not switch on battle start.");

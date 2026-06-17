@@ -7,6 +7,7 @@
     "wechat:debug": "npm run wechat:assets && node scripts/start-wechat-debug.mjs",
     "wechat:test": "node scripts/test-wechat-debug.mjs",
     "wechat:battle:test": "node scripts/test-wechat-battle.mjs",
+    "wechat:battle:skills:test": "node scripts/test-wechat-battle-skills.mjs",
     "wechat:map:debug": "node scripts/test-wechat-map-debug.mjs",
     "wechat:worldmap:test": "node scripts/test-wechat-worldmap.mjs",
     "wechat:inventory:test": "node scripts/test-wechat-inventory.mjs",

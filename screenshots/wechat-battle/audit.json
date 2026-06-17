@@ -6,15 +6,17 @@
   "mode": "game",
   "dialog": {
     "speaker": "战斗",
-    "text": "伏兵败退。你获得 20 两银子，止血散×1、清心丸×1。还剩 5 处密探据点。"
+    "text": "伏兵败退。你获得 21 两银子，止血散×1、清心丸×1、密探令牌×1。还剩 5 处密探据点。"
   },
   "battle": {
     "attacks": [
       {
         "attackerId": "hero",
         "targetId": "scoutA",
+        "skillId": "guiyuan_sword",
         "damage": 38,
-        "targetHp": 0
+        "targetHp": 0,
+        "status": null
       }
     ],
     "moves": [
@@ -26,7 +28,7 @@
     ],
     "result": "victory",
     "rewards": {
-      "money": 20,
+      "money": 21,
       "items": [
         {
           "itemId": "hemostatic_powder",
@@ -37,14 +39,20 @@
           "itemId": "qingxin_pill",
           "name": "清心丸",
           "amount": 1
+        },
+        {
+          "itemId": "scout_token",
+          "name": "密探令牌",
+          "amount": 1
         }
       ]
     }
   },
-  "money": 140,
+  "money": 141,
   "items": {
     "hemostatic_powder": 3,
-    "qingxin_pill": 2
+    "qingxin_pill": 2,
+    "scout_token": 1
   },
   "audio": {
     "world": {

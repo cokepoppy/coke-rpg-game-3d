@@ -33,10 +33,15 @@ const ASSETS = {
   yipintangLeader: "character-pack/yipintang-leader.png",
   vendor: "character-pack/vendor.png",
   keeper: "character-pack/keeper.png",
-  battleMap: "battle-pack/battle-courtyard.png",
+  battleTemple: "battle-pack/battle-temple.png",
+  battleFerry: "battle-pack/battle-ferry.png",
+  battleBamboo: "battle-pack/battle-bamboo.png",
   bgm: "audio-pack/cangshan-road.m4a",
   battleBgm: "audio-pack/battle-loop.wav",
-  hitSfx: "audio-pack/hit.wav"
+  hitSfx: "audio-pack/hit.wav",
+  stunSfx: "audio-pack/stun.wav",
+  healSfx: "audio-pack/heal.wav",
+  sweepSfx: "audio-pack/sweep.wav"
 };
 
 const BATTLE = {
@@ -45,13 +50,23 @@ const BATTLE = {
   rows: 9,
   objective: "击退伏兵",
   players: [
-    { id: "hero", name: GAME.heroName, sprite: "hero", side: "player", x: 2, y: 7, hp: 88, qi: 100, move: 3, range: 2, damage: 38, skill: "归元剑气" },
-    { id: "companion", name: GAME.companionName, sprite: "companion", side: "player", x: 1, y: 7, hp: 72, qi: 70, move: 3, range: 1, damage: 24, skill: "短剑" }
+    { id: "hero", name: GAME.heroName, sprite: "hero", side: "player", x: 2, y: 7, hp: 88, qi: 110, move: 3, range: 2, damage: 32, skillIds: ["guiyuan_sword", "daze", "whirlwind"] },
+    { id: "companion", name: GAME.companionName, sprite: "companion", side: "player", x: 1, y: 7, hp: 72, qi: 90, move: 3, range: 1, damage: 24, skillIds: ["quick_slash", "heal", "guard_break"] }
   ],
   enemies: [
-    { id: "scoutA", name: "暗哨甲", sprite: "scout", side: "enemy", x: 4, y: 7, hp: 38, qi: 40, move: 2, range: 1, damage: 18, skill: "短刀" },
-    { id: "scoutB", name: "竹林弩手", sprite: "scoutArcher", side: "enemy", x: 5, y: 5, hp: 46, qi: 40, move: 2, range: 1, damage: 18, skill: "袖弩" }
+    { id: "scoutA", name: "暗哨甲", sprite: "scout", side: "enemy", x: 4, y: 7, hp: 38, qi: 40, move: 2, range: 1, damage: 18, skillIds: ["quick_slash"] },
+    { id: "scoutB", name: "竹林弩手", sprite: "scoutArcher", side: "enemy", x: 5, y: 5, hp: 46, qi: 40, move: 2, range: 2, damage: 16, skillIds: ["arrow_shot"] }
   ],
+  skills: {
+    quick_slash: { id: "quick_slash", name: "疾斩", cost: 0, range: 1, damage: 24, kind: "single", effect: "近身攻击" },
+    guiyuan_sword: { id: "guiyuan_sword", name: "归元剑气", cost: 35, range: 2, damage: 38, kind: "single", effect: "远距剑气" },
+    daze: { id: "daze", name: "点穴", cost: 45, range: 3, damage: 18, kind: "single", status: "stunned", statusTurns: 1, effect: "伤害并晕眩一回合" },
+    whirlwind: { id: "whirlwind", name: "回风扫叶", cost: 55, range: 1, damage: 24, kind: "aoe", radius: 1, effect: "命中目标周围敌人" },
+    heal: { id: "heal", name: "回春散", cost: 30, range: 0, heal: 24, kind: "ally_all", effect: "我方全体回血" },
+    guard_break: { id: "guard_break", name: "破甲刺", cost: 35, range: 1, damage: 22, kind: "single", status: "exposed", statusTurns: 2, effect: "破防两回合" },
+    arrow_shot: { id: "arrow_shot", name: "袖弩", cost: 0, range: 2, damage: 16, kind: "single", effect: "远程射击" },
+    rally: { id: "rally", name: "振奋", cost: 25, range: 0, qiRestore: 18, kind: "ally_all", effect: "我方回复真气" }
+  },
   rewards: {
     money: { min: 18, max: 35 },
     drops: [

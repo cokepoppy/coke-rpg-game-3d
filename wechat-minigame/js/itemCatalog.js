@@ -21,7 +21,8 @@ const ITEM_CATALOG = {
     type: "武器",
     rarity: "常见",
     effect: "攻击 +6",
-    description: "锋口干净的铁剑，适合初入江湖者。"
+    description: "锋口干净的铁剑，适合初入江湖者。",
+    equip: { attack: 6 }
   },
   steel_saber: {
     id: "steel_saber",
@@ -29,7 +30,26 @@ const ITEM_CATALOG = {
     type: "武器",
     rarity: "精良",
     effect: "攻击 +9",
-    description: "刀身略弯，劈斩有力。"
+    description: "刀身略弯，劈斩有力。",
+    equip: { attack: 9 }
+  },
+  swift_boots: {
+    id: "swift_boots",
+    name: "踏云履",
+    type: "装备",
+    rarity: "精良",
+    effect: "移动 +1",
+    description: "轻便软底靴，走山道时更省力。",
+    equip: { move: 1 }
+  },
+  leather_armor: {
+    id: "leather_armor",
+    name: "软鳞甲",
+    type: "装备",
+    rarity: "精良",
+    effect: "防御 +5",
+    description: "薄甲贴身，能卸去一部分刀剑力道。",
+    equip: { defense: 5 }
   },
   scout_token: {
     id: "scout_token",
@@ -66,7 +86,9 @@ const SHOP_CATALOG = {
       { itemId: "hemostatic_powder", price: 18 },
       { itemId: "qingxin_pill", price: 22 },
       { itemId: "iron_sword", price: 120, limit: 1 },
-      { itemId: "steel_saber", price: 160, limit: 1 }
+      { itemId: "steel_saber", price: 160, limit: 1 },
+      { itemId: "swift_boots", price: 140, limit: 1 },
+      { itemId: "leather_armor", price: 150, limit: 1 }
     ]
   }
 };
@@ -104,4 +126,17 @@ function shopEntries(shopId, items) {
   });
 }
 
-module.exports = { ITEM_CATALOG, SHOP_CATALOG, itemById, shopById, inventoryEntries, shopEntries };
+function equipmentModifiers(items) {
+  const modifiers = { attack: 0, move: 0, defense: 0 };
+  for (const [itemId, amount] of Object.entries(items || {})) {
+    if (amount <= 0) continue;
+    const equip = itemById(itemId).equip;
+    if (!equip) continue;
+    modifiers.attack += equip.attack || 0;
+    modifiers.move += equip.move || 0;
+    modifiers.defense += equip.defense || 0;
+  }
+  return modifiers;
+}
+
+module.exports = { ITEM_CATALOG, SHOP_CATALOG, itemById, shopById, inventoryEntries, shopEntries, equipmentModifiers };

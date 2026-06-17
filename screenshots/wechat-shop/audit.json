@@ -21,7 +21,9 @@
     "shop:buy:hemostatic_powder",
     "shop:buy:qingxin_pill",
     "shop:buy:iron_sword",
-    "shop:buy:steel_saber"
+    "shop:buy:steel_saber",
+    "shop:buy:swift_boots",
+    "shop:buy:leather_armor"
   ],
   "errors": []
 }

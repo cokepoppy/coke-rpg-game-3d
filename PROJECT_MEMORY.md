@@ -75,6 +75,7 @@ This verifies:
 
 - Browser background music must start from a user gesture. Call `AudioManager.play()` from menu button handlers such as New Game, Continue, or Load, not during app boot.
 - Keep generated BGM metadata in `assets/audio/bgm-manifest.json` so later work knows which file is selected, which alternates exist, and what prompt produced the track.
+- Formal BGM/SFX/voice production should use `codex-plugins/rpg-game-studio/skills/rpg-audio-generation/`. Keep provider prompts and source URLs in manifests, use local deterministic WAV only as test placeholders, and assert SFX play counts in E2E audits.
 
 ## Map Rendering Pitfalls
 

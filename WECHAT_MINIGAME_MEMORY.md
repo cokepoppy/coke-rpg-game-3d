@@ -70,6 +70,7 @@ lsof -nP -iTCP:4174 -sTCP:LISTEN
 - 世界地图/关卡解锁验收使用 `npm run wechat:worldmap:test`，输出 `screenshots/wechat-worldmap/`。密探战斗胜利后必须把对应 trigger id 加入清剿集合，地图触发器和 NPC 渲染都要过滤已清剿 id，避免同一战斗反复触发。
 - 临时脚本生成的 `battle-loop.wav` 只能当占位音轨。用户要求 Suno 正式战斗 BGM 时，不要在最终说明里把这个占位 wav 说成 Suno 成品。
 - 资产脚本生成 WAV 时必须用确定性噪声，不要直接用 `Math.random()`，否则每次 `npm run wechat:assets` 都会产生无意义二进制 diff。
+- 正式战斗音乐和音效要走 `codex-plugins/rpg-game-studio/skills/rpg-audio-generation/` 的工作流：Suno 产 BGM，ElevenLabs/Firefly/Suno Sounds 产候选 SFX，运行包仍由 `copy-wechat-assets.mjs` 统一落地；没有用户登录时不要假装已经从 Suno 生成。
 - 房间入口要配置成“门前触发区 + exitTo 回到原地图坐标”，不要把进入房间逻辑写死在某一个客栈分支里；新增房间后同步扩展地图 debug 截图点。
 - imagegen 生成的正式地图/房间原图要先保存到 `assets/generated/...`，再由 `scripts/copy-wechat-assets.mjs` 压缩到 `wechat-minigame/*-pack/`。不要只手动覆盖微信运行包，否则下一次 `npm run wechat:assets` 会把图刷回旧版本。
 - 微信竖屏舆图必须按 `390x844` 同比例设计，运行包用 `780x1688`。不要把横图或宽图压成 `780x624` 后再画到竖屏 canvas，那会产生非等比拉伸。

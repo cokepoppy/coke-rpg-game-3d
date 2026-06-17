@@ -75,21 +75,32 @@ for (const [source, filename] of roomVariants) {
     .toFile(path.join(root, "wechat-minigame/room-pack", filename));
 }
 
-const battleTarget = path.join(root, "wechat-minigame/battle-pack/battle-courtyard.png");
-await mkdir(path.dirname(battleTarget), { recursive: true });
-await sharp(path.join(root, "maps/dali-battle-courtyard/dali-battle-courtyard-rendered.png"))
-  .resize({ width: 1024, height: 640, fit: "cover" })
-  .png({ palette: true, quality: 92, compressionLevel: 9 })
-  .toFile(battleTarget);
+const battleMaps = [
+  ["assets/generated/wechat-battle-maps/temple-courtyard-battle-imagegen.png", "battle-temple.png"],
+  ["assets/generated/wechat-battle-maps/ferry-dock-battle-imagegen.png", "battle-ferry.png"],
+  ["assets/generated/wechat-battle-maps/bamboo-clearing-battle-imagegen.png", "battle-bamboo.png"]
+];
+for (const [source, filename] of battleMaps) {
+  const target = path.join(root, "wechat-minigame/battle-pack", filename);
+  await mkdir(path.dirname(target), { recursive: true });
+  await sharp(path.join(root, source))
+    .resize({ width: 780, height: 1120, fit: "cover", position: "attention" })
+    .modulate({ saturation: 0.82, brightness: 0.82 })
+    .png({ palette: true, quality: 90, compressionLevel: 9 })
+    .toFile(target);
+}
 
 await writeHitSfx(path.join(root, "wechat-minigame/audio-pack/hit.wav"));
+await writeToneSfx(path.join(root, "wechat-minigame/audio-pack/stun.wav"), { type: "stun" });
+await writeToneSfx(path.join(root, "wechat-minigame/audio-pack/heal.wav"), { type: "heal" });
+await writeToneSfx(path.join(root, "wechat-minigame/audio-pack/sweep.wav"), { type: "sweep" });
 await writeBattleLoop(path.join(root, "wechat-minigame/audio-pack/battle-loop.wav"));
 
 for (const pack of ["world-west-pack", "world-east-pack", "world-map-pack", "room-pack", "character-pack", "audio-pack", "battle-pack"]) {
   await writeFile(path.join(root, "wechat-minigame", pack, "game.js"), "module.exports = {};\n");
 }
 
-console.log(`Prepared ${files.length + 7} compressed runtime assets.`);
+console.log(`Prepared ${files.length + 9} compressed runtime assets.`);
 
 async function writeHitSfx(target) {
   await mkdir(path.dirname(target), { recursive: true });
@@ -138,6 +149,28 @@ async function writeBattleLoop(target) {
     const drum = (t * 2) % 1 < 0.09 ? deterministicNoise(index, 37) * Math.exp(-((t * 2) % 1) * 24) * 0.32 : 0;
     const value = Math.max(-1, Math.min(1, pulse + drone + drum));
     data.writeInt16LE(Math.round(value * 32767), index * 2);
+  }
+  await writeFile(target, Buffer.concat([wavHeader(data.length, sampleRate), data]));
+}
+
+async function writeToneSfx(target, { type }) {
+  await mkdir(path.dirname(target), { recursive: true });
+  const sampleRate = 22050;
+  const duration = type === "heal" ? 0.42 : 0.28;
+  const samples = Math.floor(sampleRate * duration);
+  const data = Buffer.alloc(samples * 2);
+  for (let index = 0; index < samples; index += 1) {
+    const t = index / sampleRate;
+    const envelope = Math.exp(-t * (type === "heal" ? 4.8 : 9.5));
+    let value = 0;
+    if (type === "stun") {
+      value = (Math.sin(Math.PI * 2 * 620 * t) + Math.sin(Math.PI * 2 * 760 * t)) * 0.22 * envelope;
+    } else if (type === "heal") {
+      value = (Math.sin(Math.PI * 2 * 420 * t) + Math.sin(Math.PI * 2 * 630 * t) * 0.65) * 0.25 * envelope;
+    } else {
+      value = (Math.sin(Math.PI * 2 * (230 + t * 520) * t) * 0.52 + deterministicNoise(index, 61) * 0.18) * envelope;
+    }
+    data.writeInt16LE(Math.round(Math.max(-1, Math.min(1, value)) * 32767), index * 2);
   }
   await writeFile(target, Buffer.concat([wavHeader(data.length, sampleRate), data]));
 }

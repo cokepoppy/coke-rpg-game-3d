@@ -2,31 +2,43 @@ const { BATTLE, GAME } = require("./config");
 const { drawSprite } = require("./player");
 
 class BattleScene {
-  constructor({ images, viewport, hitSfx, onFinish }) {
+  constructor({ images, viewport, hitSfx, skillSfx = {}, mapKey = "battleTemple", playerModifiers = {}, onFinish }) {
     this.images = images;
     this.viewport = viewport;
     this.hitSfx = hitSfx;
+    this.skillSfx = skillSfx;
     this.onFinish = onFinish;
     this.config = BATTLE;
+    this.mapKey = mapKey;
+    this.playerModifiers = playerModifiers;
     this.active = false;
     this.audit = { attacks: [], moves: [], result: null };
   }
 
   start() {
-    this.units = [...BATTLE.players, ...BATTLE.enemies].map((unit) => ({
-      ...unit,
-      maxHp: unit.hp,
-      moved: false,
-      acted: false,
-      alive: true,
-      direction: unit.side === "player" ? "right" : "left",
-      animation: null,
-      frame: 0,
-      frameTime: 0
-    }));
+    this.units = [...BATTLE.players, ...BATTLE.enemies].map((unit) => {
+      const equipment = unit.side === "player" ? this.playerModifiers : {};
+      return {
+        ...unit,
+        maxHp: unit.hp,
+        move: unit.move + (equipment.move || 0),
+        damage: unit.damage + (equipment.attack || 0),
+        bonusAttack: equipment.attack || 0,
+        defense: equipment.defense || 0,
+        status: {},
+        moved: false,
+        acted: false,
+        alive: true,
+        direction: unit.side === "player" ? "right" : "left",
+        animation: null,
+        frame: 0,
+        frameTime: 0
+      };
+    });
     this.side = "player";
     this.phase = "move";
     this.selectedId = "hero";
+    this.selectedSkillId = this.skillsFor(this.selected)[0]?.id || null;
     this.message = `${this.selected.name} 待命`;
     this.highlights = this.movesFor(this.selected);
     this.active = true;
@@ -65,16 +77,27 @@ class BattleScene {
 
   activate(button) {
     if (this.finished) return;
-    if (button === "battle:skill") {
+    if (button === "battle:skill" || button.startsWith("battle:skill:")) {
       if (!this.selected || this.selected.acted) return;
-      const targets = this.targetable(this.selected);
+      const skillId = button.split(":")[2] || this.skillsFor(this.selected)[0]?.id;
+      const skill = this.skillById(skillId);
+      if (!skill || this.selected.qi < skill.cost) {
+        this.message = "真气不足";
+        return;
+      }
+      this.selectedSkillId = skill.id;
+      if (skill.kind === "ally_all") {
+        this.castSupport(this.selected, skill);
+        return;
+      }
+      const targets = this.targetable(this.selected, skill);
       if (!targets.length) {
         this.message = "目标不在范围内";
         return;
       }
       this.phase = "target";
       this.highlights = targets.map((unit) => ({ x: unit.x, y: unit.y, kind: "target" }));
-      this.message = `选择${this.selected.skill}目标`;
+      this.message = `选择${skill.name}目标`;
     }
     if (button === "battle:end") this.endPlayerTurn();
   }
@@ -105,28 +128,61 @@ class BattleScene {
       return;
     }
     if (this.phase === "target" && this.selected && unit?.side === "enemy" && this.isHighlighted(cell.x, cell.y, "target")) {
-      this.attack(this.selected, unit);
+      this.castSkill(this.selected, unit, this.skillById(this.selectedSkillId));
     }
   }
 
-  attack(attacker, target) {
+  castSkill(attacker, target, skill = this.skillsFor(attacker)[0]) {
+    if (!skill || attacker.qi < skill.cost) return;
+    const targets = skill.kind === "aoe"
+      ? this.living(target.side).filter((unit) => unit.alive && distance(unit, target) <= (skill.radius || 0))
+      : [target];
+    attacker.qi = Math.max(0, attacker.qi - skill.cost);
     attacker.direction = directionTo(attacker, target);
-    target.direction = directionTo(target, attacker);
-    target.hp = Math.max(0, target.hp - attacker.damage);
-    target.alive = target.hp > 0;
+    for (const item of targets) this.applyDamage(attacker, item, skill);
     attacker.moved = true;
     attacker.acted = true;
-    attacker.qi = Math.max(0, attacker.qi - 35);
-    attacker.animation = { type: "attack", targetX: target.x, targetY: target.y, time: 0.26, duration: 0.26 };
-    target.animation = { type: "hit", damage: attacker.damage, time: 0.38, duration: 0.38 };
-    this.hitSfx?.play();
-    this.audit.attacks.push({ attackerId: attacker.id, targetId: target.id, damage: attacker.damage, targetHp: target.hp });
-    this.message = `${attacker.name} 使用${attacker.skill}，${target.name} 受到 ${attacker.damage} 点伤害`;
+    attacker.animation = { type: "attack", targetX: target.x, targetY: target.y, time: 0.26, duration: 0.26, skill };
+    this.playSkillSfx(skill);
+    this.message = `${attacker.name} 使用${skill.name}，命中 ${targets.length} 个目标`;
     this.phase = "select";
     this.highlights = [];
     this.selectedId = null;
     this.checkResult();
-    if (!this.finished && this.living("player").every((unit) => unit.acted)) this.endPlayerTurn();
+    if (attacker.side === "player" && !this.finished && this.living("player").every((unit) => unit.acted)) this.endPlayerTurn();
+  }
+
+  applyDamage(attacker, target, skill) {
+    target.direction = directionTo(target, attacker);
+    const exposedBonus = target.status?.exposed ? 8 : 0;
+    const rawDamage = (skill.damage ?? attacker.damage) + (skill.damage ? attacker.bonusAttack || 0 : 0) + exposedBonus;
+    const damage = Math.max(1, rawDamage - (target.defense || 0));
+    target.hp = Math.max(0, target.hp - damage);
+    target.alive = target.hp > 0;
+    if (skill.status) target.status[skill.status] = skill.statusTurns || 1;
+    target.animation = { type: "hit", damage, time: 0.42, duration: 0.42, skill };
+    this.audit.attacks.push({ attackerId: attacker.id, targetId: target.id, skillId: skill.id, damage, targetHp: target.hp, status: skill.status || null });
+  }
+
+  castSupport(attacker, skill) {
+    attacker.qi = Math.max(0, attacker.qi - skill.cost);
+    const allies = this.living(attacker.side).filter((unit) => unit.alive);
+    for (const ally of allies) {
+      if (skill.heal) {
+        ally.hp = Math.min(ally.maxHp, ally.hp + skill.heal);
+        ally.animation = { type: "heal", amount: skill.heal, time: 0.48, duration: 0.48, skill };
+      }
+      if (skill.qiRestore) ally.qi += skill.qiRestore;
+    }
+    attacker.moved = true;
+    attacker.acted = true;
+    this.audit.attacks.push({ attackerId: attacker.id, targetId: "allies", skillId: skill.id, heal: skill.heal || 0, qiRestore: skill.qiRestore || 0 });
+    this.playSkillSfx(skill);
+    this.message = `${attacker.name} 使用${skill.name}`;
+    this.phase = "select";
+    this.highlights = [];
+    this.selectedId = null;
+    if (attacker.side === "player" && this.living("player").every((unit) => unit.acted)) this.endPlayerTurn();
   }
 
   endPlayerTurn() {
@@ -142,7 +198,14 @@ class BattleScene {
     if (!this.active || this.finished) return;
     const enemy = this.living("enemy")[0];
     const target = this.living("player")[0];
-    if (enemy && target && distance(enemy, target) <= enemy.range) this.attack(enemy, target);
+    if (enemy?.status?.stunned) {
+      enemy.status.stunned -= 1;
+      this.message = `${enemy.name} 被点穴，无法行动`;
+    } else if (enemy && target) {
+      const skill = this.skillsFor(enemy)[0];
+      if (skill && distance(enemy, target) <= skill.range) this.castSkill(enemy, target, skill);
+    }
+    for (const unit of this.units) this.tickStatus(unit);
     for (const unit of this.living("player")) {
       unit.moved = false;
       unit.acted = false;
@@ -183,8 +246,9 @@ class BattleScene {
     return this.units.find((unit) => (unit.alive || unit.animation) && unit.x === x && unit.y === y);
   }
 
-  targetable(unit) {
-    return this.living("enemy").filter((enemy) => enemy.alive && distance(unit, enemy) <= unit.range);
+  targetable(unit, skill = this.skillsFor(unit)[0]) {
+    const targetSide = unit.side === "player" ? "enemy" : "player";
+    return this.living(targetSide).filter((target) => target.alive && distance(unit, target) <= skill.range);
   }
 
   movesFor(unit) {
@@ -201,6 +265,29 @@ class BattleScene {
 
   isHighlighted(x, y, kind) {
     return this.highlights.some((cell) => cell.x === x && cell.y === y && cell.kind === kind);
+  }
+
+  skillsFor(unit) {
+    if (!unit) return [];
+    return (unit.skillIds || ["quick_slash"]).map((id) => this.skillById(id)).filter(Boolean).slice(0, 3);
+  }
+
+  skillById(id) {
+    return BATTLE.skills[id] || null;
+  }
+
+  tickStatus(unit) {
+    for (const [key, turns] of Object.entries(unit.status || {})) {
+      if (turns <= 1) delete unit.status[key];
+      else unit.status[key] = turns - 1;
+    }
+  }
+
+  playSkillSfx(skill) {
+    if (skill.kind === "ally_all") return this.skillSfx.heal?.play();
+    if (skill.status === "stunned") return this.skillSfx.stunned?.play();
+    if (skill.kind === "aoe") return this.skillSfx.aoe?.play();
+    return this.hitSfx?.play();
   }
 
   layout() {
@@ -255,8 +342,9 @@ class BattleScene {
     context.clip();
     context.fillStyle = "#121511";
     context.fillRect(field.x, field.y, field.width, field.height);
-    if (this.images.battleMap) context.drawImage(this.images.battleMap, 0, 0, this.images.battleMap.width, this.images.battleMap.height, field.x, field.y, field.width, field.height);
-    context.fillStyle = "rgba(8, 10, 8, 0.26)";
+    const background = this.images[this.mapKey] || this.images.battleTemple;
+    if (background) drawImageCover(context, background, field.x, field.y, field.width, field.height);
+    context.fillStyle = "rgba(8, 10, 8, 0.12)";
     context.fillRect(field.x, field.y, field.width, field.height);
     for (const cell of this.highlights) {
       context.fillStyle = cell.kind === "target" ? "rgba(209, 48, 38, 0.38)" : "rgba(80, 155, 255, 0.30)";
@@ -297,6 +385,11 @@ class BattleScene {
       context.fillRect(center.x - 24, center.y + 29, 48, 5);
       context.fillStyle = unit.side === "player" ? "#65d28c" : "#e65d50";
       context.fillRect(center.x - 24, center.y + 29, 48 * Math.max(0, unit.hp / unit.maxHp), 5);
+      if (unit.status?.stunned || unit.status?.exposed) {
+        context.fillStyle = unit.status.stunned ? "#ffd36b" : "#9bd1ff";
+        context.font = "700 11px sans-serif";
+        context.fillText(unit.status.stunned ? "晕" : "破", center.x + 28, center.y - 22);
+      }
       if (unit.animation?.type === "hit" && unit.animation.damage) {
         context.fillStyle = "#ffd36b";
         context.strokeStyle = "rgba(22, 10, 8, 0.9)";
@@ -305,6 +398,11 @@ class BattleScene {
         context.strokeText(`-${unit.animation.damage}`, center.x, center.y - 48);
         context.fillText(`-${unit.animation.damage}`, center.x, center.y - 48);
       }
+      if (unit.animation?.type === "heal") {
+        context.fillStyle = "#9dffad";
+        context.font = "700 16px sans-serif";
+        context.fillText(`+${unit.animation.amount}`, center.x, center.y - 48);
+      }
       if (unit.animation?.type === "attack") this.drawAttackLine(context, unit);
     }
   }
@@ -312,7 +410,7 @@ class BattleScene {
   drawAttackLine(context, unit) {
     const from = this.cellCenter(unit);
     const to = this.cellCenter({ x: unit.animation.targetX, y: unit.animation.targetY });
-    context.strokeStyle = "#bd63ff";
+    context.strokeStyle = unit.animation.skill?.status === "stunned" ? "#ffd36b" : unit.animation.skill?.kind === "aoe" ? "#ff8b4a" : "#bd63ff";
     context.lineWidth = 4;
     context.beginPath();
     context.moveTo(from.x, from.y - 6);
@@ -335,11 +433,16 @@ class BattleScene {
     context.font = "13px sans-serif";
     const stats = selected ? `${selected.name}  HP ${selected.hp}/${selected.maxHp}  气 ${selected.qi}` : "点击我方角色选择行动";
     context.fillText(stats, 24, panel.y + 62);
-    ui.button(context, "battle:skill", 24, panel.y + 86, panel.width - 48, 44, selected ? `${selected.skill}  -35` : "选择角色", selected && !selected.acted ? "primary" : "disabled");
+    const skills = this.skillsFor(selected);
+    skills.forEach((skill, index) => {
+      const y = panel.y + 82 + index * 38;
+      const disabled = !selected || selected.acted || selected.qi < skill.cost;
+      ui.button(context, `battle:skill:${skill.id}`, 24, y, panel.width - 48, 32, `${skill.name}  -${skill.cost}`, disabled ? "disabled" : index === 0 ? "primary" : "normal");
+    });
     context.textAlign = "left";
     context.fillStyle = "rgba(246, 234, 209, 0.68)";
     context.font = "12px sans-serif";
-    context.fillText("蓝格移动，点技能后选择红格目标。", 24, panel.y + 158);
+    context.fillText("蓝格移动，点技能后选择红格目标；装备会影响移动/攻击/防御。", 24, panel.y + 188);
   }
 }
 
@@ -352,6 +455,15 @@ function directionTo(from, to) {
   const dy = to.y - from.y;
   if (Math.abs(dx) >= Math.abs(dy)) return dx < 0 ? "left" : "right";
   return dy < 0 ? "up" : "down";
+}
+
+function drawImageCover(context, image, x, y, width, height) {
+  const scale = Math.max(width / image.width, height / image.height);
+  const sourceWidth = width / scale;
+  const sourceHeight = height / scale;
+  const sourceX = (image.width - sourceWidth) / 2;
+  const sourceY = (image.height - sourceHeight) / 2;
+  context.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, x, y, width, height);
 }
 
 module.exports = { BattleScene };

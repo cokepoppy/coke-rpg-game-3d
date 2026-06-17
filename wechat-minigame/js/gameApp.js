@@ -5,7 +5,7 @@ const { MapManager } = require("./mapManager");
 const { DialogSystem } = require("./dialogSystem");
 const { UiRenderer } = require("./uiRenderer");
 const { BattleScene } = require("./battleScene");
-const { inventoryEntries, itemById, shopById, shopEntries } = require("./itemCatalog");
+const { inventoryEntries, itemById, shopById, shopEntries, equipmentModifiers } = require("./itemCatalog");
 
 const SAVE_KEY = "cangshan-rpg-save-v1";
 
@@ -44,12 +44,17 @@ class GameApp {
     this.audio = createAudio(ASSETS.bgm);
     this.battleAudio = createAudio(ASSETS.battleBgm);
     this.hitSfx = createSfx(ASSETS.hitSfx);
+    this.skillSfx = {
+      stunned: createSfx(ASSETS.stunSfx),
+      heal: createSfx(ASSETS.healSfx),
+      aoe: createSfx(ASSETS.sweepSfx)
+    };
     this.bindTouch();
     this.frame();
   }
 
   async loadAssets() {
-    const entries = Object.entries(ASSETS).filter(([key]) => !["bgm", "battleBgm", "hitSfx"].includes(key));
+    const entries = Object.entries(ASSETS).filter(([key]) => !key.endsWith("Sfx") && !key.endsWith("Bgm") && key !== "bgm");
     await Promise.all(entries.map(async ([key, source]) => { this.images[key] = await loadImage(this.canvas, source); }));
   }
 
@@ -243,6 +248,9 @@ class GameApp {
       images: this.images,
       viewport: this.viewport,
       hitSfx: this.hitSfx,
+      skillSfx: this.skillSfx,
+      mapKey: this.battleMapFor(triggerId),
+      playerModifiers: equipmentModifiers(this.items),
       onFinish: (result, audit) => {
         const rewards = result === "victory" ? this.grantBattleRewards() : { money: 0, items: [] };
         if (result === "victory" && this.currentBattleTriggerId) this.defeatedScouts.add(this.currentBattleTriggerId);
@@ -390,6 +398,12 @@ class GameApp {
 
   addItem(itemId, amount = 1) {
     this.items[itemId] = (this.items[itemId] || 0) + amount;
+  }
+
+  battleMapFor(triggerId) {
+    if (triggerId === "scout_archer" || triggerId === "scout_bridge") return "battleBamboo";
+    if (triggerId === "scout_gate") return "battleFerry";
+    return "battleTemple";
   }
 
   resolveActiveTrigger() {

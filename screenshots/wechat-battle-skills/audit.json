@@ -1,0 +1,47 @@
+{
+  "initial": {
+    "mapKey": "battleBamboo",
+    "hero": {
+      "move": 4,
+      "damage": 41,
+      "defense": 5,
+      "skills": [
+        "guiyuan_sword",
+        "daze",
+        "whirlwind"
+      ]
+    }
+  },
+  "afterDaze": {
+    "scoutHp": 11,
+    "stunned": 1,
+    "stunSfx": 1,
+    "attack": {
+      "attackerId": "hero",
+      "targetId": "scoutA",
+      "skillId": "daze",
+      "damage": 27,
+      "targetHp": 11,
+      "status": "stunned"
+    }
+  },
+  "afterAoe": {
+    "targets": [
+      "scoutA",
+      "scoutB"
+    ],
+    "sweepSfx": 1
+  },
+  "afterHeal": {
+    "heroHp": 64,
+    "healSfx": 1,
+    "support": {
+      "attackerId": "companion",
+      "targetId": "allies",
+      "skillId": "heal",
+      "heal": 24,
+      "qiRestore": 0
+    }
+  },
+  "errors": []
+}

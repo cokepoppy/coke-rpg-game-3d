@@ -131,6 +131,7 @@ class BattleScene {
     unit.moved = true;
     unit.acted = true;
     unit.animation = { type: "wait", time: 0.24 };
+    this.skillSfx.wait?.play();
     this.audit.moves.push({ id: unit.id, wait: true });
     this.message = `${unit.name} 待命`;
     this.phase = "select";
@@ -306,7 +307,8 @@ class BattleScene {
     const moves = [];
     for (let y = 0; y < BATTLE.rows; y += 1) {
       for (let x = 0; x < BATTLE.cols; x += 1) {
-        if (!occupied.has(`${x},${y}`) && distance(unit, { x, y }) <= unit.move) moves.push({ x, y, kind: "move" });
+        const steps = distance(unit, { x, y });
+        if (steps > 0 && !occupied.has(`${x},${y}`) && steps <= unit.move) moves.push({ x, y, kind: "move" });
       }
     }
     return moves;
@@ -382,7 +384,7 @@ class BattleScene {
     context.font = "14px sans-serif";
     context.fillStyle = "#d8bd82";
     context.fillText(`${this.side === "player" ? "我方回合" : "敌方回合"}  ·  ${BATTLE.objective}`, 18, titleY + 30);
-    const buttonTop = Math.max((this.viewport.menuButton?.bottom || 44) + 10, titleY + 56);
+    const buttonTop = Math.max(70, top - 54);
     ui.button(context, "battle:end", this.viewport.width - 112, buttonTop, 90, 42, "结束回合", this.side === "player" ? "normal" : "disabled");
   }
 
@@ -398,8 +400,16 @@ class BattleScene {
     if (background) drawImageCover(context, background, field.x, field.y, field.width, field.height);
     context.fillStyle = "rgba(8, 10, 8, 0.12)";
     context.fillRect(field.x, field.y, field.width, field.height);
+    const selected = this.selected;
+    if (selected) {
+      context.fillStyle = "rgba(229, 190, 82, 0.26)";
+      context.strokeStyle = "rgba(255, 221, 112, 0.92)";
+      context.lineWidth = 3;
+      context.fillRect(grid.x + selected.x * tile, grid.y + selected.y * tile, tile, tile);
+      context.strokeRect(grid.x + selected.x * tile + 2, grid.y + selected.y * tile + 2, tile - 4, tile - 4);
+    }
     for (const cell of this.highlights) {
-      context.fillStyle = cell.kind === "target" ? "rgba(209, 48, 38, 0.38)" : "rgba(80, 155, 255, 0.30)";
+      context.fillStyle = cell.kind === "target" ? "rgba(209, 48, 38, 0.40)" : "rgba(134, 224, 122, 0.34)";
       context.fillRect(grid.x + cell.x * tile, grid.y + cell.y * tile, tile, tile);
     }
     context.strokeStyle = "rgba(245, 234, 208, 0.20)";
@@ -462,6 +472,13 @@ class BattleScene {
         context.font = "700 16px sans-serif";
         context.strokeText(`-${unit.animation.damage}`, center.x, center.y - 48);
         context.fillText(`-${unit.animation.damage}`, center.x, center.y - 48);
+      }
+      if (unit.id === this.selectedId && unit.side === this.side) {
+        context.strokeStyle = "rgba(255, 226, 116, 0.96)";
+        context.lineWidth = 3;
+        context.beginPath();
+        context.ellipse(center.x, center.y + 34, 30, 10, 0, 0, Math.PI * 2);
+        context.stroke();
       }
       if (unit.animation?.type === "heal") {
         context.fillStyle = "#9dffad";

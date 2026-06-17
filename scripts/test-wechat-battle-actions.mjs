@@ -67,7 +67,8 @@ try {
       scout: { hp: scout.hp, animation: scout.animation?.type || null },
       attacks: battle.audit.attacks,
       waits: battle.audit.moves.filter((event) => event.wait),
-      hitSfx: game.hitSfx.audit
+      hitSfx: game.hitSfx.audit,
+      waitSfx: game.skillSfx.wait.audit
     };
   });
   audit.errors = errors;
@@ -76,6 +77,7 @@ try {
   if (!audit.attacks.some((event) => event.skillId === "basic_attack" && event.damage > 0)) throw new Error("Basic attack did not damage an adjacent enemy.");
   if (audit.hitSfx.playCount < 1) throw new Error("Basic attack did not trigger hit SFX.");
   if (!audit.waits.some((event) => event.id === "companion")) throw new Error("Wait action was not recorded.");
+  if (audit.waitSfx.playCount < 1) throw new Error("Wait action did not trigger wait SFX.");
   if (audit.side !== "enemy") throw new Error(`All player actions should advance to enemy turn, received ${audit.side}/${audit.phase}`);
   if (errors.length) throw new Error(`Browser errors: ${errors.join(" | ")}`);
   await writeFile(`${output}/audit.json`, `${JSON.stringify(audit, null, 2)}\n`);

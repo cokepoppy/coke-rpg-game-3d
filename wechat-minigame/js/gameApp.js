@@ -34,6 +34,7 @@ class GameApp {
     this.activeShopId = null;
     this.shopMessage = "";
     this.shopNotice = null;
+    this.lastPromptTriggerId = null;
     this.lastShopAudit = null;
     this.axis = { x: 0, y: 0 };
     this.lastTime = Date.now();
@@ -54,8 +55,12 @@ class GameApp {
     this.skillSfx = {
       stunned: createSfx(ASSETS.stunSfx),
       heal: createSfx(ASSETS.healSfx),
-      aoe: createSfx(ASSETS.sweepSfx)
+      aoe: createSfx(ASSETS.sweepSfx),
+      wait: createSfx(ASSETS.waitSfx)
     };
+    this.uiSfx = createSfx(ASSETS.uiSfx);
+    this.promptSfx = createSfx(ASSETS.promptSfx);
+    this.buySfx = createSfx(ASSETS.buySfx);
     this.bindTouch();
     this.frame();
   }
@@ -85,7 +90,9 @@ class GameApp {
     }
     if (this.mode !== "game" || this.dialog.active) return;
     this.player.update(dt, this.axis, (bounds) => this.mapManager.canMove(bounds));
+    const previousTriggerId = this.activeTrigger?.id || null;
     this.activeTrigger = this.resolveActiveTrigger();
+    this.maybePlayPromptSfx(previousTriggerId, this.activeTrigger?.id || null);
   }
 
   render() {
@@ -100,10 +107,13 @@ class GameApp {
       ctx.clip();
       ctx.translate(this.ui.playRect.x, this.ui.playRect.y);
       for (const npc of this.visibleNpcs()) {
-        drawSprite(ctx, this.images[npc.sprite], npc.x - camera.x, npc.y - camera.y, npc.direction, 0, 82, 82);
+        drawSprite(ctx, this.images[npc.sprite], npc.x - camera.x, npc.y - camera.y, npc.direction, 0, 96, 96);
         ctx.textAlign = "center";
-        ctx.font = "12px sans-serif";
-        ctx.fillStyle = "rgba(22,16,10,.86)";
+        ctx.font = "700 12px sans-serif";
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "rgba(20, 14, 8, 0.86)";
+        ctx.strokeText(npc.name, npc.x - camera.x, npc.y - camera.y + 14);
+        ctx.fillStyle = "#fff6dd";
         ctx.fillText(npc.name, npc.x - camera.x, npc.y - camera.y + 14);
       }
       this.player.draw(ctx, camera);
@@ -173,6 +183,7 @@ class GameApp {
   }
 
   activate(button) {
+    if (this.shouldClickSfx(button)) this.uiSfx?.play();
     if (button === "new") return this.newGame();
     if (button === "continue") return this.loadGame();
     if (button === "music") return this.toggleMusic();
@@ -370,6 +381,7 @@ class GameApp {
     this.player.y = (spawn || point).y;
     this.player.direction = "down";
     this.activeTrigger = null;
+    this.lastPromptTriggerId = null;
   }
 
   saveGame() {
@@ -474,6 +486,7 @@ class GameApp {
     }
     this.money -= price;
     this.addItem(itemId, 1);
+    this.buySfx?.play();
     this.shopMessage = `买到${item.name}，花费 ${price} 两`;
     this.shopNotice = { text: `购买成功：${item.name}`, time: 1.8, kind: "success" };
     this.lastShopAudit = { ok: true, itemId, price, money: this.money, owned: this.items[itemId] };
@@ -494,6 +507,18 @@ class GameApp {
     if (!trigger) return null;
     if (this.defeatedScouts.has(trigger.id)) return null;
     return trigger;
+  }
+
+  maybePlayPromptSfx(previousTriggerId, currentTriggerId) {
+    if (!currentTriggerId || currentTriggerId === previousTriggerId || currentTriggerId === this.lastPromptTriggerId) return;
+    this.lastPromptTriggerId = currentTriggerId;
+    this.promptSfx?.play();
+  }
+
+  shouldClickSfx(button) {
+    if (!button) return false;
+    if (["left", "right", "up", "down"].includes(button)) return false;
+    return true;
   }
 
   visibleNpcs() {

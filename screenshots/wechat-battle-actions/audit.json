@@ -36,5 +36,11 @@
     "playEvents": 1,
     "errors": []
   },
+  "waitSfx": {
+    "source": "audio-pack/wait.wav",
+    "playCount": 1,
+    "playEvents": 1,
+    "errors": []
+  },
   "errors": []
 }

@@ -50,6 +50,9 @@ try {
     money: globalThis.__cangshanGame.money,
     items: globalThis.__cangshanGame.items,
     shopAudit: globalThis.__cangshanGame.lastShopAudit,
+    shopNotice: globalThis.__cangshanGame.shopNotice,
+    buySfx: globalThis.__cangshanGame.buySfx.audit,
+    promptSfx: globalThis.__cangshanGame.promptSfx.audit,
     buttons: globalThis.__cangshanGame.ui.buttons.map((button) => button.id),
     errors: []
   }));
@@ -59,6 +62,8 @@ try {
   if (!audit.shopAudit?.ok || audit.shopAudit.itemId !== "qingxin_pill") throw new Error("Shop purchase audit failed.");
   if (audit.money !== 98) throw new Error(`Expected money 98 after buying qingxin_pill, received ${audit.money}`);
   if (audit.items.qingxin_pill !== 2) throw new Error(`Expected qingxin_pill x2, received ${audit.items.qingxin_pill}`);
+  if (!audit.shopNotice?.text?.includes("购买成功")) throw new Error("Shop did not show purchase success notice.");
+  if (audit.buySfx.playCount < 1) throw new Error("Shop purchase did not trigger buy SFX.");
   if (!audit.buttons.includes("closeShop")) throw new Error("Shop close button was not rendered.");
   if (errors.length) throw new Error(`Browser errors: ${errors.join(" | ")}`);
   await writeFile(`${output}/audit.json`, `${JSON.stringify(audit, null, 2)}\n`);

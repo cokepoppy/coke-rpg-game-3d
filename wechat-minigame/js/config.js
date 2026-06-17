@@ -13,8 +13,8 @@ const GAME = {
     directions: ["down", "left", "right", "up"],
     walkSequence: [0, 1, 0, 3],
     frameDuration: 0.105,
-    drawWidth: 112,
-    drawHeight: 112
+    drawWidth: 96,
+    drawHeight: 96
   }
 };
 
@@ -43,7 +43,11 @@ const ASSETS = {
   hitSfx: "audio-pack/hit.wav",
   stunSfx: "audio-pack/stun.wav",
   healSfx: "audio-pack/heal.wav",
-  sweepSfx: "audio-pack/sweep.wav"
+  sweepSfx: "audio-pack/sweep.wav",
+  uiSfx: "audio-pack/ui.wav",
+  promptSfx: "audio-pack/prompt.wav",
+  buySfx: "audio-pack/buy.wav",
+  waitSfx: "audio-pack/wait.wav"
 };
 
 const BATTLE = {
@@ -92,10 +96,10 @@ const WORLD_NODES = [
 
 const ROOM_COLLISIONS = [
   { x: 0, y: 0, width: 1280, height: 80 },
-  { x: 100, y: 120, width: 338, height: 230 },
-  { x: 488, y: 330, width: 313, height: 160 },
-  { x: 900, y: 80, width: 300, height: 430 },
-  { x: 200, y: 430, width: 263, height: 180 },
+  { x: 110, y: 145, width: 300, height: 175 },
+  { x: 520, y: 350, width: 250, height: 118 },
+  { x: 948, y: 100, width: 230, height: 350 },
+  { x: 220, y: 455, width: 220, height: 120 },
   { x: 0, y: 0, width: 40, height: 768 },
   { x: 1240, y: 0, width: 40, height: 768 }
 ];
@@ -112,13 +116,13 @@ const APOTHECARY_COLLISIONS = [
   { x: 1240, y: 0, width: 40, height: 768 },
   { x: 0, y: 704, width: 520, height: 64 },
   { x: 760, y: 704, width: 520, height: 64 },
-  { x: 48, y: 84, width: 292, height: 460 },
-  { x: 350, y: 84, width: 590, height: 150 },
-  { x: 340, y: 260, width: 560, height: 104 },
-  { x: 980, y: 84, width: 230, height: 420 },
-  { x: 820, y: 430, width: 240, height: 176 },
-  { x: 430, y: 650, width: 96, height: 80 },
-  { x: 760, y: 650, width: 96, height: 80 }
+  { x: 68, y: 104, width: 240, height: 360 },
+  { x: 382, y: 104, width: 500, height: 105 },
+  { x: 375, y: 282, width: 485, height: 72 },
+  { x: 1010, y: 104, width: 160, height: 330 },
+  { x: 850, y: 455, width: 190, height: 120 },
+  { x: 446, y: 672, width: 58, height: 48 },
+  { x: 782, y: 672, width: 58, height: 48 }
 ];
 
 const APOTHECARY_TRIGGERS = [
@@ -133,15 +137,15 @@ const TEAHOUSE_COLLISIONS = [
   { x: 1240, y: 0, width: 40, height: 768 },
   { x: 0, y: 704, width: 520, height: 64 },
   { x: 760, y: 704, width: 520, height: 64 },
-  { x: 60, y: 82, width: 340, height: 250 },
-  { x: 415, y: 110, width: 560, height: 168 },
-  { x: 1040, y: 84, width: 170, height: 440 },
-  { x: 250, y: 320, width: 180, height: 120 },
-  { x: 535, y: 300, width: 180, height: 118 },
-  { x: 820, y: 320, width: 180, height: 118 },
-  { x: 335, y: 500, width: 184, height: 130 },
-  { x: 690, y: 500, width: 184, height: 130 },
-  { x: 920, y: 595, width: 255, height: 130 }
+  { x: 76, y: 104, width: 280, height: 190 },
+  { x: 445, y: 130, width: 480, height: 120 },
+  { x: 1062, y: 104, width: 120, height: 350 },
+  { x: 275, y: 340, width: 135, height: 82 },
+  { x: 560, y: 320, width: 130, height: 80 },
+  { x: 845, y: 340, width: 135, height: 82 },
+  { x: 362, y: 522, width: 132, height: 88 },
+  { x: 718, y: 522, width: 132, height: 88 },
+  { x: 948, y: 620, width: 198, height: 84 }
 ];
 
 const TEAHOUSE_TRIGGERS = [

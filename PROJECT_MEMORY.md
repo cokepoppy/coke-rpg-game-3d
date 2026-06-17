@@ -234,6 +234,10 @@ curl --noproxy '*' -I --max-time 3 http://127.0.0.1:5173/index.modular.html
 - Keep combat NPCs on the main road or near intended choke points. Hidden
   battle triggers make mobile exploration feel broken even when the trigger
   technically exists.
+- Treat sound as a first-class gameplay feedback layer. Short UI/prompt/buy
+  cues should be generated locally and audited with `playCount`/`playEvents`;
+  higher-fidelity combat sounds can come from AI or licensed libraries, then be
+  normalized, trimmed, and tested against the actual animation timing.
 
 ## Workflow Rule
 

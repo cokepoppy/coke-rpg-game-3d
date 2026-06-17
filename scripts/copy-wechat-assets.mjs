@@ -99,12 +99,16 @@ await writeHitSfx(path.join(root, "wechat-minigame/audio-pack/hit.wav"));
 await writeToneSfx(path.join(root, "wechat-minigame/audio-pack/stun.wav"), { type: "stun" });
 await writeToneSfx(path.join(root, "wechat-minigame/audio-pack/heal.wav"), { type: "heal" });
 await writeToneSfx(path.join(root, "wechat-minigame/audio-pack/sweep.wav"), { type: "sweep" });
+await writeUiSfx(path.join(root, "wechat-minigame/audio-pack/ui.wav"), { type: "ui" });
+await writeUiSfx(path.join(root, "wechat-minigame/audio-pack/prompt.wav"), { type: "prompt" });
+await writeUiSfx(path.join(root, "wechat-minigame/audio-pack/buy.wav"), { type: "buy" });
+await writeUiSfx(path.join(root, "wechat-minigame/audio-pack/wait.wav"), { type: "wait" });
 
 for (const pack of ["world-west-pack", "world-east-pack", "world-map-pack", "room-pack", "character-pack", "audio-pack", "battle-pack", "video-pack"]) {
   await writeFile(path.join(root, "wechat-minigame", pack, "game.js"), "module.exports = {};\n");
 }
 
-console.log(`Prepared ${files.length + 9} compressed runtime assets.`);
+console.log(`Prepared ${files.length + 13} compressed runtime assets.`);
 
 async function writeHitSfx(target) {
   await mkdir(path.dirname(target), { recursive: true });
@@ -155,6 +159,38 @@ async function writeToneSfx(target, { type }) {
       value = (Math.sin(Math.PI * 2 * 420 * t) + Math.sin(Math.PI * 2 * 630 * t) * 0.65) * 0.25 * envelope;
     } else {
       value = (Math.sin(Math.PI * 2 * (230 + t * 520) * t) * 0.52 + deterministicNoise(index, 61) * 0.18) * envelope;
+    }
+    data.writeInt16LE(Math.round(Math.max(-1, Math.min(1, value)) * 32767), index * 2);
+  }
+  await writeFile(target, Buffer.concat([wavHeader(data.length, sampleRate), data]));
+}
+
+async function writeUiSfx(target, { type }) {
+  await mkdir(path.dirname(target), { recursive: true });
+  const sampleRate = 22050;
+  const duration = type === "buy" ? 0.32 : type === "prompt" ? 0.24 : 0.16;
+  const samples = Math.floor(sampleRate * duration);
+  const data = Buffer.alloc(samples * 2);
+  for (let index = 0; index < samples; index += 1) {
+    const t = index / sampleRate;
+    let value = 0;
+    if (type === "ui") {
+      const envelope = Math.exp(-t * 22);
+      value = (Math.sin(Math.PI * 2 * 640 * t) * 0.4 + Math.sin(Math.PI * 2 * 960 * t) * 0.18) * envelope;
+    } else if (type === "prompt") {
+      const e1 = Math.exp(-t * 15);
+      const e2 = t > 0.075 ? Math.exp(-(t - 0.075) * 18) : 0;
+      value = Math.sin(Math.PI * 2 * 720 * t) * 0.24 * e1 + Math.sin(Math.PI * 2 * 1080 * t) * 0.22 * e2;
+    } else if (type === "buy") {
+      const e1 = Math.exp(-t * 9);
+      const e2 = t > 0.09 ? Math.exp(-(t - 0.09) * 10) : 0;
+      const e3 = t > 0.18 ? Math.exp(-(t - 0.18) * 12) : 0;
+      value = Math.sin(Math.PI * 2 * 660 * t) * 0.24 * e1
+        + Math.sin(Math.PI * 2 * 880 * t) * 0.22 * e2
+        + Math.sin(Math.PI * 2 * 1320 * t) * 0.18 * e3;
+    } else {
+      const envelope = Math.exp(-t * 14);
+      value = Math.sin(Math.PI * 2 * 260 * t) * 0.28 * envelope + deterministicNoise(index, 91) * 0.05 * envelope;
     }
     data.writeInt16LE(Math.round(Math.max(-1, Math.min(1, value)) * 32767), index * 2);
   }

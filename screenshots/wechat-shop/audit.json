@@ -16,6 +16,23 @@
     "money": 98,
     "owned": 2
   },
+  "shopNotice": {
+    "text": "购买成功：清心丸",
+    "time": 1.5830000000000006,
+    "kind": "success"
+  },
+  "buySfx": {
+    "source": "audio-pack/buy.wav",
+    "playCount": 1,
+    "playEvents": 1,
+    "errors": []
+  },
+  "promptSfx": {
+    "source": "audio-pack/prompt.wav",
+    "playCount": 1,
+    "playEvents": 1,
+    "errors": []
+  },
   "buttons": [
     "closeShop",
     "shop:buy:hemostatic_powder",

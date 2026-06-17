@@ -13,7 +13,11 @@ const files = [
   ["assets/characters/yipintang_leader/yipintang_leader-walk-anchored.png", "wechat-minigame/character-pack/yipintang-leader.png"],
   ["assets/characters/medicine_vendor/medicine_vendor-walk-anchored.png", "wechat-minigame/character-pack/vendor.png"],
   ["assets/characters/inn_keeper/inn_keeper-walk-anchored.png", "wechat-minigame/character-pack/keeper.png"],
-  ["assets/audio/cangshan-road-mobile.m4a", "wechat-minigame/audio-pack/cangshan-road.m4a"]
+  ["assets/generated/npcs/xiaoyao-daoist-master-spritesheet-alpha.png", "wechat-minigame/character-pack/daoist-master.png"],
+  ["assets/audio/cangshan-road-mobile.m4a", "wechat-minigame/audio-pack/cangshan-road.m4a"],
+  ["assets/audio/iron-fan-valley.mp3", "wechat-minigame/audio-pack/iron-fan-valley.mp3"],
+  ["assets/generated/videos/xiaoyao-daoist-fuyao-mobile.m4v", "wechat-minigame/video-pack/fuyao-teaching.m4v"],
+  ["assets/generated/videos/fuyao-frames/fuyao-poster-portrait.png", "wechat-minigame/video-pack/fuyao-poster.png"]
 ];
 
 await rm(path.join(root, "wechat-minigame/assets"), { recursive: true, force: true });
@@ -27,6 +31,7 @@ await rm(path.join(root, "wechat-minigame/world-map-pack"), { recursive: true, f
 await rm(path.join(root, "wechat-minigame/character-pack"), { recursive: true, force: true });
 await rm(path.join(root, "wechat-minigame/audio-pack"), { recursive: true, force: true });
 await rm(path.join(root, "wechat-minigame/battle-pack"), { recursive: true, force: true });
+await rm(path.join(root, "wechat-minigame/video-pack"), { recursive: true, force: true });
 
 for (const [source, destination] of files) {
   const target = path.join(root, destination);
@@ -94,9 +99,8 @@ await writeHitSfx(path.join(root, "wechat-minigame/audio-pack/hit.wav"));
 await writeToneSfx(path.join(root, "wechat-minigame/audio-pack/stun.wav"), { type: "stun" });
 await writeToneSfx(path.join(root, "wechat-minigame/audio-pack/heal.wav"), { type: "heal" });
 await writeToneSfx(path.join(root, "wechat-minigame/audio-pack/sweep.wav"), { type: "sweep" });
-await writeBattleLoop(path.join(root, "wechat-minigame/audio-pack/battle-loop.wav"));
 
-for (const pack of ["world-west-pack", "world-east-pack", "world-map-pack", "room-pack", "character-pack", "audio-pack", "battle-pack"]) {
+for (const pack of ["world-west-pack", "world-east-pack", "world-map-pack", "room-pack", "character-pack", "audio-pack", "battle-pack", "video-pack"]) {
   await writeFile(path.join(root, "wechat-minigame", pack, "game.js"), "module.exports = {};\n");
 }
 
@@ -130,27 +134,6 @@ async function writeHitSfx(target) {
   header.write("data", 36);
   header.writeUInt32LE(data.length, 40);
   await writeFile(target, Buffer.concat([header, data]));
-}
-
-async function writeBattleLoop(target) {
-  await mkdir(path.dirname(target), { recursive: true });
-  const sampleRate = 22050;
-  const duration = 8;
-  const samples = Math.floor(sampleRate * duration);
-  const data = Buffer.alloc(samples * 2);
-  const scale = [0, 2, 3, 7, 10];
-  for (let index = 0; index < samples; index += 1) {
-    const t = index / sampleRate;
-    const beat = Math.floor(t * 4);
-    const note = scale[beat % scale.length];
-    const rootFreq = 110 * Math.pow(2, note / 12);
-    const pulse = Math.sin(Math.PI * 2 * rootFreq * t) * 0.34;
-    const drone = Math.sin(Math.PI * 2 * 55 * t) * 0.22;
-    const drum = (t * 2) % 1 < 0.09 ? deterministicNoise(index, 37) * Math.exp(-((t * 2) % 1) * 24) * 0.32 : 0;
-    const value = Math.max(-1, Math.min(1, pulse + drone + drum));
-    data.writeInt16LE(Math.round(value * 32767), index * 2);
-  }
-  await writeFile(target, Buffer.concat([wavHeader(data.length, sampleRate), data]));
 }
 
 async function writeToneSfx(target, { type }) {

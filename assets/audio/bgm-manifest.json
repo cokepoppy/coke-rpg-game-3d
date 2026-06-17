@@ -6,6 +6,15 @@
     "source": "Suno",
     "prompt": "Instrumental only, no vocals. Original wuxia RPG background music for an ancient Dali martial arts adventure: guqin, xiao flute, pipa, soft war drums, cinematic Chinese fantasy, heroic but gentle, wandering through mountain temples and old inns, loopable game BGM, 90 seconds, clean mix, no lyrics."
   },
+  "battle": {
+    "id": "iron-fan-valley",
+    "title": "Iron Fan Valley",
+    "file": "./iron-fan-valley.mp3",
+    "runtime": "../wechat-minigame/audio-pack/iron-fan-valley.mp3",
+    "source": "Suno",
+    "prompt": "Manual Suno generation by user for wuxia tactical battle background music.",
+    "notes": "Formal battle BGM replacing the deterministic local battle-loop.wav placeholder."
+  },
   "alternates": [
     {
       "id": "temple-pathways",

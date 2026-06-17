@@ -40,5 +40,46 @@ window.wx = {
       pause: () => audio.pause(),
       stop: () => { audio.pause(); audio.currentTime = 0; }
     };
-  }
+  },
+  createVideo: (options) => createBrowserVideo(options)
 };
+
+function createBrowserVideo(options) {
+  const video = document.createElement("video");
+  video.dataset.wechatVideo = "true";
+  video.src = options.src;
+  video.autoplay = Boolean(options.autoplay);
+  video.loop = Boolean(options.loop);
+  video.muted = Boolean(options.muted);
+  video.controls = Boolean(options.controls);
+  video.playsInline = true;
+  video.style.position = "fixed";
+  video.style.zIndex = "10";
+  video.style.objectFit = options.objectFit || "contain";
+  video.style.background = options.backgroundColor || "#000";
+  const place = () => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = rect.width / canvas.width;
+    const scaleY = rect.height / canvas.height;
+    video.style.left = `${rect.left + options.x * scaleX}px`;
+    video.style.top = `${rect.top + options.y * scaleY}px`;
+    video.style.width = `${options.width * scaleX}px`;
+    video.style.height = `${options.height * scaleY}px`;
+  };
+  place();
+  window.addEventListener("resize", place);
+  document.body.appendChild(video);
+  return {
+    play: () => video.play().catch(() => {}),
+    pause: () => video.pause(),
+    stop: () => { video.pause(); video.currentTime = 0; },
+    show: () => { video.style.display = "block"; },
+    hide: () => { video.style.display = "none"; },
+    destroy: () => { window.removeEventListener("resize", place); video.remove(); },
+    onEnded: (handler) => video.addEventListener("ended", handler, { once: true }),
+    onPlay: (handler) => video.addEventListener("play", handler),
+    onTimeUpdate: (handler) => video.addEventListener("timeupdate", handler),
+    onWaiting: (handler) => video.addEventListener("waiting", handler),
+    onError: (handler) => video.addEventListener("error", () => handler({ errMsg: "browser video error" }), { once: true })
+  };
+}

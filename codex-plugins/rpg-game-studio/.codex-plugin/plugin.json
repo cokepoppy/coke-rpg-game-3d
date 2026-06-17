@@ -22,7 +22,8 @@
       "Dialogue and story script scaffolding",
       "Turn-based tactics battle architecture",
       "Battle QA logs and screenshot workflow",
-      "RPG BGM, SFX, and voice generation workflow"
+      "RPG BGM, SFX, and voice generation workflow",
+      "Pixel RPG cutscene video generation workflow"
     ],
     "defaultPrompt": "Use RPG Game Studio to scaffold a modular browser RPG project."
   }

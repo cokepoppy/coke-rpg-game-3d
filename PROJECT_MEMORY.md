@@ -163,6 +163,56 @@ curl --noproxy '*' -I --max-time 3 http://127.0.0.1:5173/index.modular.html
 - When generation fails, keep the asset contract and regeneration prompt in the report so the next run can continue from a precise failure state.
 - Batch character work should generate prompts from roster/config, process all outputs through the same normalization script, then audit anchors/gait/cropping before accepting assets.
 - `process_character_roster.mjs` must preserve subdirectories for `source: "existing"` characters. Taking only `path.basename(character.sheet)` breaks generated hero paths such as `hero/hero-walk-anchored-v3-gaitfix.png`.
+- Seedance video references must match the project's sprite style first. Do not feed tall painterly NPC concept art into video generation when the game uses compact `1252x1252` 4x4 chibi RPG sprite sheets; generate or normalize a sprite-style reference first.
+
+## Seedance Automation Pitfalls
+
+- Seedance uses a private web contract that can change without notice. Keep the
+  observed contract in
+  `codex-plugins/rpg-game-studio/skills/rpg-pixel-video-generation/references/seedance-api-contract.md`
+  and re-capture it after UI or request failures.
+- The current unified workspace submits to `/api/seedance/submit`; an older
+  bundle still contains `/api/seedance2/submit`. Do not assume the legacy route
+  is the active one.
+- Upload is a two-step flow: request `/api/s3/sts`, then PUT bytes to the
+  returned short-lived URL. Only the returned `completedUrl` belongs in the
+  generation payload.
+- Never persist or print the Clerk token, cookies, STS response, signed upload
+  URL, or Authorization headers. `scripts/seedance-submit.mjs` reads the token
+  from `SEEDANCE_BEARER_TOKEN` at runtime.
+- API discovery must not spend credits. The automation defaults to dry-run and
+  requires explicit `--execute` before upload and task submission.
+- A zero-credit account redirects Generate to pricing before the submit request
+  is emitted. In that case, recover field names from the exact production
+  bundle loaded by the current page and clearly mark that limitation.
+
+## Cutscene Integration Pitfalls
+
+- Keep generated MP4 files in a dedicated `video-pack` subpackage. Do not load
+  them through the image asset loader or mix them into map packs.
+- The browser simulator needs a `wx.createVideo` shim that positions a DOM video
+  relative to the scaled canvas. The game runtime should use the same
+  `CutscenePlayer` lifecycle in browser and WeChat.
+- Leave canvas space below the native video for the Skip button. A native video
+  overlay can consume touches in its own rectangle and hide canvas controls
+  placed beneath it.
+- Test both terminal paths: natural `ended` and explicit `skipped`. Both must
+  destroy the overlay, resume map music, return to story mode, and apply the
+  same deterministic reward.
+- A cutscene reward must be persisted in save data and injected into battle
+  configuration explicitly. Showing a reward dialog alone does not make the
+  learned skill usable.
+- Phone preview can show a black native video even when the browser shim plays
+  the same file. Track `onPlay`, `onTimeUpdate`, and `onError`; if no time
+  update arrives quickly, destroy the native video and switch to a canvas
+  poster/storyboard fallback instead of leaving the user on a black screen.
+- AI-generated mp4 should be converted to a conservative mobile runtime copy
+  and paired with a poster image in the same video pack. Keep the original
+  provider file for provenance, but do not make true-device playback depend on
+  that exact export.
+- NPC placement requires rendered-map inspection. Coordinate-only placement can
+  put a character on a roof, stall, lantern, or rock even when collision data
+  says the location is reachable.
 
 ## Workflow Rule
 

@@ -2,7 +2,7 @@ const { BATTLE, GAME } = require("./config");
 const { drawSprite } = require("./player");
 
 class BattleScene {
-  constructor({ images, viewport, hitSfx, skillSfx = {}, mapKey = "battleTemple", playerModifiers = {}, onFinish }) {
+  constructor({ images, viewport, hitSfx, skillSfx = {}, mapKey = "battleTemple", playerModifiers = {}, unlockedSkillIds = [], onFinish }) {
     this.images = images;
     this.viewport = viewport;
     this.hitSfx = hitSfx;
@@ -11,6 +11,7 @@ class BattleScene {
     this.config = BATTLE;
     this.mapKey = mapKey;
     this.playerModifiers = playerModifiers;
+    this.unlockedSkillIds = unlockedSkillIds;
     this.active = false;
     this.audit = { attacks: [], moves: [], result: null };
   }
@@ -18,8 +19,12 @@ class BattleScene {
   start() {
     this.units = [...BATTLE.players, ...BATTLE.enemies].map((unit) => {
       const equipment = unit.side === "player" ? this.playerModifiers : {};
+      const skillIds = unit.id === "hero" && this.unlockedSkillIds.length
+        ? [...(unit.skillIds || []).slice(0, 2), ...this.unlockedSkillIds].slice(0, 3)
+        : unit.skillIds;
       return {
         ...unit,
+        skillIds,
         maxHp: unit.hp,
         move: unit.move + (equipment.move || 0),
         damage: unit.damage + (equipment.attack || 0),

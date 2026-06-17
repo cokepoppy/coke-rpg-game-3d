@@ -33,11 +33,13 @@ const ASSETS = {
   yipintangLeader: "character-pack/yipintang-leader.png",
   vendor: "character-pack/vendor.png",
   keeper: "character-pack/keeper.png",
+  daoistMaster: "character-pack/daoist-master.png",
   battleTemple: "battle-pack/battle-temple.png",
   battleFerry: "battle-pack/battle-ferry.png",
   battleBamboo: "battle-pack/battle-bamboo.png",
+  daoistCutscenePoster: "video-pack/fuyao-poster.png",
   bgm: "audio-pack/cangshan-road.m4a",
-  battleBgm: "audio-pack/battle-loop.wav",
+  battleBgm: "audio-pack/iron-fan-valley.mp3",
   hitSfx: "audio-pack/hit.wav",
   stunSfx: "audio-pack/stun.wav",
   healSfx: "audio-pack/heal.wav",
@@ -65,7 +67,8 @@ const BATTLE = {
     heal: { id: "heal", name: "回春散", cost: 30, range: 0, heal: 24, kind: "ally_all", effect: "我方全体回血" },
     guard_break: { id: "guard_break", name: "破甲刺", cost: 35, range: 1, damage: 22, kind: "single", status: "exposed", statusTurns: 2, effect: "破防两回合" },
     arrow_shot: { id: "arrow_shot", name: "袖弩", cost: 0, range: 2, damage: 16, kind: "single", effect: "远程射击" },
-    rally: { id: "rally", name: "振奋", cost: 25, range: 0, qiRestore: 18, kind: "ally_all", effect: "我方回复真气" }
+    rally: { id: "rally", name: "振奋", cost: 25, range: 0, qiRestore: 18, kind: "ally_all", effect: "我方回复真气" },
+    fuyou_step: { id: "fuyou_step", name: "扶摇诀", cost: 50, range: 3, damage: 30, kind: "aoe", radius: 1, status: "stunned", statusTurns: 1, effect: "御风群攻并使敌人晕眩" }
   },
   rewards: {
     money: { min: 18, max: 35 },
@@ -170,6 +173,7 @@ const MAPS = {
       { id: "apothecaryDoor", x: 3350, y: 2380, width: 210, height: 180, label: "进入百草铺" },
       { id: "teahouseDoor", x: 2220, y: 1120, width: 230, height: 180, label: "进入松风茶肆" },
       { id: "vendor", x: 3260, y: 2500, width: 220, height: 220, label: "询问药摊老人" },
+      { id: "daoist_master", x: 2580, y: 2740, width: 360, height: 300, label: "拜会逍遥道人" },
       { id: "scout", x: 790, y: 660, width: 210, height: 190, label: "挑战西岭密探" },
       { id: "scout_bridge", x: 1510, y: 2500, width: 220, height: 190, label: "挑战桥头暗哨" },
       { id: "scout_archer", x: 2020, y: 1840, width: 220, height: 190, label: "挑战竹林弩手" },
@@ -180,6 +184,7 @@ const MAPS = {
     npcs: [
       { id: "keeper", name: "客栈掌柜", sprite: "keeper", x: 2735, y: 2525, direction: "right" },
       { id: "vendor", name: "药摊老人", sprite: "vendor", x: 3370, y: 2600, direction: "down" },
+      { id: "daoist_master", name: "逍遥道人", sprite: "daoistMaster", x: 2780, y: 2890, direction: "down" },
       { id: "scout", name: "西岭密探", sprite: "scout", x: 895, y: 745, direction: "down" },
       { id: "scout_bridge", name: "桥头暗哨", sprite: "scout", x: 1730, y: 2520, direction: "left" },
       { id: "scout_archer", name: "竹林弩手", sprite: "scoutArcher", x: 2240, y: 1845, direction: "left" },

@@ -13,7 +13,7 @@
   "afterMove": {
     "mapId": "world",
     "x": 2700,
-    "y": 2333.000000000007,
+    "y": 2333.0000000000064,
     "trigger": "inn"
   },
   "interaction": {

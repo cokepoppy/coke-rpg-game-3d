@@ -1,0 +1,51 @@
+{
+  "rewardDialog": {
+    "speaker": "旁白",
+    "text": "动画播放受限，已切换为分镜传功。你领悟了“扶摇诀”。"
+  },
+  "learned": [
+    "fuyou_step"
+  ],
+  "battleSkills": [
+    "guiyuan_sword",
+    "daze",
+    "fuyou_step"
+  ],
+  "videoRemoved": true,
+  "trigger": "daoist_master",
+  "endedCutscene": {
+    "source": "video-pack/fuyao-teaching.m4v",
+    "resolvedSource": "../wechat-minigame/video-pack/fuyao-teaching.m4v",
+    "sourceKind": "package",
+    "started": true,
+    "playEvent": true,
+    "timeUpdates": 20,
+    "fallback": false,
+    "result": "ended",
+    "error": null
+  },
+  "skippedCutscene": {
+    "source": "video-pack/fuyao-teaching.m4v",
+    "resolvedSource": "../wechat-minigame/video-pack/fuyao-teaching.m4v",
+    "sourceKind": "package",
+    "started": true,
+    "playEvent": true,
+    "timeUpdates": 0,
+    "fallback": false,
+    "result": "skipped",
+    "error": null
+  },
+  "fallbackCutscene": {
+    "source": "video-pack/fuyao-teaching.m4v",
+    "resolvedSource": "../wechat-minigame/video-pack/fuyao-teaching.m4v",
+    "sourceKind": "package",
+    "started": true,
+    "playEvent": false,
+    "timeUpdates": 0,
+    "fallback": true,
+    "result": "fallback",
+    "error": "video did not start",
+    "fallbackReason": "watchdog"
+  },
+  "errors": []
+}

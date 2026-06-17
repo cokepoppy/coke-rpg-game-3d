@@ -17,6 +17,45 @@ class UiRenderer {
     else this.renderControls(context, state.activeTrigger);
   }
 
+  renderCutscene(context, state) {
+    this.buttons = [];
+    context.fillStyle = "#080806";
+    context.fillRect(0, 0, this.viewport.width, this.viewport.height);
+    if (state.fallback) this.renderCutsceneFallback(context, state);
+    context.fillStyle = "rgba(24, 19, 13, 0.98)";
+    context.fillRect(0, 0, this.viewport.width, 54);
+    context.textAlign = "left";
+    context.fillStyle = "#f3e4bf";
+    context.font = "700 17px serif";
+    context.fillText(state.title || "江湖传功", 18, 33);
+    context.textAlign = "center";
+    context.fillStyle = state.fallback ? "#e6c77c" : "#cdb57d";
+    context.font = "12px sans-serif";
+    context.fillText(state.fallback ? "视频播放受限，正在播放分镜兜底" : "动画播放结束后将自动返回剧情", this.viewport.width / 2, this.viewport.height - 66);
+    this.button(context, "cutscene:skip", 24, this.viewport.height - 52, this.viewport.width - 48, 38, "跳过动画", "normal");
+  }
+
+  renderCutsceneFallback(context, state) {
+    const poster = state.images?.[state.fallback.poster];
+    const x = 0;
+    const y = 54;
+    const width = this.viewport.width;
+    const height = this.viewport.height - 138;
+    if (poster) drawImageCover(context, poster, x, y, width, height);
+    context.fillStyle = "rgba(8, 7, 5, 0.34)";
+    context.fillRect(x, y, width, height);
+    const elapsed = Math.max(0, Date.now() - state.fallback.startedAt);
+    const progress = Math.min(1, elapsed / state.fallback.durationMs);
+    context.fillStyle = "rgba(222, 184, 94, 0.92)";
+    context.fillRect(22, this.viewport.height - 86, (width - 44) * progress, 3);
+    context.textAlign = "center";
+    context.fillStyle = "#f7e9c8";
+    context.font = "700 20px serif";
+    context.fillText("扶摇传功", width / 2, this.viewport.height * 0.46);
+    context.font = "14px sans-serif";
+    context.fillText("逍遥道人以清风入脉，传你御风之法", width / 2, this.viewport.height * 0.46 + 30);
+  }
+
   renderMenu(context, state) {
     const { width, height } = this.viewport;
     context.fillStyle = "#171510";

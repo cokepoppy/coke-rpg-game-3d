@@ -1,0 +1,21 @@
+{
+  "videos": [
+    {
+      "id": "xiaoyao-daoist-fuyao",
+      "file": "xiaoyao-daoist-fuyao.mp4",
+      "sourceFile": "/Users/shangguanchenhuan/Downloads/video-cgt-20260617142548-c7v8q.mp4",
+      "provider": "Seedance 2 Pro",
+      "createdAt": "2026-06-17",
+      "durationSeconds": 5.042,
+      "width": 496,
+      "height": 864,
+      "videoCodec": "H.264",
+      "audioCodec": "AAC",
+      "mobileRuntimeSource": "xiaoyao-daoist-fuyao-mobile.m4v",
+      "posterSource": "fuyao-frames/fuyao-poster-portrait.png",
+      "storyTrigger": "daoist_master",
+      "rewardSkillId": "fuyou_step",
+      "runtimeFile": "wechat-minigame/video-pack/fuyao-teaching.m4v"
+    }
+  ]
+}

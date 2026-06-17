@@ -3,6 +3,7 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
+    "seedance:submit": "node scripts/seedance-submit.mjs",
     "wechat:assets": "node scripts/copy-wechat-assets.mjs",
     "wechat:debug": "npm run wechat:assets && node scripts/start-wechat-debug.mjs",
     "wechat:test": "node scripts/test-wechat-debug.mjs",
@@ -12,6 +13,7 @@
     "wechat:worldmap:test": "node scripts/test-wechat-worldmap.mjs",
     "wechat:inventory:test": "node scripts/test-wechat-inventory.mjs",
     "wechat:shop:test": "node scripts/test-wechat-shop.mjs",
+    "wechat:cutscene:test": "node scripts/test-wechat-cutscene.mjs",
     "wechat:open": "npm run wechat:assets && /Applications/wechatwebdevtools.app/Contents/MacOS/cli open --project $PWD/wechat-minigame --lang zh",
     "wechat:preview": "npm run wechat:assets && /Applications/wechatwebdevtools.app/Contents/MacOS/cli preview --project $PWD/wechat-minigame --lang zh"
   },

@@ -5,6 +5,9 @@ const { MapManager } = require("./mapManager");
 const { DialogSystem } = require("./dialogSystem");
 const { UiRenderer } = require("./uiRenderer");
 const { BattleScene } = require("./battleScene");
+const { CutscenePlayer } = require("./cutscenePlayer");
+const { CUTSCENES } = require("./cutsceneCatalog");
+const { daoistMasterDialogue } = require("./story/daoistMasterStory");
 const { inventoryEntries, itemById, shopById, shopEntries, equipmentModifiers } = require("./itemCatalog");
 
 const SAVE_KEY = "cangshan-rpg-save-v1";
@@ -23,6 +26,9 @@ class GameApp {
     this.money = 120;
     this.items = {};
     this.defeatedScouts = new Set();
+    this.learnedSkills = new Set();
+    this.seenCutscenes = new Set();
+    this.cutsceneFallback = null;
     this.currentBattleTriggerId = null;
     this.worldMapUnlocked = false;
     this.activeShopId = null;
@@ -116,6 +122,11 @@ class GameApp {
       message: this.shopMessage
     });
     if (this.mode === "battle") return this.battle.render(ctx, this.ui);
+    if (this.mode === "cutscene") return this.ui.renderCutscene(ctx, {
+      title: this.activeCutscene?.title,
+      fallback: this.cutsceneFallback,
+      images: this.images
+    });
     this.ui.render(ctx, {
       mode: this.mode,
       dialog: this.dialog,
@@ -168,6 +179,7 @@ class GameApp {
     if (button === "closeWorldMap") return this.closeWorldMap();
     if (button === "interact") return this.interact();
     if (button.startsWith("battle:")) return this.battle?.activate(button);
+    if (button === "cutscene:skip") return this.cutscene?.skip();
     if (button.startsWith("choice:")) return this.dialog.advance(Number(button.split(":")[1]));
   }
 
@@ -176,6 +188,8 @@ class GameApp {
     this.money = 120;
     this.items = { hemostatic_powder: 2, qingxin_pill: 1 };
     this.defeatedScouts = new Set();
+    this.learnedSkills = new Set();
+    this.seenCutscenes = new Set();
     this.currentBattleTriggerId = null;
     this.worldMapUnlocked = false;
     this.activeShopId = null;
@@ -232,6 +246,12 @@ class GameApp {
         { label: "查看货物", action: () => this.openShop("apothecary") },
         { label: "暂时离开" }
       ] });
+    } else if (trigger.id === "daoist_master") {
+      this.dialog.show(daoistMasterDialogue({
+        heroName: GAME.heroName,
+        learned: this.learnedSkills.has("fuyou_step"),
+        onTeach: () => this.playCutscene("daoistTeaching")
+      }));
     } else if (trigger.id.startsWith("scout")) {
       this.dialog.show({ speaker: "西岭密探", text: "前路封了。若再向前一步，刀剑无眼。", choices: [
         { label: "拔剑迎战", action: () => this.startBattle(trigger.id) },
@@ -251,6 +271,7 @@ class GameApp {
       skillSfx: this.skillSfx,
       mapKey: this.battleMapFor(triggerId),
       playerModifiers: equipmentModifiers(this.items),
+      unlockedSkillIds: [...this.learnedSkills],
       onFinish: (result, audit) => {
         const rewards = result === "victory" ? this.grantBattleRewards() : { money: 0, items: [] };
         if (result === "victory" && this.currentBattleTriggerId) this.defeatedScouts.add(this.currentBattleTriggerId);
@@ -286,6 +307,52 @@ class GameApp {
     return { money, items };
   }
 
+  playCutscene(id) {
+    const cutscene = CUTSCENES[id];
+    if (!cutscene || this.mode === "cutscene") return;
+    this.axis = { x: 0, y: 0 };
+    this.touchBindings.clear();
+    this.audio?.pause();
+    this.activeCutscene = cutscene;
+    this.cutsceneFallback = null;
+    this.mode = "cutscene";
+    this.cutscene = new CutscenePlayer({
+      viewport: this.viewport,
+      source: cutscene.source,
+      remoteSource: cutscene.remoteSource,
+      fallbackDurationMs: cutscene.fallbackDurationMs,
+      onFallback: (reason, audit) => {
+        this.cutsceneFallback = {
+          reason,
+          audit,
+          poster: cutscene.poster,
+          startedAt: Date.now(),
+          durationMs: cutscene.fallbackDurationMs || 4200
+        };
+      },
+      onFinish: (result, audit) => this.finishCutscene(cutscene, result, audit)
+    });
+    this.cutscene.play();
+  }
+
+  finishCutscene(cutscene, result, audit) {
+    this.lastCutsceneAudit = audit;
+    this.seenCutscenes.add(cutscene.id);
+    this.learnedSkills.add(cutscene.rewardSkillId);
+    this.cutscene = null;
+    this.activeCutscene = null;
+    this.cutsceneFallback = null;
+    this.mode = "game";
+    this.playMusic();
+    this.dialog.show({
+      speaker: result === "fallback" ? "旁白" : "逍遥道人",
+      text: result === "fallback"
+        ? `动画播放受限，已切换为分镜传功。你领悟了“${cutscene.rewardSkillName}”。`
+        : `清风归于经脉。你领悟了“${cutscene.rewardSkillName}”，战斗时可御风群攻并点住敌人。`,
+      choices: [{ label: "记下心法" }]
+    });
+  }
+
   enterRoom(id) {
     this.enterMap(id);
   }
@@ -307,7 +374,9 @@ class GameApp {
       money: this.money,
       items: this.items,
       defeatedScouts: [...this.defeatedScouts],
-      worldMapUnlocked: this.worldMapUnlocked
+      worldMapUnlocked: this.worldMapUnlocked,
+      learnedSkills: [...this.learnedSkills],
+      seenCutscenes: [...this.seenCutscenes]
     });
   }
 
@@ -319,6 +388,8 @@ class GameApp {
     this.items = save.items || {};
     this.defeatedScouts = new Set(save.defeatedScouts || []);
     this.worldMapUnlocked = Boolean(save.worldMapUnlocked) || this.defeatedScouts.size >= SCOUT_IDS.length;
+    this.learnedSkills = new Set(save.learnedSkills || []);
+    this.seenCutscenes = new Set(save.seenCutscenes || []);
     this.enterMap(save.mapId || "world", { x: save.x, y: save.y });
     this.playMusic();
   }

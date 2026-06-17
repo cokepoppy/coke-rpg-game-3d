@@ -29,6 +29,10 @@
     {
       "name": "battlePack",
       "root": "battle-pack"
+    },
+    {
+      "name": "videoPack",
+      "root": "video-pack"
     }
   ],
   "networkTimeout": {

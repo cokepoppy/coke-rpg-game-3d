@@ -34,8 +34,28 @@ try {
     scout.x = 4;
     scout.y = 7;
     battle.selectedId = "hero";
+    battle.phase = "move";
+    battle.highlights = battle.movesFor(hero);
+  });
+  const undoAudit = await page.evaluate(() => {
+    const battle = globalThis.__cangshanGame.battle;
+    const hero = battle.units.find((unit) => unit.id === "hero");
+    const start = { x: hero.x, y: hero.y };
+    const target = battle.highlights.find((cell) => cell.x === 2 && cell.y === 7) || battle.highlights[0];
+    const center = battle.cellCenter(target);
+    battle.handleTap(center.x, center.y);
+    const moved = { x: hero.x, y: hero.y, phase: battle.phase, canUndo: Boolean(hero.previousCell) };
+    battle.undoMove();
+    return { start, moved, afterUndo: { x: hero.x, y: hero.y, phase: battle.phase, moved: hero.moved, canUndo: Boolean(hero.previousCell) } };
+  });
+  await page.evaluate(() => {
+    const battle = globalThis.__cangshanGame.battle;
+    const hero = battle.units.find((unit) => unit.id === "hero");
+    battle.selectedId = "hero";
     battle.phase = "act";
     battle.highlights = [];
+    hero.previousCell = null;
+    hero.moved = false;
   });
   await page.waitForTimeout(120);
   await page.screenshot({ path: `${output}/01-battle-actions-ready.png` });
@@ -52,6 +72,20 @@ try {
   await clickButton(page, "battle:wait");
   await page.waitForTimeout(100);
   await page.screenshot({ path: `${output}/03-after-wait.png` });
+  await page.waitForTimeout(760);
+  const afterEnemy = await page.evaluate(() => {
+    const battle = globalThis.__cangshanGame.battle;
+    const selected = battle.selected;
+    const target = battle.highlights[0];
+    const before = selected ? { id: selected.id, x: selected.x, y: selected.y } : null;
+    if (target) {
+      const center = battle.cellCenter(target);
+      battle.handleTap(center.x, center.y);
+    }
+    const after = selected ? { id: selected.id, x: selected.x, y: selected.y, moved: selected.moved, phase: battle.phase } : null;
+    return { side: battle.side, phase: battle.phase, selectedId: battle.selectedId, before, after, enemyActions: battle.audit.enemyActions };
+  });
+  await page.screenshot({ path: `${output}/04-next-turn-direct-move.png` });
 
   const audit = await page.evaluate(() => {
     const game = globalThis.__cangshanGame;
@@ -67,18 +101,29 @@ try {
       scout: { hp: scout.hp, animation: scout.animation?.type || null },
       attacks: battle.audit.attacks,
       waits: battle.audit.moves.filter((event) => event.wait),
+      undoMoves: battle.audit.moves.filter((event) => event.undo),
+      enemyActions: battle.audit.enemyActions,
       hitSfx: game.hitSfx.audit,
-      waitSfx: game.skillSfx.wait.audit
+      waitSfx: game.skillSfx.wait.audit,
+      postEnemy: {
+        side: battle.side,
+        phase: battle.phase,
+        selectedId: battle.selectedId
+      }
     };
   });
+  audit.undo = undoAudit;
+  audit.afterEnemy = afterEnemy;
   audit.errors = errors;
 
+  if (audit.undo.afterUndo.x !== audit.undo.start.x || audit.undo.afterUndo.y !== audit.undo.start.y || audit.undo.afterUndo.moved) throw new Error("Undo move did not restore the selected unit.");
   if (audit.hero.qi !== 0) throw new Error(`Basic attack should not consume qi, received ${audit.hero.qi}`);
   if (!audit.attacks.some((event) => event.skillId === "basic_attack" && event.damage > 0)) throw new Error("Basic attack did not damage an adjacent enemy.");
   if (audit.hitSfx.playCount < 1) throw new Error("Basic attack did not trigger hit SFX.");
   if (!audit.waits.some((event) => event.id === "companion")) throw new Error("Wait action was not recorded.");
   if (audit.waitSfx.playCount < 1) throw new Error("Wait action did not trigger wait SFX.");
-  if (audit.side !== "enemy") throw new Error(`All player actions should advance to enemy turn, received ${audit.side}/${audit.phase}`);
+  if (!audit.enemyActions.some((event) => event.action === "attack" || event.action === "move")) throw new Error("Enemy turn did not move or attack.");
+  if (audit.afterEnemy.side !== "player" || audit.afterEnemy.before?.x === audit.afterEnemy.after?.x && audit.afterEnemy.before?.y === audit.afterEnemy.after?.y) throw new Error("Next player turn did not allow direct movement from the default selected unit.");
   if (errors.length) throw new Error(`Browser errors: ${errors.join(" | ")}`);
   await writeFile(`${output}/audit.json`, `${JSON.stringify(audit, null, 2)}\n`);
   console.log(JSON.stringify(audit, null, 2));

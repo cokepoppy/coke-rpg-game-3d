@@ -7,6 +7,7 @@
     "wechat:assets": "node scripts/copy-wechat-assets.mjs",
     "wechat:debug": "npm run wechat:assets && node scripts/start-wechat-debug.mjs",
     "wechat:test": "node scripts/test-wechat-debug.mjs",
+    "wechat:menu:test": "node scripts/test-wechat-menu.mjs",
     "wechat:battle:test": "node scripts/test-wechat-battle.mjs",
     "wechat:battle:skills:test": "node scripts/test-wechat-battle-skills.mjs",
     "wechat:battle:actions:test": "node scripts/test-wechat-battle-actions.mjs",
@@ -15,6 +16,7 @@
     "wechat:inventory:test": "node scripts/test-wechat-inventory.mjs",
     "wechat:shop:test": "node scripts/test-wechat-shop.mjs",
     "wechat:cutscene:test": "node scripts/test-wechat-cutscene.mjs",
+    "wechat:devtools:cutscene:test": "node scripts/test-wechat-devtools-cutscene.mjs",
     "wechat:open": "npm run wechat:assets && /Applications/wechatwebdevtools.app/Contents/MacOS/cli open --project $PWD/wechat-minigame --lang zh",
     "wechat:preview": "npm run wechat:assets && /Applications/wechatwebdevtools.app/Contents/MacOS/cli preview --project $PWD/wechat-minigame --lang zh"
   },

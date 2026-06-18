@@ -32,8 +32,11 @@ try {
 
   await page.evaluate(() => {
     const game = globalThis.__cangshanGame;
-    game.enterMap("world", { x: 895, y: 745 });
-    game.activeTrigger = game.mapManager.nearby(game.player.boundsAt(game.player.x, game.player.y));
+    game.enterMap("world");
+    const trigger = game.mapManager.map.triggers.find((entry) => entry.id === "scout");
+    game.player.x = trigger.x + trigger.width / 2;
+    game.player.y = trigger.y + trigger.height / 2;
+    game.activeTrigger = trigger;
   });
   await page.waitForTimeout(120);
   await page.screenshot({ path: `${output}/02-scout-trigger.png` });

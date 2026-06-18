@@ -32,7 +32,15 @@ class UiRenderer {
     context.textAlign = "center";
     context.fillStyle = state.fallback ? "#e6c77c" : "#cdb57d";
     context.font = "12px sans-serif";
-    context.fillText(state.fallback ? "视频播放受限，正在播放分镜兜底" : "动画播放结束后将自动返回剧情", this.viewport.width / 2, this.viewport.height - 66);
+    const debugText = state.debug
+      ? `video:${state.debug.event}  play:${state.debug.playEvent ? "Y" : "N"}  frames:${state.debug.timeUpdates || 0}${state.debug.error ? `  ${state.debug.error}` : ""}`
+      : "";
+    context.fillText(state.fallback ? "视频播放受限，正在播放分镜兜底" : "动画播放结束后将自动返回剧情", this.viewport.width / 2, this.viewport.height - 76);
+    if (debugText) {
+      context.fillStyle = "#8fc6ff";
+      context.font = "10px monospace";
+      context.fillText(debugText.slice(0, 56), this.viewport.width / 2, this.viewport.height - 60);
+    }
     this.button(context, "cutscene:skip", 24, this.viewport.height - 52, this.viewport.width - 48, 38, "跳过动画", "normal");
   }
 
@@ -75,9 +83,19 @@ class UiRenderer {
     context.fillStyle = "#d8bd82";
     context.font = "15px serif";
     context.fillText(GAME.subtitle, width / 2, height * 0.25 + 34);
-    this.button(context, "new", width / 2 - 112, height * 0.52, 224, 52, "新开始游戏", "primary");
-    this.button(context, "continue", width / 2 - 112, height * 0.52 + 66, 224, 52, state.hasSave ? "加载存档" : "暂无存档", state.hasSave ? "normal" : "disabled");
-    this.button(context, "music", width / 2 - 112, height * 0.52 + 132, 224, 48, state.musicEnabled ? "音乐：开" : "音乐：关", "normal");
+    const menuY = height * 0.4;
+    const rowHeight = 48;
+    const rowGap = 10;
+    this.button(context, "resume", width / 2 - 112, menuY, 224, rowHeight, "返回游戏", state.canResume ? "primary" : "disabled");
+    this.button(context, "save", width / 2 - 112, menuY + (rowHeight + rowGap), 224, rowHeight, "保存存档", state.canResume ? "normal" : "disabled");
+    this.button(context, "continue", width / 2 - 112, menuY + (rowHeight + rowGap) * 2, 224, rowHeight, state.hasSave ? "加载存档" : "暂无存档", state.hasSave ? "normal" : "disabled");
+    this.button(context, "new", width / 2 - 112, menuY + (rowHeight + rowGap) * 3, 224, rowHeight, "新开始游戏", "normal");
+    this.button(context, "music", width / 2 - 112, menuY + (rowHeight + rowGap) * 4, 224, rowHeight, state.musicEnabled ? "音乐：开" : "音乐：关", "normal");
+    if (state.menuNotice) {
+      context.fillStyle = state.menuNotice === "存档成功" ? "#8fd09a" : "#e5c77e";
+      context.font = "700 13px sans-serif";
+      context.fillText(state.menuNotice, width / 2, menuY + (rowHeight + rowGap) * 5 + 18);
+    }
     context.fillStyle = "rgba(246, 234, 209, 0.68)";
     context.font = "12px sans-serif";
     context.fillText("竖屏触控版 · 轻触方向键移动", width / 2, height - 38);

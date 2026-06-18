@@ -6,6 +6,7 @@ const { DialogSystem } = require("./dialogSystem");
 const { UiRenderer } = require("./uiRenderer");
 const { BattleScene } = require("./battleScene");
 const { CutscenePlayer } = require("./cutscenePlayer");
+const { recordCutsceneDiagnostic } = require("./cutsceneDiagnostics");
 const { CUTSCENES } = require("./cutsceneCatalog");
 const { daoistMasterDialogue } = require("./story/daoistMasterStory");
 const { inventoryEntries, itemById, shopById, shopEntries, equipmentModifiers } = require("./itemCatalog");
@@ -29,11 +30,14 @@ class GameApp {
     this.learnedSkills = new Set();
     this.seenCutscenes = new Set();
     this.cutsceneFallback = null;
+    this.cutsceneDebug = null;
     this.currentBattleTriggerId = null;
     this.worldMapUnlocked = false;
     this.activeShopId = null;
     this.shopMessage = "";
     this.shopNotice = null;
+    this.menuCanResume = false;
+    this.menuNotice = "";
     this.lastPromptTriggerId = null;
     this.lastShopAudit = null;
     this.axis = { x: 0, y: 0 };
@@ -141,6 +145,7 @@ class GameApp {
     if (this.mode === "cutscene") return this.ui.renderCutscene(ctx, {
       title: this.activeCutscene?.title,
       fallback: this.cutsceneFallback,
+      debug: this.cutsceneDebug,
       images: this.images
     });
     this.ui.render(ctx, {
@@ -153,7 +158,9 @@ class GameApp {
       worldMapUnlocked: this.worldMapUnlocked || this.defeatedScouts.size > 0,
       defeatedScouts: this.defeatedScouts.size,
       totalScouts: SCOUT_IDS.length,
-      hasSave: Boolean(readSave(SAVE_KEY))
+      hasSave: Boolean(readSave(SAVE_KEY)),
+      canResume: this.menuCanResume,
+      menuNotice: this.menuNotice
     });
   }
 
@@ -186,6 +193,8 @@ class GameApp {
     if (this.shouldClickSfx(button)) this.uiSfx?.play();
     if (button === "new") return this.newGame();
     if (button === "continue") return this.loadGame();
+    if (button === "resume") return this.closeMenu();
+    if (button === "save") return this.saveGame();
     if (button === "music") return this.toggleMusic();
     if (button === "menu") return this.openMenu();
     if (button === "inventory") return this.openInventory();
@@ -201,6 +210,8 @@ class GameApp {
   }
 
   newGame() {
+    this.menuCanResume = false;
+    this.menuNotice = "";
     this.mode = "game";
     this.money = 120;
     this.items = { hemostatic_powder: 2, qingxin_pill: 1 };
@@ -223,9 +234,17 @@ class GameApp {
   }
 
   openMenu() {
-    this.saveGame();
+    this.menuCanResume = this.mode === "game";
+    this.menuNotice = "";
     this.mode = "menu";
     this.axis = { x: 0, y: 0 };
+  }
+
+  closeMenu() {
+    if (!this.menuCanResume) return;
+    this.mode = "game";
+    this.menuNotice = "";
+    this.playMusic();
   }
 
   interact() {
@@ -333,12 +352,31 @@ class GameApp {
     this.audio?.pause();
     this.activeCutscene = cutscene;
     this.cutsceneFallback = null;
+    this.cutsceneDebug = { event: "starting", source: cutscene.source, updatedAt: Date.now() };
+    recordCutsceneDiagnostic("starting", this.cutsceneDebug);
     this.mode = "cutscene";
     this.cutscene = new CutscenePlayer({
       viewport: this.viewport,
       source: cutscene.source,
       remoteSource: cutscene.remoteSource,
+      playbackDurationMs: cutscene.playbackDurationMs,
+      fallbackDelayMs: cutscene.fallbackDelayMs,
       fallbackDurationMs: cutscene.fallbackDurationMs,
+      onEvent: (event, audit) => {
+        this.cutsceneDebug = {
+          event,
+          source: audit.resolvedSource || cutscene.source,
+          playEvent: audit.playEvent,
+          timeUpdates: audit.timeUpdates,
+          waitingCount: audit.waitingCount || 0,
+          videoCapabilities: audit.videoCapabilities,
+          simulatorEventBridgeUnobservable: audit.simulatorEventBridgeUnobservable,
+          fallback: audit.fallback,
+          error: audit.error,
+          updatedAt: Date.now()
+        };
+        recordCutsceneDiagnostic(event, this.cutsceneDebug);
+      },
       onFallback: (reason, audit) => {
         this.cutsceneFallback = {
           reason,
@@ -355,11 +393,13 @@ class GameApp {
 
   finishCutscene(cutscene, result, audit) {
     this.lastCutsceneAudit = audit;
+    recordCutsceneDiagnostic("finish", { ...audit, result });
     this.seenCutscenes.add(cutscene.id);
     this.learnedSkills.add(cutscene.rewardSkillId);
     this.cutscene = null;
     this.activeCutscene = null;
     this.cutsceneFallback = null;
+    this.cutsceneDebug = null;
     this.mode = "game";
     this.playMusic();
     this.dialog.show({
@@ -385,8 +425,13 @@ class GameApp {
   }
 
   saveGame() {
-    if (!this.player || !this.mapManager) return;
+    if (!this.player || !this.mapManager || !this.menuCanResume) {
+      this.menuNotice = "当前没有可保存的游戏进度";
+      return false;
+    }
     writeSave(SAVE_KEY, {
+      version: 1,
+      savedAt: Date.now(),
       mapId: this.mapManager.id,
       x: Math.round(this.player.x),
       y: Math.round(this.player.y),
@@ -397,11 +442,17 @@ class GameApp {
       learnedSkills: [...this.learnedSkills],
       seenCutscenes: [...this.seenCutscenes]
     });
+    this.menuNotice = "存档成功";
+    this.buySfx?.play();
+    return true;
   }
 
   loadGame() {
     const save = readSave(SAVE_KEY);
-    if (!save) return;
+    if (!save) {
+      this.menuNotice = "还没有可加载的存档";
+      return false;
+    }
     this.mode = "game";
     this.money = save.money ?? 120;
     this.items = save.items || {};
@@ -410,7 +461,10 @@ class GameApp {
     this.learnedSkills = new Set(save.learnedSkills || []);
     this.seenCutscenes = new Set(save.seenCutscenes || []);
     this.enterMap(save.mapId || "world", { x: save.x, y: save.y });
+    this.menuCanResume = true;
+    this.menuNotice = "";
     this.playMusic();
+    return true;
   }
 
   toggleMusic() {

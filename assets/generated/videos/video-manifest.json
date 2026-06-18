@@ -11,11 +11,11 @@
       "height": 864,
       "videoCodec": "H.264",
       "audioCodec": "AAC",
-      "mobileRuntimeSource": "xiaoyao-daoist-fuyao-mobile.m4v",
+      "mobileRuntimeSource": "xiaoyao-daoist-fuyao.mp4",
       "posterSource": "fuyao-frames/fuyao-poster-portrait.png",
       "storyTrigger": "daoist_master",
       "rewardSkillId": "fuyou_step",
-      "runtimeFile": "wechat-minigame/video-pack/fuyao-teaching.m4v"
+      "runtimeFile": "wechat-minigame/video-pack/fuyao-teaching.mp4"
     }
   ]
 }

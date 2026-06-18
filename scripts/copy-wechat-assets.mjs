@@ -16,7 +16,7 @@ const files = [
   ["assets/generated/npcs/xiaoyao-daoist-master-spritesheet-alpha.png", "wechat-minigame/character-pack/daoist-master.png"],
   ["assets/audio/cangshan-road-mobile.m4a", "wechat-minigame/audio-pack/cangshan-road.m4a"],
   ["assets/audio/iron-fan-valley.mp3", "wechat-minigame/audio-pack/iron-fan-valley.mp3"],
-  ["assets/generated/videos/xiaoyao-daoist-fuyao-mobile.m4v", "wechat-minigame/video-pack/fuyao-teaching.m4v"],
+  ["assets/generated/videos/xiaoyao-daoist-fuyao.mp4", "wechat-minigame/video-pack/fuyao-teaching.mp4"],
   ["assets/generated/videos/fuyao-frames/fuyao-poster-portrait.png", "wechat-minigame/video-pack/fuyao-poster.png"]
 ];
 

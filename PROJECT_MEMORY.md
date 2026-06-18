@@ -216,6 +216,22 @@ curl --noproxy '*' -I --max-time 3 http://127.0.0.1:5173/index.modular.html
 - NPC placement requires rendered-map inspection. Coordinate-only placement can
   put a character on a roof, stall, lantern, or rock even when collision data
   says the location is reachable.
+- Simulator-first cutscene debugging uses `npm run wechat:devtools:cutscene:test`.
+  The test temporarily enables a scenario, opens Developer Tools through its
+  CLI, reads a JSON audit from `wx.env.USER_DATA_PATH`, and restores the config.
+  It does not click the IDE through screenshots.
+- `miniprogram-automator` is Page-oriented. It can connect to a Canvas Mini Game
+  automation port while `App.callFunction`, `App.callWxMethod`, and screenshot
+  commands never answer. Use in-game hooks plus persisted telemetry instead.
+- Developer Tools `2.01.2510290` visibly plays the staged H.264/AAC MP4, but its
+  `Video` object emits no play/time-update/error callbacks and does not advance
+  exposed `currentTime`. This was visually confirmed on 2026-06-18. On
+  `platform === "devtools"`, use the known clip duration instead of the phone
+  watchdog so a playing video is not destroyed as a false black-screen result.
+  See `docs/wechat-simulator-debugging.md`.
+- Keep the simulator-first layers explicit: browser shim validates visible
+  frames and lifecycle; Developer Tools validates compilation, real API shape,
+  telemetry, and fallback; a phone validates native codec/playback policy.
 
 ## WeChat Mobile UI / Battle Pitfalls
 
@@ -234,10 +250,32 @@ curl --noproxy '*' -I --max-time 3 http://127.0.0.1:5173/index.modular.html
 - Keep combat NPCs on the main road or near intended choke points. Hidden
   battle triggers make mobile exploration feel broken even when the trigger
   technically exists.
+- Enemy turns must include movement toward a target, not just attack-if-in-range.
+  Otherwise the turn appears to skip whenever enemies start outside skill range.
+- After enemy turns reset to player control, set the phase to `move` for the
+  default selected unit. Showing movement highlights while leaving phase as
+  `select` creates a broken state where green tiles are visible but untappable.
+- A moved-but-not-acted unit needs an explicit undo affordance. Store the
+  previous cell before movement and clear it after attack, wait, or turn reset.
 - Treat sound as a first-class gameplay feedback layer. Short UI/prompt/buy
   cues should be generated locally and audited with `playCount`/`playEvents`;
-  higher-fidelity combat sounds can come from AI or licensed libraries, then be
-  normalized, trimmed, and tested against the actual animation timing.
+  higher-fidelity combat sounds should use ElevenLabs Sound Effects first,
+  with licensed libraries as fallback, then be normalized, trimmed, and tested
+  against the actual animation timing.
+- For phone-only video failures, do not rely only on `console.info`. Mirror
+  cutscene events into `wx.getLogManager` and show compact event/frame status in
+  the canvas UI so users can report `create`, `play`, `first-frame`,
+  `watchdog`, or `error` directly from the phone screen.
+- Treat the in-game main menu as a pause state, not a one-way title screen.
+  Opening it must preserve the active dialog/map state and expose an explicit
+  Return action. Do not silently overwrite the save slot when the menu opens;
+  save only from the Save action and show a visible success/failure result.
+- Save/load E2E must mutate money, inventory, map coordinates, and then verify
+  that Load restores all of them. Checking only whether a save key exists does
+  not prove restoration works.
+- Battle tours must locate overworld encounters by stable trigger ID such as
+  `scout`, not copied map coordinates. NPC placement changes frequently while
+  trigger identity is part of the gameplay contract.
 
 ## Workflow Rule
 

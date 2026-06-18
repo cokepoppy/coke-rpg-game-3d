@@ -29,6 +29,7 @@ window.wx = {
   onTouchCancel: (handler) => listeners.cancel.push(handler),
   getStorageSync: (key) => storage.get(key) || "",
   setStorageSync: (key, value) => storage.set(key, value),
+  getLogManager: () => ({ log: (...args) => console.log(...args), warn: (...args) => console.warn(...args) }),
   loadSubpackage: ({ success }) => { queueMicrotask(() => success && success()); return { onProgressUpdate() {} }; },
   createInnerAudioContext: () => {
     const audio = new Audio();

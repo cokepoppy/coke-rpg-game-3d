@@ -2,12 +2,12 @@
 
 ## Recommended Sources
 
+- Preferred high-fidelity generator: ElevenLabs Sound Effects. Use it first for
+  production-quality game one-shots, especially combat impacts, sword slashes,
+  skill casts, NPC cues, and polished UI confirmations.
 - Programmatic local WAV generation for short UI cues: button taps, prompt
   pings, purchase chimes, wait/confirm sounds. This is fast, deterministic,
   license-safe, and easy to tune in `scripts/copy-wechat-assets.mjs`.
-- ElevenLabs Sound Effects for bespoke cinematic or stylized one-shots. Use it
-  for sword hits, magic casts, monster cues, and room ambience when local
-  synthesis sounds too synthetic.
 - Stable Audio for longer ambience, battle beds, and stylized soundscapes.
 - Sonniss GameAudioGDC bundles as royalty-free production-quality fallback
   material. Keep license notes with imported files.
@@ -44,6 +44,10 @@ one-shot sound effect
 Generate 4-8 variants, normalize to -3 dB peak, trim silence under 30 ms, and
 test in game with screenshots plus SFX audit. Do not accept a sound only because
 it plays in isolation; judge it against the actual battle animation timing.
+
+For ElevenLabs Sound Effects, prefer prompts that describe material, motion,
+duration, and mix constraints instead of vague emotion. Keep outputs dry and
+short, then integrate through `audio-pack` with the same audit checks.
 
 ## QA Checklist
 

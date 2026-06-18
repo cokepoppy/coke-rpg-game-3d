@@ -1,18 +1,18 @@
 {
-  "side": "enemy",
-  "phase": "enemy",
+  "side": "player",
+  "phase": "act",
   "hero": {
     "qi": 0,
     "moved": true,
-    "acted": true
+    "acted": false
   },
   "companion": {
-    "moved": true,
-    "acted": true
+    "moved": false,
+    "acted": false
   },
   "scout": {
     "hp": 6,
-    "animation": "hit"
+    "animation": null
   },
   "attacks": [
     {
@@ -22,6 +22,22 @@
       "damage": 32,
       "targetHp": 6,
       "status": null
+    },
+    {
+      "attackerId": "scoutA",
+      "targetId": "hero",
+      "skillId": "quick_slash",
+      "damage": 24,
+      "targetHp": 64,
+      "status": null
+    },
+    {
+      "attackerId": "scoutB",
+      "targetId": "hero",
+      "skillId": "arrow_shot",
+      "damage": 16,
+      "targetHp": 48,
+      "status": null
     }
   ],
   "waits": [
@@ -30,10 +46,38 @@
       "wait": true
     }
   ],
+  "undoMoves": [
+    {
+      "id": "hero",
+      "undo": true,
+      "x": 3,
+      "y": 7
+    }
+  ],
+  "enemyActions": [
+    {
+      "id": "scoutA",
+      "action": "attack",
+      "targetId": "hero",
+      "skillId": "quick_slash"
+    },
+    {
+      "id": "scoutB",
+      "action": "move",
+      "x": 3,
+      "y": 5
+    },
+    {
+      "id": "scoutB",
+      "action": "attack",
+      "targetId": "hero",
+      "skillId": "arrow_shot"
+    }
+  ],
   "hitSfx": {
     "source": "audio-pack/hit.wav",
-    "playCount": 1,
-    "playEvents": 1,
+    "playCount": 3,
+    "playEvents": 3,
     "errors": []
   },
   "waitSfx": {
@@ -41,6 +85,67 @@
     "playCount": 1,
     "playEvents": 1,
     "errors": []
+  },
+  "postEnemy": {
+    "side": "player",
+    "phase": "act",
+    "selectedId": "hero"
+  },
+  "undo": {
+    "start": {
+      "x": 3,
+      "y": 7
+    },
+    "moved": {
+      "x": 2,
+      "y": 7,
+      "phase": "act",
+      "canUndo": true
+    },
+    "afterUndo": {
+      "x": 3,
+      "y": 7,
+      "phase": "move",
+      "moved": false,
+      "canUndo": false
+    }
+  },
+  "afterEnemy": {
+    "side": "player",
+    "phase": "act",
+    "selectedId": "hero",
+    "before": {
+      "id": "hero",
+      "x": 3,
+      "y": 7
+    },
+    "after": {
+      "id": "hero",
+      "x": 3,
+      "y": 4,
+      "moved": true,
+      "phase": "act"
+    },
+    "enemyActions": [
+      {
+        "id": "scoutA",
+        "action": "attack",
+        "targetId": "hero",
+        "skillId": "quick_slash"
+      },
+      {
+        "id": "scoutB",
+        "action": "move",
+        "x": 3,
+        "y": 5
+      },
+      {
+        "id": "scoutB",
+        "action": "attack",
+        "targetId": "hero",
+        "skillId": "arrow_shot"
+      }
+    ]
   },
   "errors": []
 }

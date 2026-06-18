@@ -14,8 +14,8 @@
   "videoRemoved": true,
   "trigger": "daoist_master",
   "endedCutscene": {
-    "source": "video-pack/fuyao-teaching.m4v",
-    "resolvedSource": "../wechat-minigame/video-pack/fuyao-teaching.m4v",
+    "source": "video-pack/fuyao-teaching.mp4",
+    "resolvedSource": "../wechat-minigame/video-pack/fuyao-teaching.mp4",
     "sourceKind": "package",
     "started": true,
     "playEvent": true,
@@ -23,11 +23,18 @@
     "fallback": false,
     "result": "ended",
     "error": null,
+    "videoCapabilities": {
+      "created": true,
+      "play": true,
+      "onPlay": true,
+      "onTimeUpdate": true,
+      "onError": true
+    },
     "waitingCount": 1
   },
   "skippedCutscene": {
-    "source": "video-pack/fuyao-teaching.m4v",
-    "resolvedSource": "../wechat-minigame/video-pack/fuyao-teaching.m4v",
+    "source": "video-pack/fuyao-teaching.mp4",
+    "resolvedSource": "../wechat-minigame/video-pack/fuyao-teaching.mp4",
     "sourceKind": "package",
     "started": true,
     "playEvent": true,
@@ -35,11 +42,18 @@
     "fallback": false,
     "result": "skipped",
     "error": null,
+    "videoCapabilities": {
+      "created": true,
+      "play": true,
+      "onPlay": true,
+      "onTimeUpdate": true,
+      "onError": true
+    },
     "waitingCount": 1
   },
   "fallbackCutscene": {
-    "source": "video-pack/fuyao-teaching.m4v",
-    "resolvedSource": "../wechat-minigame/video-pack/fuyao-teaching.m4v",
+    "source": "video-pack/fuyao-teaching.mp4",
+    "resolvedSource": "../wechat-minigame/video-pack/fuyao-teaching.mp4",
     "sourceKind": "package",
     "started": true,
     "playEvent": false,
@@ -47,6 +61,13 @@
     "fallback": true,
     "result": "fallback",
     "error": "video did not start",
+    "videoCapabilities": {
+      "created": true,
+      "play": true,
+      "onPlay": true,
+      "onTimeUpdate": true,
+      "onError": true
+    },
     "fallbackReason": "watchdog"
   },
   "errors": []

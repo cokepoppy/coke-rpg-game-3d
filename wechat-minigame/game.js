@@ -1,7 +1,12 @@
 const { GameApp } = require("./js/gameApp");
+const { SIMULATOR_SCENARIO } = require("./js/simulatorScenario");
 
 const game = new GameApp();
 globalThis.__cangshanGame = game;
-game.start().catch((error) => {
-  console.error("Failed to start Cangshan RPG", error);
-});
+game.start()
+  .then(() => {
+    if (SIMULATOR_SCENARIO.cutscene) game.playCutscene(SIMULATOR_SCENARIO.cutscene);
+  })
+  .catch((error) => {
+    console.error("Failed to start Cangshan RPG", error);
+  });

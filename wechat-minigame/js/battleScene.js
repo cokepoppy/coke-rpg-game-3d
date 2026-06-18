@@ -13,7 +13,7 @@ class BattleScene {
     this.playerModifiers = playerModifiers;
     this.unlockedSkillIds = unlockedSkillIds;
     this.active = false;
-    this.audit = { attacks: [], moves: [], result: null };
+    this.audit = { attacks: [], moves: [], enemyActions: [], result: null };
   }
 
   start() {
@@ -47,6 +47,7 @@ class BattleScene {
     this.selectedSkillId = this.skillsFor(this.selected)[0]?.id || null;
     this.message = `${this.selected.name} 待命`;
     this.highlights = this.movesFor(this.selected);
+    this.turnNotice = { text: "我方回合", time: 1.2 };
     this.active = true;
   }
 
@@ -68,6 +69,10 @@ class BattleScene {
       }
       unit.displayHp += (unit.hp - unit.displayHp) * Math.min(1, dt * 7.5);
     }
+    if (this.turnNotice) {
+      this.turnNotice.time -= dt;
+      if (this.turnNotice.time <= 0) this.turnNotice = null;
+    }
     if (this.side === "enemy" && !this.enemyThinking) {
       this.enemyThinking = true;
       setTimeout(() => this.runEnemyTurn(), 360);
@@ -86,6 +91,7 @@ class BattleScene {
     if (this.finished) return;
     if (button === "battle:attack") return this.chooseBasicAttack();
     if (button === "battle:wait") return this.waitSelected();
+    if (button === "battle:undo") return this.undoMove();
     if (button === "battle:skill" || button.startsWith("battle:skill:")) {
       if (!this.selected || this.selected.acted) return;
       const skillId = button.split(":")[2] || this.skillsFor(this.selected)[0]?.id;
@@ -140,6 +146,21 @@ class BattleScene {
     this.advanceAfterPlayerAction();
   }
 
+  undoMove() {
+    const unit = this.selected;
+    if (!unit || !unit.moved || unit.acted || !unit.previousCell) return;
+    unit.x = unit.previousCell.x;
+    unit.y = unit.previousCell.y;
+    unit.direction = unit.previousCell.direction || unit.direction;
+    unit.previousCell = null;
+    unit.moved = false;
+    unit.animation = { type: "move", time: 0.12 };
+    this.audit.moves.push({ id: unit.id, undo: true, x: unit.x, y: unit.y });
+    this.phase = "move";
+    this.highlights = this.movesFor(unit);
+    this.message = `${unit.name} 已取消移动`;
+  }
+
   handleTap(x, y) {
     if (this.side !== "player" || !this.active || this.finished) return;
     const cell = this.cellFromPoint(x, y);
@@ -154,6 +175,7 @@ class BattleScene {
     }
     if (this.phase === "move" && this.selected && this.isHighlighted(cell.x, cell.y, "move")) {
       const selected = this.selected;
+      selected.previousCell = { x: selected.x, y: selected.y, direction: selected.direction };
       selected.direction = directionTo(selected, cell);
       selected.x = cell.x;
       selected.y = cell.y;
@@ -241,31 +263,79 @@ class BattleScene {
     this.phase = "enemy";
     this.selectedId = null;
     this.highlights = [];
+    this.turnNotice = { text: "敌方回合", time: 1.35 };
     this.message = "敌方回合";
   }
 
   runEnemyTurn() {
     if (!this.active || this.finished) return;
-    const enemy = this.living("enemy")[0];
-    const target = this.living("player")[0];
-    if (enemy?.status?.stunned) {
-      enemy.status.stunned -= 1;
-      this.message = `${enemy.name} 被点穴，无法行动`;
-    } else if (enemy && target) {
-      const skill = this.skillsFor(enemy)[0];
-      if (skill && distance(enemy, target) <= skill.range) this.castSkill(enemy, target, skill);
+    const enemies = this.living("enemy").filter((unit) => unit.alive);
+    for (const enemy of enemies) {
+      const target = nearest(enemy, this.living("player").filter((unit) => unit.alive));
+      if (!target) break;
+      if (enemy.status?.stunned) {
+        enemy.status.stunned -= 1;
+        this.message = `${enemy.name} 被点穴，无法行动`;
+        this.audit.enemyActions.push({ id: enemy.id, action: "stunned" });
+        continue;
+      }
+      const skill = this.skillsFor(enemy)[0] || this.skillById("basic_attack");
+      if (distance(enemy, target) > skill.range) this.moveEnemyToward(enemy, target, skill.range);
+      if (distance(enemy, target) <= skill.range) this.enemyCastSkill(enemy, target, skill);
+      else {
+        this.message = `${enemy.name} 正在逼近`;
+        this.audit.enemyActions.push({ id: enemy.id, action: "advance", x: enemy.x, y: enemy.y });
+      }
+      if (this.finished) return;
     }
     for (const unit of this.units) this.tickStatus(unit);
     for (const unit of this.living("player")) {
       unit.moved = false;
       unit.acted = false;
+      unit.previousCell = null;
     }
     this.side = "player";
-    this.phase = "select";
+    this.phase = "move";
     this.selectedId = this.living("player")[0]?.id || null;
     this.highlights = this.selected ? this.movesFor(this.selected) : [];
-    this.message = "我方回合";
+    this.turnNotice = { text: "我方回合", time: 1.35 };
+    this.message = this.selected ? `${this.selected.name} 行动` : "我方回合";
     this.enemyThinking = false;
+  }
+
+  moveEnemyToward(enemy, target, preferredRange = 1) {
+    const occupied = new Set(this.units.filter((unit) => unit.alive && unit.id !== enemy.id).map((unit) => `${unit.x},${unit.y}`));
+    let best = { x: enemy.x, y: enemy.y, metric: distance(enemy, target) * 10 };
+    for (let y = 0; y < BATTLE.rows; y += 1) {
+      for (let x = 0; x < BATTLE.cols; x += 1) {
+        const steps = distance(enemy, { x, y });
+        if (steps < 1 || steps > enemy.move || occupied.has(`${x},${y}`)) continue;
+        const rangeDistance = Math.abs(distance({ x, y }, target) - preferredRange);
+        const metric = rangeDistance * 10 + distance({ x, y }, target);
+        if (metric < best.metric) best = { x, y, metric };
+      }
+    }
+    if (best.x === enemy.x && best.y === enemy.y) return;
+    enemy.direction = directionTo(enemy, best);
+    enemy.x = best.x;
+    enemy.y = best.y;
+    enemy.moved = true;
+    enemy.animation = { type: "move", time: 0.16 };
+    this.audit.enemyActions.push({ id: enemy.id, action: "move", x: enemy.x, y: enemy.y });
+  }
+
+  enemyCastSkill(enemy, target, skill) {
+    if (!skill || enemy.qi < skill.cost) skill = this.skillById("basic_attack");
+    enemy.qi = Math.max(0, enemy.qi - (skill.cost || 0));
+    enemy.direction = directionTo(enemy, target);
+    this.applyDamage(enemy, target, skill);
+    enemy.moved = true;
+    enemy.acted = true;
+    enemy.animation = { type: "attack", targetX: target.x, targetY: target.y, time: 0.26, duration: 0.26, skill };
+    this.playSkillSfx(skill);
+    this.message = `${enemy.name} 攻击 ${target.name}`;
+    this.audit.enemyActions.push({ id: enemy.id, action: "attack", targetId: target.id, skillId: skill.id });
+    this.checkResult();
   }
 
   checkResult() {
@@ -427,6 +497,7 @@ class BattleScene {
       context.stroke();
     }
     this.drawUnits(context);
+    this.drawTurnNotice(context, field);
     context.restore();
   }
 
@@ -473,13 +544,6 @@ class BattleScene {
         context.strokeText(`-${unit.animation.damage}`, center.x, center.y - 48);
         context.fillText(`-${unit.animation.damage}`, center.x, center.y - 48);
       }
-      if (unit.id === this.selectedId && unit.side === this.side) {
-        context.strokeStyle = "rgba(255, 226, 116, 0.96)";
-        context.lineWidth = 3;
-        context.beginPath();
-        context.ellipse(center.x, center.y + 34, 30, 10, 0, 0, Math.PI * 2);
-        context.stroke();
-      }
       if (unit.animation?.type === "heal") {
         context.fillStyle = "#9dffad";
         context.font = "700 16px sans-serif";
@@ -510,6 +574,28 @@ class BattleScene {
     context.lineCap = "butt";
   }
 
+  drawTurnNotice(context, field) {
+    if (!this.turnNotice) return;
+    const alpha = Math.min(1, this.turnNotice.time / 0.28);
+    const width = Math.min(220, this.viewport.width - 56);
+    const x = (this.viewport.width - width) / 2;
+    const y = field.y + 14;
+    context.save();
+    context.globalAlpha = alpha;
+    context.fillStyle = "rgba(21, 16, 11, 0.92)";
+    roundedRect(context, x, y, width, 42, 7);
+    context.fill();
+    context.strokeStyle = "rgba(224, 192, 126, 0.74)";
+    context.stroke();
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillStyle = "#f5ead2";
+    context.font = "700 17px serif";
+    context.fillText(this.turnNotice.text, this.viewport.width / 2, y + 21);
+    context.textBaseline = "alphabetic";
+    context.restore();
+  }
+
   drawPanel(context, ui) {
     const { panel } = this.layout();
     context.fillStyle = "rgba(21, 16, 11, 0.98)";
@@ -528,6 +614,9 @@ class BattleScene {
     const actionDisabled = !selected || selected.acted;
     ui.button(context, "battle:attack", 24, panel.y + 78, Math.floor((panel.width - 58) / 2), 34, "普通攻击", actionDisabled ? "disabled" : "primary");
     ui.button(context, "battle:wait", panel.width / 2 + 5, panel.y + 78, Math.floor((panel.width - 58) / 2), 34, "待命", actionDisabled ? "disabled" : "normal");
+    if (selected?.moved && !selected.acted && selected.previousCell) {
+      ui.button(context, "battle:undo", panel.width - 104, panel.y + 28, 80, 30, "取消移动", "normal");
+    }
     const skills = this.skillsFor(selected);
     skills.forEach((skill, index) => {
       const y = panel.y + 120 + index * 32;
@@ -543,6 +632,20 @@ class BattleScene {
 
 function distance(a, b) {
   return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+}
+
+function nearest(from, units) {
+  return units.slice().sort((a, b) => distance(from, a) - distance(from, b))[0] || null;
+}
+
+function roundedRect(context, x, y, width, height, radius) {
+  context.beginPath();
+  context.moveTo(x + radius, y);
+  context.arcTo(x + width, y, x + width, y + height, radius);
+  context.arcTo(x + width, y + height, x, y + height, radius);
+  context.arcTo(x, y + height, x, y, radius);
+  context.arcTo(x, y, x + width, y, radius);
+  context.closePath();
 }
 
 function directionTo(from, to) {

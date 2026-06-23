@@ -14,6 +14,7 @@ const reportPath = args.report;
 const contactPath = args.contact;
 const rows = Number(args.rows || 4);
 const cols = Number(args.cols || 4);
+const motion = args.motion || "walk";
 const alphaThreshold = Number(args.alphaThreshold || args["alpha-threshold"] || 24);
 const minComponentArea = Number(args.minComponentArea || args["min-component-area"] || 40);
 const footBand = Number(args.footBand || args["foot-band"] || 14);
@@ -82,6 +83,7 @@ const report = {
   output: out ? path.resolve(out) : null,
   rows,
   cols,
+  motion,
   cell: { width: cellW, height: cellH },
   targetAnchor: target,
   thresholds: {
@@ -97,13 +99,14 @@ const report = {
   after,
   contract,
   regenerate,
-  regenerationPrompt: regenerate ? buildRegenerationPrompt(contract.failures) : null,
+  regenerationPrompt: regenerate ? buildRegenerationPrompt(contract.failures, motion) : null,
   pass: after.global.anchorXDrift <= maxAnchorDrift && after.global.anchorYDrift <= maxAnchorDrift && contract.pass,
   frames: beforeFrames.map((frame, index) => ({
     row: frame.row,
     col: frame.col,
     direction: directionName(frame.row),
     body: frame.body,
+    visual: frame.visual,
     anchor: frame.anchor,
     centroid: frame.centroid,
     residuePixels: frame.residuePixels,
@@ -128,7 +131,13 @@ function measureFrames(buffer, imageWidth, cellWidth, cellHeight) {
       const components = findComponents(buffer, imageWidth, cellWidth, cellHeight, row, col)
         .filter((component) => component.count >= minComponentArea)
         .sort((a, b) => b.count - a.count);
-      const body = components[0] || emptyBounds(cellWidth, cellHeight);
+      const visual = components[0] || emptyBounds(cellWidth, cellHeight);
+      const attackBodies = motion === "attack"
+        ? findComponents(buffer, imageWidth, cellWidth, cellHeight, row, col, isAttackBodyPixel)
+          .filter((component) => component.count >= minComponentArea)
+          .sort((a, b) => b.count - a.count)
+        : components;
+      const body = attackBodies[0] || visual;
       const residue = components.slice(1);
       frames.push({
         row,
@@ -136,7 +145,10 @@ function measureFrames(buffer, imageWidth, cellWidth, cellHeight) {
         cellWidth,
         cellHeight,
         body,
-        anchor: findFootAnchor(buffer, imageWidth, cellWidth, cellHeight, row, col, body),
+        visual,
+        anchor: motion === "attack"
+          ? findAttackFootAnchor(buffer, imageWidth, cellWidth, cellHeight, row, col, body)
+          : findFootAnchor(buffer, imageWidth, cellWidth, cellHeight, row, col, body),
         centroid: findCentroid(buffer, imageWidth, cellWidth, cellHeight, row, col, body),
         residuePixels: residue.reduce((sum, item) => sum + item.count, 0)
       });
@@ -145,15 +157,19 @@ function measureFrames(buffer, imageWidth, cellWidth, cellHeight) {
   return frames;
 }
 
-function findComponents(buffer, imageWidth, cellWidth, cellHeight, row, col) {
+function findComponents(buffer, imageWidth, cellWidth, cellHeight, row, col, pixelFilter) {
   const seen = new Uint8Array(cellWidth * cellHeight);
   const components = [];
   const offset = (x, y) => y * cellWidth + x;
-  const alphaAt = (x, y) => buffer[((row * cellHeight + y) * imageWidth + (col * cellWidth + x)) * 4 + 3];
+  const pixelAt = (x, y) => {
+    const index = ((row * cellHeight + y) * imageWidth + (col * cellWidth + x)) * 4;
+    if (buffer[index + 3] < alphaThreshold) return false;
+    return pixelFilter ? pixelFilter(buffer, index) : true;
+  };
   for (let y = 0; y < cellHeight; y += 1) {
     for (let x = 0; x < cellWidth; x += 1) {
       const start = offset(x, y);
-      if (seen[start] || alphaAt(x, y) < alphaThreshold) continue;
+      if (seen[start] || !pixelAt(x, y)) continue;
       const queue = [[x, y]];
       let cursor = 0;
       let left = x;
@@ -178,7 +194,7 @@ function findComponents(buffer, imageWidth, cellWidth, cellHeight, row, col) {
         ]) {
           if (nx < 0 || ny < 0 || nx >= cellWidth || ny >= cellHeight) continue;
           const next = offset(nx, ny);
-          if (seen[next] || alphaAt(nx, ny) < alphaThreshold) continue;
+          if (seen[next] || !pixelAt(nx, ny)) continue;
           seen[next] = 1;
           queue.push([nx, ny]);
         }
@@ -202,6 +218,44 @@ function findFootAnchor(buffer, imageWidth, cellWidth, cellHeight, row, col, bod
   xs.sort((a, b) => a - b);
   const rawX = Math.round(median(xs));
   return { x: rawX, y: body.bottom, rawX };
+}
+
+function findAttackFootAnchor(buffer, imageWidth, cellWidth, cellHeight, row, col, body) {
+  const bodyAt = (x, y) => {
+    const index = ((row * cellHeight + y) * imageWidth + (col * cellWidth + x)) * 4;
+    return buffer[index + 3] >= alphaThreshold && isAttackBodyPixel(buffer, index);
+  };
+  const minRunWidth = Math.max(12, Math.round(cellWidth * 0.04));
+  const minCombinedWidth = Math.max(18, Math.round(cellWidth * 0.06));
+
+  for (let y = body.bottom; y >= body.top; y -= 1) {
+    const runs = [];
+    let start = null;
+    for (let x = body.left; x <= body.right + 1; x += 1) {
+      const opaque = x <= body.right && bodyAt(x, y);
+      if (opaque && start === null) start = x;
+      if (!opaque && start !== null) {
+        const end = x - 1;
+        if (end - start + 1 >= minRunWidth) runs.push({ start, end });
+        start = null;
+      }
+    }
+    const width = runs.reduce((sum, run) => sum + run.end - run.start + 1, 0);
+    if (width < minCombinedWidth) continue;
+    return { x: body.centerX, y, rawX: body.centerX };
+  }
+
+  return { x: body.centerX, y: body.bottom, rawX: body.centerX };
+}
+
+function isAttackBodyPixel(buffer, index) {
+  const r = buffer[index];
+  const g = buffer[index + 1];
+  const b = buffer[index + 2];
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const brightness = (r + g + b) / 3;
+  return !(brightness > 105 && max - min < 42);
 }
 
 function findCentroid(buffer, imageWidth, cellWidth, cellHeight, row, col, body) {
@@ -249,10 +303,10 @@ function summarize(frames) {
 function validateContract(frames) {
   const failures = [];
   const global = summarize(frames).global;
-  const topMargin = Math.min(...frames.map((frame) => frame.body.top));
-  const leftMargin = Math.min(...frames.map((frame) => frame.body.left));
-  const rightMargin = Math.min(...frames.map((frame) => frame.cellWidth - frame.body.right - 1));
-  const verticalGait = ["down", "up"].map((direction) => verticalStride(frames, direction));
+  const topMargin = Math.min(...frames.map((frame) => (frame.visual || frame.body).top));
+  const leftMargin = Math.min(...frames.map((frame) => (frame.visual || frame.body).left));
+  const rightMargin = Math.min(...frames.map((frame) => frame.cellWidth - (frame.visual || frame.body).right - 1));
+  const verticalGait = motion === "walk" ? ["down", "up"].map((direction) => verticalStride(frames, direction)) : [];
 
   if (global.anchorXDrift > maxAnchorDrift || global.anchorYDrift > maxAnchorDrift) {
     failures.push(`global foot anchor drift ${global.anchorXDrift},${global.anchorYDrift}px exceeds ${maxAnchorDrift}px`);
@@ -290,7 +344,19 @@ function verticalStride(frames, direction) {
   };
 }
 
-function buildRegenerationPrompt(failures) {
+function buildRegenerationPrompt(failures, motionType) {
+  if (motionType === "attack") {
+    return [
+      "Regenerate this character as a strict 4x4 top-down pixel-art RPG attack sprite sheet.",
+      "Canvas contract: 4 columns x 4 rows; the final asset must normalize cleanly to 128x128 px per frame.",
+      "Rows: down, left, right, up. Columns: guard, weapon raised, strike impact, recovery.",
+      "Keep the feet planted on the identical bottom-center map anchor while the torso, arms, and weapon animate.",
+      "Keep at least 8 px top padding and 10 px side padding in every frame after normalization; do not crop head, hair, robe, weapon, hands, or feet.",
+      "Every frame uses identical scale and identity. The weapon must remain inside its own cell.",
+      "Perfectly flat #FF00FF chroma-key background; no shadows, text, labels, grid, UI, effects, or watermark.",
+      `Previous QA failures: ${failures.join("; ")}.`
+    ].join("\n");
+  }
   return [
     "Regenerate this character as a strict 4x4 top-down pixel-art RPG walk sprite sheet.",
     "Canvas contract: 4 columns x 4 rows; the final asset must normalize cleanly to 128x128 px per frame.",

@@ -1,0 +1,9 @@
+Use case: identity-preserve
+Asset type: engine-ready 2D pixel-art RPG attack sprite sheet
+Input image: hero-walk-anchored-v4-motionfix.png is the exact character identity, costume, proportions, palette, top-down 3/4 pixel-art rendering, face, black tied hair, navy robe, white sash, and scale reference.
+Primary request: generate one strict 4 columns x 4 rows attack sprite sheet for this exact hero wielding a slim traditional Chinese jian sword.
+Grid contract: row 1 faces down, row 2 faces left, row 3 faces right, row 4 faces up. In every row the four frames are combat-ready stance with sword low, sword raised above or behind the shoulder, decisive downward sword slash at impact, and recovery stance returning toward guard.
+Composition: one character only in every cell, identical scale, same bottom-center foot contact anchor, feet planted while torso and sword animate. Keep the complete weapon inside its cell with generous padding.
+Style: match the reference exactly; compact chibi wuxia pixel sprite with crisp hard pixel clusters.
+Background: perfectly flat solid #FF00FF chroma-key.
+Avoid: text, labels, grid lines, borders, UI, watermark, glow, motion blur, slash effects, blood, extra weapons, extra limbs, duplicate characters, cropped pixels, or magenta on the character.

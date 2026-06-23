@@ -105,6 +105,8 @@ try {
   if (!audit.battle?.moves?.some((event) => event.id === "hero" && event.x === 3 && event.y === 7)) throw new Error("Missing audited hero move.");
   if (audit.moveLock.hero.x !== 3 || audit.moveLock.hero.y !== 7 || audit.moveLock.moves !== 1) throw new Error("Hero moved more than once in one turn.");
   if (!audit.battle?.attacks?.some((event) => event.attackerId === "hero" && event.targetId === "scoutA" && event.skillId === "guiyuan_sword" && event.damage === 38)) throw new Error("Missing audited hero skill attack.");
+  if (!audit.battle?.animations?.some((event) => event.id === "hero" && event.sprite === "heroAttack" && event.frames?.join(",") === "0,1,2,3")) throw new Error("Hero attack did not use the generated four-frame attack sheet.");
+  if (audit.battle?.renderedAttackFrames?.filter((event) => event.id === "hero").map((event) => event.frame).sort().join(",") !== "0,1,2,3") throw new Error("Hero attack did not render all four generated frames.");
   if (!audit.battle?.rewards?.money || audit.money <= 120) throw new Error("Battle rewards did not add money.");
   if (!audit.items.hemostatic_powder) throw new Error("Guaranteed reward item was not added.");
   if (audit.audio.battle.playCount < 1 || audit.audio.world.pauseCount < 1) throw new Error("Battle music did not switch on battle start.");

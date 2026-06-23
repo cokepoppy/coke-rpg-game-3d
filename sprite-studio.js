@@ -5,6 +5,7 @@ const DIRECTIONS = ["down", "left", "right", "up"];
 const state = {
   image: null,
   sourceName: "",
+  motion: "walk",
   frames: [],
   direction: "down",
   frame: 0,
@@ -62,20 +63,26 @@ document.querySelectorAll("[data-dir]").forEach((button) => {
 document.querySelectorAll("[data-src]").forEach((button) => {
   button.addEventListener("click", () => {
     document.querySelectorAll("[data-src]").forEach((item) => item.classList.toggle("active", item === button));
-    loadImage(button.dataset.src, button.dataset.name);
+    loadImage(button.dataset.src, button.dataset.name, button.dataset.motion || "walk", button.dataset.report || null);
   });
 });
 
-function loadImage(src, name) {
+function loadImage(src, name, motion = "walk", reportSrc = null) {
   const image = new Image();
-  image.onload = () => {
+  image.onload = async () => {
     state.image = image;
     state.sourceName = name;
+    state.motion = motion;
     state.frames = extractFrameMeta(image);
-    state.anchor = measureAnchor(state.frames);
+    state.anchor = reportSrc ? await loadAcceptedAnchorReport(reportSrc, state.frames) : measureAnchor(state.frames);
     updateMetrics(image);
     renderAll();
-    log([
+    log(state.motion === "attack" ? [
+      `载入 ${name}。`,
+      "按 4x4 攻击帧网格切分：预备、举剑、下劈、收势。",
+      "切换四个方向并检查剑尖裁切、人物中心和脚底锚点。",
+      "正式锚点门禁以 hero-attack-anchored-pass2-v1.json 为准。"
+    ] : [
       `载入 ${name}。`,
       "按 4x4 行走帧网格切分。",
       "用 alpha 连通域区分人物主体和残留像素。",
@@ -83,6 +90,31 @@ function loadImage(src, name) {
     ]);
   };
   image.src = src;
+}
+
+async function loadAcceptedAnchorReport(src, frames) {
+  const report = await fetch(src).then((response) => {
+    if (!response.ok) throw new Error(`Anchor report ${response.status}`);
+    return response.json();
+  });
+  const scaleX = frames[0].cellW / report.cell.width;
+  const scaleY = frames[0].cellH / report.cell.height;
+  frames.forEach((frame, index) => {
+    const accepted = report.frames[index]?.afterAnchor;
+    if (accepted) frame.anchor = { x: Math.round(accepted.x * scaleX), y: Math.round(accepted.y * scaleY) };
+  });
+  return {
+    target: {
+      x: Math.round(report.targetAnchor.x * scaleX),
+      y: Math.round(report.targetAnchor.y * scaleY)
+    },
+    global: {
+      anchorXDrift: report.after.global.anchorXDrift,
+      anchorYDrift: report.after.global.anchorYDrift,
+      centroidXDrift: report.after.global.centroidXDrift
+    },
+    pass: report.pass
+  };
 }
 
 function extractFrameMeta(image) {

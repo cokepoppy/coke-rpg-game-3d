@@ -103,6 +103,8 @@ try {
       waits: battle.audit.moves.filter((event) => event.wait),
       undoMoves: battle.audit.moves.filter((event) => event.undo),
       enemyActions: battle.audit.enemyActions,
+      animations: battle.audit.animations,
+      renderedAttackFrames: battle.audit.renderedAttackFrames,
       hitSfx: game.hitSfx.audit,
       waitSfx: game.skillSfx.wait.audit,
       postEnemy: {
@@ -119,6 +121,8 @@ try {
   if (audit.undo.afterUndo.x !== audit.undo.start.x || audit.undo.afterUndo.y !== audit.undo.start.y || audit.undo.afterUndo.moved) throw new Error("Undo move did not restore the selected unit.");
   if (audit.hero.qi !== 0) throw new Error(`Basic attack should not consume qi, received ${audit.hero.qi}`);
   if (!audit.attacks.some((event) => event.skillId === "basic_attack" && event.damage > 0)) throw new Error("Basic attack did not damage an adjacent enemy.");
+  if (!audit.animations.some((event) => event.id === "hero" && event.sprite === "heroAttack" && event.frames?.length === 4)) throw new Error("Basic attack did not use the generated hero attack animation.");
+  if (audit.renderedAttackFrames.filter((event) => event.id === "hero").map((event) => event.frame).sort().join(",") !== "0,1,2,3") throw new Error("Basic attack did not visibly render all four hero attack frames.");
   if (audit.hitSfx.playCount < 1) throw new Error("Basic attack did not trigger hit SFX.");
   if (!audit.waits.some((event) => event.id === "companion")) throw new Error("Wait action was not recorded.");
   if (audit.waitSfx.playCount < 1) throw new Error("Wait action did not trigger wait SFX.");

@@ -6,6 +6,7 @@ const root = process.cwd();
 const files = [
   ["maps/dali-inn-room/dali-inn-room-rendered.png", "wechat-minigame/room-pack/inn-room.png"],
   ["assets/characters/hero/hero-walk-anchored-v4-motionfix.png", "wechat-minigame/character-pack/hero.png"],
+  ["assets/characters/hero/hero-attack-runtime-v1.png", "wechat-minigame/character-pack/hero-attack.png"],
   ["assets/characters/a_luo/a_luo-walk-anchored.png", "wechat-minigame/character-pack/companion.png"],
   ["assets/characters/masked_scout/masked_scout-walk-anchored.png", "wechat-minigame/character-pack/scout.png"],
   ["assets/characters/scout_archer/scout_archer-walk-anchored.png", "wechat-minigame/character-pack/scout-archer.png"],

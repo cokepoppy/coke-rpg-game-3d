@@ -27,6 +27,7 @@ if (!input || !out) {
 
 const rows = Number(args.rows || 4);
 const cols = Number(args.cols || 4);
+const motion = args.motion || "walk";
 const alphaThreshold = Number(args.alphaThreshold || 24);
 const transparentThreshold = Number(args.transparentThreshold || 46);
 const opaqueThreshold = Number(args.opaqueThreshold || 135);
@@ -51,8 +52,8 @@ for (const frame of beforeFrames) {
   const rowFrames = beforeFrames.filter((item) => item.row === frame.row);
   const targetCenter = Math.round(cellW / 2);
   const targetFoot = Math.max(...rowFrames.map((item) => item.bounds.bottom));
-  const dx = Math.round(targetCenter - frame.bounds.centerX);
-  const dy = Math.round(targetFoot - frame.bounds.bottom);
+  const dx = motion === "attack" ? 0 : Math.round(targetCenter - frame.bounds.centerX);
+  const dy = motion === "attack" ? 0 : Math.round(targetFoot - frame.bounds.bottom);
   const frameBuffer = await sharp(keyedPng)
     .extract({ left: frame.col * cellW, top: frame.row * cellH, width: cellW, height: cellH })
     .png()
@@ -91,6 +92,7 @@ const meta = {
   output: path.resolve(out),
   rows,
   cols,
+  motion,
   width: canvasW,
   height: canvasH,
   cell: { width: cellW, height: cellH },

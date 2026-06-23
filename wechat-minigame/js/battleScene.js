@@ -13,7 +13,7 @@ class BattleScene {
     this.playerModifiers = playerModifiers;
     this.unlockedSkillIds = unlockedSkillIds;
     this.active = false;
-    this.audit = { attacks: [], moves: [], enemyActions: [], result: null };
+    this.audit = { attacks: [], moves: [], enemyActions: [], animations: [], renderedAttackFrames: [], result: null };
   }
 
   start() {
@@ -202,7 +202,8 @@ class BattleScene {
     for (const item of targets) this.applyDamage(attacker, item, skill);
     attacker.moved = true;
     attacker.acted = true;
-    attacker.animation = { type: "attack", targetX: target.x, targetY: target.y, time: 0.26, duration: 0.26, skill };
+    attacker.animation = { type: "attack", targetX: target.x, targetY: target.y, time: 0.36, duration: 0.36, skill };
+    this.audit.animations.push({ id: attacker.id, type: "attack", sprite: attacker.attackSprite || attacker.sprite, direction: attacker.direction, frames: [0, 1, 2, 3], duration: 0.36 });
     this.playSkillSfx(skill);
     this.message = `${attacker.name} 使用${skill.name}，命中 ${targets.length} 个目标`;
     this.phase = "select";
@@ -331,7 +332,8 @@ class BattleScene {
     this.applyDamage(enemy, target, skill);
     enemy.moved = true;
     enemy.acted = true;
-    enemy.animation = { type: "attack", targetX: target.x, targetY: target.y, time: 0.26, duration: 0.26, skill };
+    enemy.animation = { type: "attack", targetX: target.x, targetY: target.y, time: 0.36, duration: 0.36, skill };
+    this.audit.animations.push({ id: enemy.id, type: "attack", sprite: enemy.attackSprite || enemy.sprite, direction: enemy.direction, frames: [0, 1, 2, 3], duration: 0.36 });
     this.playSkillSfx(skill);
     this.message = `${enemy.name} 攻击 ${target.name}`;
     this.audit.enemyActions.push({ id: enemy.id, action: "attack", targetId: target.id, skillId: skill.id });
@@ -506,10 +508,16 @@ class BattleScene {
     for (const unit of units) {
       const center = this.cellCenter(unit);
       const hit = unit.animation?.type === "hit" ? Math.sin(unit.animation.time * 92) * 7 : 0;
-      const lunge = unit.animation?.type === "attack" ? attackLunge(unit) : { x: 0, y: 0 };
+      const attacking = unit.animation?.type === "attack";
+      const lunge = attacking ? attackLunge(unit) : { x: 0, y: 0 };
       const alpha = unit.animation?.type === "hit" && Math.floor(unit.animation.time * 34) % 2 === 0 ? 0.32 : 1;
+      const spriteKey = attacking && unit.attackSprite && this.images[unit.attackSprite] ? unit.attackSprite : unit.sprite;
+      const frame = attacking ? attackAnimationFrame(unit.animation) : unit.frame;
+      if (attacking && !this.audit.renderedAttackFrames.some((event) => event.id === unit.id && event.frame === frame)) {
+        this.audit.renderedAttackFrames.push({ id: unit.id, sprite: spriteKey, direction: unit.direction, frame });
+      }
       context.globalAlpha = alpha;
-      drawSprite(context, this.images[unit.sprite], center.x + hit + lunge.x, center.y + 22 + lunge.y, unit.direction, unit.animation?.type === "attack" ? 2 : unit.frame, 70, 70);
+      drawSprite(context, this.images[spriteKey], center.x + hit + lunge.x, center.y + 22 + lunge.y, unit.direction, frame, 70, 70);
       context.globalAlpha = 1;
       if (unit.animation?.type === "hit") {
         context.fillStyle = "rgba(255, 246, 210, 0.35)";
@@ -549,7 +557,7 @@ class BattleScene {
         context.font = "700 16px sans-serif";
         context.fillText(`+${unit.animation.amount}`, center.x, center.y - 48);
       }
-      if (unit.animation?.type === "attack") this.drawAttackLine(context, unit);
+      if (attacking && (unit.animation.skill?.kind !== "basic" || !unit.attackSprite)) this.drawAttackLine(context, unit);
     }
   }
 
@@ -662,6 +670,12 @@ function attackLunge(unit) {
   if (unit.direction === "right") return { x: distance, y: 0 };
   if (unit.direction === "up") return { x: 0, y: -distance };
   return { x: 0, y: distance };
+}
+
+function attackAnimationFrame(animation) {
+  const duration = animation.duration || 0.36;
+  const progress = 1 - Math.max(0, animation.time) / duration;
+  return Math.min(3, Math.floor(Math.max(0, progress) * 4));
 }
 
 function drawImageCover(context, image, x, y, width, height) {

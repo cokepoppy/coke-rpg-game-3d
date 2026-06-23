@@ -26,6 +26,23 @@ This file records pitfalls already found in this RPG prototype. Read it before c
 - A sprite can pass foot-anchor checks and still look jittery if body center drift is high between frames. Run `codex-plugins/auto-sprite-studio/scripts/sprite_animation_audit.mjs` when left/right walking looks like it is stuttering.
 - Do not treat `sprite_anchor_audit` and `sprite_animation_audit` as the same acceptance gate. The anchor audit infers foot-contact center and may flag intentional step-foot changes after body-center stabilization. For perceived walk jitter, inspect the animation audit `xDrift` and the sprite player/contact sheet.
 - If image generation produces good identity/art but up/down step frames fail gait sign checks, a controlled post-process can mirror only the fourth frame of the down/up rows from the second frame, then rerun `sprite_anchor_audit`. Do this only after visual inspection confirms identity and framing are otherwise good.
+- Character attack sheets use the same 4x4 direction order but a different
+  motion contract: guard, weapon raised, strike impact, recovery. Pass
+  `--motion attack` through normalization, animation cleanup, and anchor audit
+  so walk-only opposite-foot checks do not reject valid combat poses.
+- A connected sword or spear can dominate the largest alpha component and make
+  generic centering align the actor to the weapon tip. Attack processing must
+  preserve the raw pose through chroma/residue cleanup, separate the low-
+  saturation bright blade from the actor body for anchor detection, and still
+  use the complete visual bounds for crop/margin validation.
+- Long-weapon attack anchors may need a second deterministic anchor pass to
+  converge after body segmentation changes. Do not relax the 2 px global
+  anchor limit; rerun the same correction and accept only the final passing
+  report.
+- The accepted protagonist attack runtime is
+  `assets/characters/hero/hero-attack-runtime-v1.png` (`512x512`, `128x128` per
+  frame). Its source, cleanup reports, contacts, and accepted pass-2 anchor
+  report remain beside it for regeneration and QA.
 
 Useful checks:
 
@@ -116,6 +133,13 @@ screenshots/room-tour/room-tour-contact.png
 - Victory must show a result dialog, apply rewards, then return to the world map. Defeat must show a game-over dialog.
 - Battle QA should force a small deterministic victory case when the goal is to test UI flow, not full combat balance.
 - The battle tour writes both screenshots and `screenshots/battle-tour/battle-audit.json`; treat the audit as the source of truth for direction, damage, SFX events, and result state.
+- Do not display a fixed walk frame as an attack after a character-specific
+  attack sheet exists. Battle units declare `attackSprite`; render frames
+  0-3 from elapsed attack time and return to the walk sheet afterward.
+- Recording an intended frame list is not enough. `BattleScene` must record
+  `renderedAttackFrames`, and E2E must assert that all four attack frames were
+  actually presented. This catches duration/frame-timing bugs that static
+  screenshots can miss.
 
 Useful check:
 

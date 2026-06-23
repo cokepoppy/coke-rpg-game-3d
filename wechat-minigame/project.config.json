@@ -1,5 +1,6 @@
 {
   "appid": "wx91b93b31d0145e09",
+  "libVersion": "3.8.12",
   "compileType": "game",
   "projectname": "cangshan-rpg",
   "description": "Cangshan portrait wuxia RPG WeChat Mini Game port",

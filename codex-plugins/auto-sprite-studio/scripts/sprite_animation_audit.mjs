@@ -14,6 +14,7 @@ const report = args.report || args.meta;
 const contact = args.contact;
 const rows = Number(args.rows || 4);
 const cols = Number(args.cols || 4);
+const motion = args.motion || "walk";
 const alphaThreshold = Number(args.alphaThreshold || args["alpha-threshold"] || 24);
 const minComponentArea = Number(args.minComponentArea || args["min-component-area"] || 40);
 
@@ -48,8 +49,8 @@ for (const frame of frames) {
   const rowFrames = frames.filter((item) => item.row === frame.row);
   const targetCenter = Math.round(cellW / 2);
   const targetFoot = Math.max(...rowFrames.map((item) => item.body.bottom));
-  const dx = targetCenter - frame.body.centerX;
-  const dy = targetFoot - frame.body.bottom;
+  const dx = motion === "attack" ? 0 : targetCenter - frame.body.centerX;
+  const dy = motion === "attack" ? 0 : targetFoot - frame.body.bottom;
   const frameBuffer = await cleanFrameBuffer(sourcePng, frame, cellW, cellH, alphaThreshold);
   composites.push({
     input: frameBuffer,
@@ -88,6 +89,7 @@ const output = {
   output: path.resolve(out),
   rows,
   cols,
+  motion,
   cell: { width: cellW, height: cellH },
   drift: {
     before: drift(frames.map((frame) => ({ row: frame.row, col: frame.col, bounds: frame.body })), rows),

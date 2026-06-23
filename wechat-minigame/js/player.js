@@ -49,7 +49,9 @@ class Player {
 function drawSprite(context, image, x, y, direction = "down", frame = 0, width = 82, height = 82) {
   const sprite = GAME.sprite;
   const row = Math.max(0, sprite.directions.indexOf(direction));
-  context.drawImage(image, frame * sprite.frameWidth, row * sprite.frameHeight, sprite.frameWidth, sprite.frameHeight,
+  const frameWidth = Math.floor((image.width || sprite.frameWidth * sprite.framesPerDirection) / sprite.framesPerDirection);
+  const frameHeight = Math.floor((image.height || sprite.frameHeight * sprite.directions.length) / sprite.directions.length);
+  context.drawImage(image, frame * frameWidth, row * frameHeight, frameWidth, frameHeight,
     Math.round(x - width / 2), Math.round(y - height * 0.86), width, height);
 }
 

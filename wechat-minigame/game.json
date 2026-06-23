@@ -4,35 +4,35 @@
   "subpackages": [
     {
       "name": "worldWestPack",
-      "root": "world-west-pack"
+      "root": "world-west-pack/"
     },
     {
       "name": "worldEastPack",
-      "root": "world-east-pack"
+      "root": "world-east-pack/"
     },
     {
       "name": "worldMapPack",
-      "root": "world-map-pack"
+      "root": "world-map-pack/"
     },
     {
       "name": "roomPack",
-      "root": "room-pack"
+      "root": "room-pack/"
     },
     {
       "name": "characterPack",
-      "root": "character-pack"
+      "root": "character-pack/"
     },
     {
       "name": "audioPack",
-      "root": "audio-pack"
+      "root": "audio-pack/"
     },
     {
       "name": "battlePack",
-      "root": "battle-pack"
+      "root": "battle-pack/"
     },
     {
       "name": "videoPack",
-      "root": "video-pack"
+      "root": "video-pack/"
     }
   ],
   "networkTimeout": {

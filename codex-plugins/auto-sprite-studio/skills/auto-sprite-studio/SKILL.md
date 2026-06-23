@@ -216,6 +216,35 @@ This writes cleaned chroma-keyed PNG sheets and updates `src/assets/effectManife
 
 Prefer reusable shared effects over one bespoke attack animation per character in early prototypes. This gives the best production speed while still replacing crude canvas placeholders with real `image_gen` animation art.
 
+## Character Attack Sheet Workflow
+
+Use a separate character attack sheet when body and weapon motion must match a
+specific actor. Keep the same 4x4 direction order as the walk sheet:
+
+- rows: down, left, right, up
+- columns: guard, weapon raised, strike impact, recovery
+- fixed bottom-center foot anchor in every frame
+- final runtime sheet: `512x512`, or `128x128` per frame
+
+Use the actor's accepted walk sheet as the identity/style reference for
+`image_gen`. Pass `--motion attack` through all three processing stages. The
+first two stages remove the chroma key and residue without centering on a long
+weapon bounding box; the anchor stage extracts the actor body separately from
+the blade and performs the actual alignment:
+
+```bash
+node scripts/sprite_anchor_audit.mjs \
+  --motion attack \
+  --input actor-attack-audited.png \
+  --out actor-attack-anchored.png \
+  --report actor-attack-anchored.json \
+  --contact actor-attack-anchor-contact.png
+```
+
+`--motion attack` preserves the shared crop, residue, margin, and anchor gates
+but skips the walk-only opposite-foot gait check. Do not use a walk frame as a
+stand-in after an accepted actor attack sheet exists.
+
 ## Drift Explanation
 
 When an animation appears to wobble or float, measure the alpha body and foot-contact anchor of each frame. AI-generated sheets often keep the character visually consistent but place each direction at a different vertical or horizontal position inside its cell. Runtime code draws fixed cells, so the transparent padding becomes visible motion drift. This plugin fixes that in two passes: first aligning each row, then aligning the global foot-contact anchor across all directions.

@@ -74,6 +74,121 @@
       "skillId": "arrow_shot"
     }
   ],
+  "animations": [
+    {
+      "id": "hero",
+      "type": "attack",
+      "sprite": "heroAttack",
+      "direction": "right",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "duration": 0.36
+    },
+    {
+      "id": "scoutA",
+      "type": "attack",
+      "sprite": "scout",
+      "direction": "left",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "duration": 0.36
+    },
+    {
+      "id": "scoutB",
+      "type": "attack",
+      "sprite": "scoutArcher",
+      "direction": "down",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "duration": 0.36
+    }
+  ],
+  "renderedAttackFrames": [
+    {
+      "id": "hero",
+      "sprite": "heroAttack",
+      "direction": "right",
+      "frame": 0
+    },
+    {
+      "id": "hero",
+      "sprite": "heroAttack",
+      "direction": "right",
+      "frame": 1
+    },
+    {
+      "id": "hero",
+      "sprite": "heroAttack",
+      "direction": "right",
+      "frame": 2
+    },
+    {
+      "id": "hero",
+      "sprite": "heroAttack",
+      "direction": "right",
+      "frame": 3
+    },
+    {
+      "id": "scoutB",
+      "sprite": "scoutArcher",
+      "direction": "down",
+      "frame": 0
+    },
+    {
+      "id": "scoutA",
+      "sprite": "scout",
+      "direction": "left",
+      "frame": 0
+    },
+    {
+      "id": "scoutB",
+      "sprite": "scoutArcher",
+      "direction": "down",
+      "frame": 1
+    },
+    {
+      "id": "scoutA",
+      "sprite": "scout",
+      "direction": "left",
+      "frame": 1
+    },
+    {
+      "id": "scoutB",
+      "sprite": "scoutArcher",
+      "direction": "down",
+      "frame": 2
+    },
+    {
+      "id": "scoutA",
+      "sprite": "scout",
+      "direction": "left",
+      "frame": 2
+    },
+    {
+      "id": "scoutB",
+      "sprite": "scoutArcher",
+      "direction": "down",
+      "frame": 3
+    },
+    {
+      "id": "scoutA",
+      "sprite": "scout",
+      "direction": "left",
+      "frame": 3
+    }
+  ],
   "hitSfx": {
     "source": "audio-pack/hit.wav",
     "playCount": 3,

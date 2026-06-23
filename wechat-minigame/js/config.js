@@ -26,6 +26,7 @@ const ASSETS = {
   teahouseRoom: "room-pack/teahouse-room.png",
   worldMap: "world-map-pack/world-map.png",
   hero: "character-pack/hero.png",
+  heroAttack: "character-pack/hero-attack.png",
   companion: "character-pack/companion.png",
   scout: "character-pack/scout.png",
   scoutArcher: "character-pack/scout-archer.png",
@@ -56,7 +57,7 @@ const BATTLE = {
   rows: 9,
   objective: "击退伏兵",
   players: [
-    { id: "hero", name: GAME.heroName, sprite: "hero", side: "player", x: 2, y: 7, hp: 88, qi: 110, move: 3, range: 2, damage: 32, skillIds: ["guiyuan_sword", "daze", "whirlwind"] },
+    { id: "hero", name: GAME.heroName, sprite: "hero", attackSprite: "heroAttack", side: "player", x: 2, y: 7, hp: 88, qi: 110, move: 3, range: 2, damage: 32, skillIds: ["guiyuan_sword", "daze", "whirlwind"] },
     { id: "companion", name: GAME.companionName, sprite: "companion", side: "player", x: 1, y: 7, hp: 72, qi: 90, move: 3, range: 1, damage: 24, skillIds: ["quick_slash", "heal", "guard_break"] }
   ],
   enemies: [

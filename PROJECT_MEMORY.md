@@ -88,6 +88,14 @@ This verifies:
 - Save/load should serialize game state through `GameState.snapshot()` and `GameState.restore()` rather than reading story flags, money, or inventory directly from UI code.
 - Menu QA should capture the title menu, settings panel, pause menu, save feedback, load-enabled state, and loaded world state.
 
+## Story System Pitfalls
+
+- Long-form wuxia剧情应先沉淀到 `src/story/wuxiaStoryBible.js`，再拆到地图触发器、战斗配置和具体脚本。不要在场景代码里临时发明核心人物、门派、武功或主线真相。
+- 参考经典武侠时只抽取人物功能、主题结构和戏剧冲突，必须改成原创姓名、势力、武功和事件。不要使用既有小说的专有角色名、门派名、武功名、国家名或标志性桥段。
+- 剧情脚本只发出动作意图，例如 `setFlag`、`addQuest`、`learnSkill`、`enterMap`、`startBattle`、`playCutscene`、`unlockWorldNode`。不要把扣血、Canvas 移动、UI 渲染或商店扣钱写进对话文本或单个大脚本。
+- 浏览器侧剧情规划验收入口是 `story-planner.html`；它读取同一份 Story Bible，能检查人物群像、章节推进、世界地图节点和脚本动作契约是否连贯。
+- 可执行长线剧情脚本放在 `src/story/wuxiaCampaignScripts.js`，再由 `src/story/storyScripts.js` 合并。新增章节脚本时先补 `chapterId`、`mapId`、`start`、`nodes` 和动作列表，再用假 DialogBox 跑 `ScriptRunner` 验证 flags、party、skills、inventory、world node 和 battle/cutscene 请求。
+
 ## Audio Pitfalls
 
 - Browser background music must start from a user gesture. Call `AudioManager.play()` from menu button handlers such as New Game, Continue, or Load, not during app boot.

@@ -29,6 +29,8 @@ class GameApp {
     this.defeatedScouts = new Set();
     this.learnedSkills = new Set();
     this.seenCutscenes = new Set();
+    this.storyFlags = new Set();
+    this.storyLog = [];
     this.cutsceneFallback = null;
     this.cutsceneDebug = null;
     this.currentBattleTriggerId = null;
@@ -218,6 +220,8 @@ class GameApp {
     this.defeatedScouts = new Set();
     this.learnedSkills = new Set();
     this.seenCutscenes = new Set();
+    this.storyFlags = new Set();
+    this.storyLog = [];
     this.currentBattleTriggerId = null;
     this.worldMapUnlocked = false;
     this.activeShopId = null;
@@ -265,6 +269,26 @@ class GameApp {
         { label: "进入茶肆", action: () => this.enterRoom("teahouseRoom") },
         { label: "暂时离开" }
       ] });
+    } else if (trigger.id === "moonValleyGate") {
+      this.dialog.show({ speaker: "月华谷山口", text: "雾气从竹林深处涌出，石阶尽头隐约有灯火。", choices: [
+        { label: "进入月华谷", action: () => this.enterMap("moonValley") },
+        { label: "暂时离开" }
+      ] });
+    } else if (trigger.id === "moonValleyExit") {
+      this.dialog.show({ speaker: "月华谷山门", text: "山风从谷口吹回旧道。要离开月华谷吗？", choices: [
+        { label: "返回苍山旧道", action: () => this.enterMap("world", this.mapManager.map.exitTo?.spawn) },
+        { label: "继续探索" }
+      ] });
+    } else if (trigger.id === "moonMedicineDoor") {
+      this.dialog.show({ speaker: "月华药庐", text: "药香透过门缝散出，里面有人正在研磨草药。", choices: [
+        { label: "进入药庐", action: () => this.enterRoom("moonMedicineHall") },
+        { label: "暂时离开" }
+      ] });
+    } else if (trigger.id === "moonStudyDoor") {
+      this.dialog.show({ speaker: "月华书房", text: "窗内灯影未灭，案上似乎摊着一卷残图。", choices: [
+        { label: "进入书房", action: () => this.enterRoom("moonStudy") },
+        { label: "暂时离开" }
+      ] });
     } else if (trigger.id === "roomExit") {
       const exit = this.mapManager.map.exitTo || { mapId: "world", spawn: { x: 2700, y: 2520 }, label: "离开房间" };
       this.dialog.show({ speaker: "门口", text: "要回到苍山旧道吗？", choices: [
@@ -289,8 +313,40 @@ class GameApp {
         learned: this.learnedSkills.has("fuyou_step"),
         onTeach: () => this.playCutscene("daoistTeaching")
       }));
+    } else if (trigger.id === "qin_wanyao") {
+      const invited = this.items.palace_invitation > 0;
+      this.dialog.show({ speaker: "秦晚瑶", text: invited
+        ? "请帖已经交给你。进王府以后，听到什么都不要立刻相信，尤其是关于上一代人的清白。"
+        : "谷中药账被人改过，少侠若要追查旧案，先从书房残图看起。这封王府请帖，也许能让你问到更深的真相。",
+      choices: invited ? [
+        { label: "记下提醒" },
+        { label: "请她配些伤药", action: () => this.openShop("apothecary") }
+      ] : [
+        { label: "收下王府请帖", action: () => this.acceptPalaceInvitation() },
+        { label: "请她配些伤药", action: () => this.openShop("apothecary") }
+      ] });
+    } else if (trigger.id === "mu_zhiyan") {
+      const heard = this.storyFlags.has("heard_swapped_children_clue");
+      this.dialog.show({ speaker: "穆芷烟", text: heard
+        ? "我说过了，被调包的孩子不止一个。你若只盯着自己的身世，就会漏掉真正下棋的人。"
+        : "昨夜有人从桥后翻入药圃，只留下半枚青铜扣。那人应还藏在谷中。被调包的孩子，也许不止你以为的那一个。",
+      choices: [
+        { label: "记下调包线索", action: () => this.rememberMoonClue() },
+        { label: "暂时离开" }
+      ] });
+    } else if (trigger.id === "moon_disciple") {
+      if (!this.storyFlags.has("moon_disciple_gift_taken")) {
+        this.storyFlags.add("moon_disciple_gift_taken");
+        this.addItem("qingxin_pill", 1);
+        this.rememberStory("月华弟子赠予清心丸，并提醒谷中叛徒藏在桥后。");
+        this.dialog.show({ speaker: "月华弟子", text: "师姐吩咐我在此等你。这枚清心丸可稳住真气，桥后的叛徒也许正等着你。", choices: [{ label: "收下" }] });
+      } else {
+        this.dialog.show({ speaker: "月华弟子", text: "桥后那人不是谷里弟子。他来得很急，像是怕你找到书房里的残图。", choices: [{ label: "记下" }] });
+      }
     } else if (trigger.id.startsWith("scout")) {
-      this.dialog.show({ speaker: "西岭密探", text: "前路封了。若再向前一步，刀剑无眼。", choices: [
+      const speaker = trigger.id === "scout_moon" ? "谷中叛徒" : "西岭密探";
+      const text = trigger.id === "scout_moon" ? "你不该来月华谷。残图和药账，都得留在这里。" : "前路封了。若再向前一步，刀剑无眼。";
+      this.dialog.show({ speaker, text, choices: [
         { label: "拔剑迎战", action: () => this.startBattle(trigger.id) },
         { label: "暂避锋芒" }
       ] });
@@ -312,12 +368,13 @@ class GameApp {
       onFinish: (result, audit) => {
         const rewards = result === "victory" ? this.grantBattleRewards() : { money: 0, items: [] };
         if (result === "victory" && this.currentBattleTriggerId) this.defeatedScouts.add(this.currentBattleTriggerId);
-        this.worldMapUnlocked = this.defeatedScouts.size >= SCOUT_IDS.length;
+        this.worldMapUnlocked = this.requiredScoutDefeatCount() >= SCOUT_IDS.length;
         this.lastBattleAudit = { ...audit, rewards };
         this.mode = "game";
         this.playMusic();
         this.activeTrigger = this.resolveActiveTrigger();
-        const clearText = this.worldMapUnlocked ? "沿路密探已清剿，舆图上出现了新的路线。" : `还剩 ${SCOUT_IDS.length - this.defeatedScouts.size} 处密探据点。`;
+        const remaining = Math.max(0, SCOUT_IDS.length - this.requiredScoutDefeatCount());
+        const clearText = this.worldMapUnlocked ? "沿路密探已清剿，舆图上出现了新的路线。" : `还剩 ${remaining} 处密探据点。`;
         this.dialog.show({
           speaker: "战斗",
           text: result === "victory" ? `伏兵败退。你获得 ${rewards.money} 两银子${rewards.items.length ? `，${rewards.items.map((item) => `${item.name}×${item.amount}`).join("、")}` : ""}。${clearText}` : "我方败退，江湖路止于此处。",
@@ -422,6 +479,35 @@ class GameApp {
     this.player.direction = "down";
     this.activeTrigger = null;
     this.lastPromptTriggerId = null;
+    this.runMapEntryStory(id);
+  }
+
+  runMapEntryStory(id) {
+    if (id !== "moonValley" || this.storyFlags.has("moon_valley_reached")) return;
+    this.storyFlags.add("moon_valley_reached");
+    this.rememberStory("苏萝带沈临川进入月华谷，月华弟子要求先查清王府玉佩来历。");
+    this.dialog.show([
+      { speaker: GAME.companionName, text: "前面就是月华谷。这里的人不爱见外客，尤其不爱见带着王府玉佩的人。" },
+      { speaker: "月华谷弟子", text: "谷主失踪后，外人不得入药庐。你们若要查旧信，先证明不是南岭王府派来的。" }
+    ]);
+  }
+
+  acceptPalaceInvitation() {
+    this.addItem("palace_invitation", 1);
+    this.storyFlags.add("palace_invitation_received");
+    this.rememberStory("秦晚瑶交出南岭王府请帖，并警告沈临川不要轻信王府密卷。");
+    this.dialog.show({ speaker: "秦晚瑶", text: "上一代人的错，不该一直压在你们身上。请帖给你，至于我的心意，等你活着回来再问。", choices: [{ label: "收好请帖" }] });
+  }
+
+  rememberMoonClue() {
+    this.storyFlags.add("heard_swapped_children_clue");
+    this.rememberStory("穆芷烟透露旧案中存在多个被调包的孩子。");
+    this.dialog.show({ speaker: "穆芷烟", text: "被调包的孩子不止一个。你以为自己是谁，王府也未必知道。", choices: [{ label: "记下线索" }] });
+  }
+
+  rememberStory(text) {
+    this.storyLog.unshift({ text, at: Date.now() });
+    this.storyLog = this.storyLog.slice(0, 20);
   }
 
   saveGame() {
@@ -440,7 +526,9 @@ class GameApp {
       defeatedScouts: [...this.defeatedScouts],
       worldMapUnlocked: this.worldMapUnlocked,
       learnedSkills: [...this.learnedSkills],
-      seenCutscenes: [...this.seenCutscenes]
+      seenCutscenes: [...this.seenCutscenes],
+      storyFlags: [...this.storyFlags],
+      storyLog: this.storyLog
     });
     this.menuNotice = "存档成功";
     this.buySfx?.play();
@@ -460,6 +548,8 @@ class GameApp {
     this.worldMapUnlocked = Boolean(save.worldMapUnlocked) || this.defeatedScouts.size >= SCOUT_IDS.length;
     this.learnedSkills = new Set(save.learnedSkills || []);
     this.seenCutscenes = new Set(save.seenCutscenes || []);
+    this.storyFlags = new Set(save.storyFlags || []);
+    this.storyLog = Array.isArray(save.storyLog) ? save.storyLog.slice(0, 20) : [];
     this.enterMap(save.mapId || "world", { x: save.x, y: save.y });
     this.menuCanResume = true;
     this.menuNotice = "";
@@ -551,6 +641,7 @@ class GameApp {
   }
 
   battleMapFor(triggerId) {
+    if (triggerId === "scout_moon") return "battleBamboo";
     if (triggerId === "scout_archer" || triggerId === "scout_bridge") return "battleBamboo";
     if (triggerId === "scout_gate") return "battleFerry";
     return "battleTemple";
@@ -582,9 +673,14 @@ class GameApp {
   worldNodes() {
     return WORLD_NODES.map((node) => {
       if (node.id === "cangshan") return { ...node, status: this.worldMapUnlocked ? "cleared" : "current" };
+      if (node.id === "yuehua") return { ...node, status: this.worldMapUnlocked ? "current" : "unlocked" };
       if (this.worldMapUnlocked && node.id === "erhai") return { ...node, status: "unlocked" };
       return node;
     });
+  }
+
+  requiredScoutDefeatCount() {
+    return SCOUT_IDS.filter((id) => this.defeatedScouts.has(id)).length;
   }
 }
 

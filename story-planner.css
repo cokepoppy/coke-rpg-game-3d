@@ -1,0 +1,285 @@
+:root {
+  color-scheme: dark;
+  --bg: #11130f;
+  --panel: rgba(26, 23, 18, 0.88);
+  --panel-2: rgba(43, 35, 25, 0.84);
+  --line: rgba(232, 208, 151, 0.24);
+  --line-strong: rgba(232, 208, 151, 0.46);
+  --text: #f5ead0;
+  --muted: rgba(245, 234, 208, 0.7);
+  --gold: #e2b55d;
+  --green: #72b68e;
+  --red: #b85d4e;
+  font-family: ui-serif, "Songti SC", "Noto Serif CJK SC", "STSong", serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    radial-gradient(circle at 18% 12%, rgba(226, 181, 93, 0.18), transparent 30rem),
+    radial-gradient(circle at 82% 10%, rgba(114, 182, 142, 0.15), transparent 26rem),
+    #11130f;
+  background-size: 32px 32px, 32px 32px, auto, auto, auto;
+  color: var(--text);
+}
+
+button {
+  font: inherit;
+}
+
+.story-planner {
+  width: min(1440px, 100%);
+  margin: 0 auto;
+  padding: 22px;
+}
+
+.planner-hero {
+  min-height: 210px;
+  display: grid;
+  align-content: end;
+  gap: 12px;
+  padding: 28px;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(90deg, rgba(17, 19, 15, 0.72), rgba(17, 19, 15, 0.18)),
+    url("./assets/generated/wechat-world-map/wuxia-world-map-portrait-imagegen.png") center 42% / cover;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+}
+
+.planner-hero h1 {
+  margin: 0;
+  font-size: clamp(32px, 5vw, 58px);
+  line-height: 1;
+}
+
+.planner-hero p {
+  max-width: 860px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.tabs {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+  padding: 14px 0;
+  overflow-x: auto;
+  background: linear-gradient(180deg, #11130f 72%, rgba(17, 19, 15, 0));
+}
+
+.tabs button {
+  min-height: 38px;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(36, 31, 24, 0.88);
+  color: var(--text);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tabs button[aria-selected="true"] {
+  border-color: var(--gold);
+  background: rgba(107, 75, 36, 0.92);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 14px;
+}
+
+.panel {
+  grid-column: span 12;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  box-shadow: 0 18px 54px rgba(0, 0, 0, 0.24);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(55, 43, 28, 0.62);
+}
+
+.panel-header h2,
+.panel-header h3 {
+  margin: 0;
+  color: var(--gold);
+  font-size: 20px;
+}
+
+.panel-body {
+  padding: 18px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.card {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid rgba(232, 208, 151, 0.18);
+  border-radius: 6px;
+  background: var(--panel-2);
+}
+
+.card h3,
+.card h4 {
+  margin: 0 0 8px;
+  color: #ffe4a4;
+  font-size: 17px;
+}
+
+.card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 0;
+}
+
+.tag {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  padding: 3px 8px;
+  border: 1px solid rgba(232, 208, 151, 0.2);
+  border-radius: 999px;
+  color: rgba(245, 234, 208, 0.82);
+  background: rgba(0, 0, 0, 0.18);
+  font-size: 12px;
+}
+
+.timeline {
+  display: grid;
+  gap: 12px;
+}
+
+.chapter {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid rgba(232, 208, 151, 0.18);
+  border-radius: 6px;
+  background: rgba(30, 26, 20, 0.82);
+}
+
+.chapter-index {
+  display: grid;
+  place-items: center;
+  min-height: 96px;
+  border: 1px solid rgba(232, 208, 151, 0.18);
+  border-radius: 6px;
+  color: var(--gold);
+  background: rgba(0, 0, 0, 0.2);
+  font-size: 34px;
+  font-weight: 700;
+}
+
+.chapter h3 {
+  margin: 0 0 8px;
+  color: #ffe4a4;
+  font-size: 20px;
+}
+
+.chapter p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.list {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--text);
+  line-height: 1.7;
+}
+
+.matrix {
+  display: grid;
+  gap: 10px;
+}
+
+.matrix-row {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr) 160px;
+  gap: 10px;
+  align-items: start;
+  padding: 12px;
+  border: 1px solid rgba(232, 208, 151, 0.16);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.16);
+}
+
+.matrix-row strong {
+  color: #ffe4a4;
+}
+
+.matrix-row span {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.contract {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.contract-item {
+  padding: 12px;
+  border: 1px solid rgba(114, 182, 142, 0.24);
+  border-radius: 6px;
+  background: rgba(24, 54, 38, 0.34);
+}
+
+.contract-item strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #aee0bd;
+}
+
+.contract-item code {
+  color: #f7d68c;
+  white-space: normal;
+}
+
+@media (max-width: 720px) {
+  .story-planner {
+    padding: 12px;
+  }
+
+  .planner-hero {
+    padding: 20px;
+  }
+
+  .chapter,
+  .matrix-row {
+    grid-template-columns: 1fr;
+  }
+}

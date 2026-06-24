@@ -43,9 +43,14 @@ export class ScriptRunner {
       if (action.type === "addQuest") this.gameState.addQuest(action.quest);
       if (action.type === "completeQuest") this.gameState.completeQuest(action.questId);
       if (action.type === "remember") this.gameState.remember(action.text);
+      if (action.type === "learnSkill") this.gameState.learnSkill(action.characterId, action.skillId);
+      if (action.type === "joinParty") this.gameState.joinParty(action.characterId);
+      if (action.type === "leaveParty") this.gameState.leaveParty(action.characterId);
+      if (action.type === "unlockWorldNode") this.gameState.unlockWorldNode(action.nodeId);
       if (action.type === "startBattle") result = this.battleManager.requestBattle(action);
       if (action.type === "enterMap") result = { kind: "map-transition", mapId: action.mapId, spawn: action.spawn };
       if (action.type === "openShop") result = { kind: "shop-requested", shopId: action.shopId };
+      if (action.type === "playCutscene") result = { kind: "cutscene-requested", cutsceneId: action.cutsceneId };
     }
     return result;
   }

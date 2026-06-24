@@ -1,4 +1,5 @@
 import { shopScripts } from "./scripts/shopScripts.js";
+import { wuxiaCampaignScripts } from "./wuxiaCampaignScripts.js";
 
 export const storyScripts = {
   opening: {
@@ -368,5 +369,6 @@ export const storyScripts = {
       }
     }
   },
+  ...wuxiaCampaignScripts,
   ...shopScripts
 };

@@ -3,7 +3,8 @@ name: Deploy GitHub Pages
 on:
   push:
     branches:
-      - codex/map-menu-sprite-polish
+      - main
+      - codex/browser-runtime
   workflow_dispatch:
 
 permissions:
@@ -25,12 +26,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Build static artifact
         run: |
-          mkdir -p dist
-          cp index.html index.modular.html styles.modular.css dist/
-          cp sprite-studio.html sprite-studio.css sprite-studio.js dist/
-          cp -R src assets maps dist/
+          npm run pages:build
           find dist -name ".DS_Store" -delete
 
       - name: Setup Pages

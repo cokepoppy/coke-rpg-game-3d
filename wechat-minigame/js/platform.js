@@ -80,7 +80,7 @@ function createSfx(source) {
 function loadAssetPacks() {
   if (!wx.loadSubpackage) return Promise.resolve();
   const load = (name) => new Promise((resolve, reject) => wx.loadSubpackage({ name, success: resolve, fail: reject }));
-  return Promise.all([load("worldWestPack"), load("worldEastPack"), load("worldMapPack"), load("roomPack"), load("characterPack"), load("audioPack"), load("battlePack"), load("videoPack")]);
+  return Promise.all([load("worldWestPack"), load("worldEastPack"), load("worldMapPack"), load("moonValleyPack"), load("roomPack"), load("characterPack"), load("audioPack"), load("battlePack"), load("videoPack")]);
 }
 
 function readSave(key) {

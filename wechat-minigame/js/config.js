@@ -21,9 +21,12 @@ const GAME = {
 const ASSETS = {
   worldWest: "world-west-pack/world-west.png",
   worldEast: "world-east-pack/world-east.png",
+  moonValley: "moon-valley-pack/moon-valley.png",
   room: "room-pack/inn-room.png",
   apothecaryRoom: "room-pack/apothecary-room.png",
   teahouseRoom: "room-pack/teahouse-room.png",
+  moonMedicineHall: "room-pack/moon-valley-medicine-hall.png",
+  moonStudy: "room-pack/moon-valley-study.png",
   worldMap: "world-map-pack/world-map.png",
   hero: "character-pack/hero.png",
   heroAttack: "character-pack/hero-attack.png",
@@ -35,6 +38,18 @@ const ASSETS = {
   vendor: "character-pack/vendor.png",
   keeper: "character-pack/keeper.png",
   daoistMaster: "character-pack/daoist-master.png",
+  qinWanyao: "character-pack/qin-wanyao.png",
+  muZhiyan: "character-pack/mu-zhiyan.png",
+  moonValleyDisciple: "character-pack/moon-valley-disciple.png",
+  moonValleyTraitor: "character-pack/moon-valley-traitor.png",
+  xiaoBeichen: "character-pack/xiao-beichen.png",
+  xuYunsheng: "character-pack/xu-yunsheng.png",
+  lianZhao: "character-pack/lian-zhao.png",
+  rongQingxuan: "character-pack/rong-qingxuan.png",
+  xiaoCangming: "character-pack/xiao-cangming.png",
+  rongJinghuai: "character-pack/rong-jinghuai.png",
+  wuChenseng: "character-pack/wu-chenseng.png",
+  shenYuanhe: "character-pack/shen-yuanhe.png",
   battleTemple: "battle-pack/battle-temple.png",
   battleFerry: "battle-pack/battle-ferry.png",
   battleBamboo: "battle-pack/battle-bamboo.png",
@@ -91,6 +106,7 @@ const SCOUT_IDS = ["scout", "scout_bridge", "scout_archer", "scout_road", "scout
 
 const WORLD_NODES = [
   { id: "cangshan", name: "苍山旧道", x: 168, y: 610, status: "current" },
+  { id: "yuehua", name: "月华谷", x: 242, y: 486, status: "locked" },
   { id: "erhai", name: "洱海渡口", x: 292, y: 430, status: "locked" },
   { id: "jianhu", name: "剑湖宫道", x: 122, y: 176, status: "locked" }
 ];
@@ -155,6 +171,41 @@ const TEAHOUSE_TRIGGERS = [
   { id: "desk", x: 850, y: 100, width: 220, height: 170, label: "查看告示" }
 ];
 
+const MOON_ROOM_COLLISIONS = [
+  { x: 0, y: 0, width: 1280, height: 72 },
+  { x: 0, y: 0, width: 36, height: 768 },
+  { x: 1244, y: 0, width: 36, height: 768 },
+  { x: 0, y: 708, width: 520, height: 60 },
+  { x: 760, y: 708, width: 520, height: 60 }
+];
+
+const MOON_MEDICINE_COLLISIONS = [
+  ...MOON_ROOM_COLLISIONS,
+  { x: 70, y: 84, width: 250, height: 390 },
+  { x: 340, y: 72, width: 570, height: 168 },
+  { x: 948, y: 92, width: 254, height: 262 },
+  { x: 515, y: 360, width: 335, height: 135 },
+  { x: 72, y: 602, width: 218, height: 96 },
+  { x: 930, y: 542, width: 260, height: 125 }
+];
+
+const MOON_STUDY_COLLISIONS = [
+  ...MOON_ROOM_COLLISIONS,
+  { x: 60, y: 60, width: 205, height: 206 },
+  { x: 305, y: 50, width: 360, height: 198 },
+  { x: 705, y: 210, width: 345, height: 118 },
+  { x: 150, y: 448, width: 238, height: 96 },
+  { x: 1015, y: 478, width: 174, height: 120 },
+  { x: 1116, y: 285, width: 118, height: 185 },
+  { x: 235, y: 278, width: 230, height: 142 }
+];
+
+const MOON_ROOM_TRIGGERS = [
+  { id: "roomExit", x: 520, y: 650, width: 240, height: 118, label: "离开月华谷房间" },
+  { id: "wardrobe", x: 940, y: 125, width: 230, height: 220, label: "搜索柜架" },
+  { id: "desk", x: 690, y: 160, width: 330, height: 180, label: "查看案卷" }
+];
+
 const MAPS = {
   world: {
     id: "world",
@@ -178,6 +229,7 @@ const MAPS = {
       { id: "inn", x: 2680, y: 2260, width: 360, height: 260, label: "进入云来客栈" },
       { id: "apothecaryDoor", x: 3290, y: 2320, width: 340, height: 260, label: "进入百草铺" },
       { id: "teahouseDoor", x: 2160, y: 1060, width: 360, height: 260, label: "进入松风茶肆" },
+      { id: "moonValleyGate", x: 3000, y: 1320, width: 360, height: 300, label: "前往月华谷" },
       { id: "vendor", x: 3260, y: 2500, width: 220, height: 220, label: "询问药摊老人" },
       { id: "daoist_master", x: 2580, y: 2740, width: 360, height: 300, label: "拜会逍遥道人" },
       { id: "scout", x: 2520, y: 2500, width: 260, height: 230, label: "挑战西岭密探" },
@@ -198,6 +250,69 @@ const MAPS = {
       { id: "scout_monk", name: "寺前护卫", sprite: "monkGuard", x: 2840, y: 1410, direction: "down" },
       { id: "scout_gate", name: "山门首领", sprite: "yipintangLeader", x: 3240, y: 1730, direction: "down" }
     ]
+  },
+  moonValley: {
+    id: "moonValley",
+    image: "moonValley",
+    width: 780,
+    height: 1688,
+    spawn: { x: 390, y: 1575 },
+    exitTo: { mapId: "world", spawn: { x: 3180, y: 1480 }, label: "返回苍山旧道" },
+    collisions: [
+      { x: 0, y: 0, width: 780, height: 24 },
+      { x: 0, y: 1664, width: 780, height: 24 },
+      { x: 0, y: 0, width: 28, height: 1688 },
+      { x: 752, y: 0, width: 28, height: 1688 },
+      { x: 0, y: 0, width: 145, height: 395 },
+      { x: 600, y: 0, width: 180, height: 500 },
+      { x: 228, y: 36, width: 332, height: 178 },
+      { x: 5, y: 360, width: 230, height: 330 },
+      { x: 470, y: 285, width: 280, height: 345 },
+      { x: 45, y: 760, width: 235, height: 205 },
+      { x: 512, y: 782, width: 232, height: 182 },
+      { x: 560, y: 1040, width: 185, height: 205 },
+      { x: 18, y: 1110, width: 230, height: 270 },
+      { x: 560, y: 1285, width: 185, height: 220 },
+      { x: 0, y: 1450, width: 220, height: 220 },
+      { x: 565, y: 1500, width: 190, height: 180 }
+    ],
+    triggers: [
+      { id: "moonValleyExit", x: 290, y: 1560, width: 200, height: 120, label: "返回苍山旧道" },
+      { id: "moonStudyDoor", x: 320, y: 205, width: 140, height: 120, label: "进入月华书房" },
+      { id: "moonMedicineDoor", x: 570, y: 860, width: 150, height: 135, label: "进入月华药庐" },
+      { id: "qin_wanyao", x: 315, y: 630, width: 160, height: 170, label: "拜会秦晚瑶" },
+      { id: "mu_zhiyan", x: 480, y: 1080, width: 160, height: 170, label: "询问穆芷烟" },
+      { id: "moon_disciple", x: 300, y: 1360, width: 170, height: 180, label: "询问月华弟子" },
+      { id: "scout_moon", x: 340, y: 500, width: 170, height: 170, label: "挑战谷中叛徒" }
+    ],
+    npcs: [
+      { id: "qin_wanyao", name: "秦晚瑶", sprite: "qinWanyao", x: 392, y: 700, direction: "down" },
+      { id: "mu_zhiyan", name: "穆芷烟", sprite: "muZhiyan", x: 555, y: 1160, direction: "left" },
+      { id: "moon_disciple", name: "月华弟子", sprite: "moonValleyDisciple", x: 385, y: 1450, direction: "up" },
+      { id: "scout_moon", name: "谷中叛徒", sprite: "moonValleyTraitor", x: 425, y: 575, direction: "down" }
+    ]
+  },
+  moonMedicineHall: {
+    id: "moonMedicineHall",
+    image: "moonMedicineHall",
+    width: 1280,
+    height: 768,
+    spawn: { x: 610, y: 650 },
+    exitTo: { mapId: "moonValley", spawn: { x: 638, y: 1010 }, label: "离开月华药庐" },
+    collisions: MOON_MEDICINE_COLLISIONS,
+    triggers: MOON_ROOM_TRIGGERS,
+    npcs: [{ id: "qin_wanyao", name: "秦晚瑶", sprite: "qinWanyao", x: 610, y: 305, direction: "down" }]
+  },
+  moonStudy: {
+    id: "moonStudy",
+    image: "moonStudy",
+    width: 1280,
+    height: 768,
+    spawn: { x: 610, y: 650 },
+    exitTo: { mapId: "moonValley", spawn: { x: 390, y: 345 }, label: "离开月华书房" },
+    collisions: MOON_STUDY_COLLISIONS,
+    triggers: MOON_ROOM_TRIGGERS,
+    npcs: [{ id: "mu_zhiyan", name: "穆芷烟", sprite: "muZhiyan", x: 880, y: 385, direction: "left" }]
   },
   room: {
     id: "room",

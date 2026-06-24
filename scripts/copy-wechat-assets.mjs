@@ -5,6 +5,8 @@ import sharp from "sharp";
 const root = process.cwd();
 const files = [
   ["maps/dali-inn-room/dali-inn-room-rendered.png", "wechat-minigame/room-pack/inn-room.png"],
+  ["assets/generated/wechat-moon-valley/moon-valley-medicine-hall-runtime.png", "wechat-minigame/room-pack/moon-valley-medicine-hall.png"],
+  ["assets/generated/wechat-moon-valley/moon-valley-study-runtime.png", "wechat-minigame/room-pack/moon-valley-study.png"],
   ["assets/characters/hero/hero-walk-anchored-v4-motionfix.png", "wechat-minigame/character-pack/hero.png"],
   ["assets/characters/hero/hero-attack-runtime-v1.png", "wechat-minigame/character-pack/hero-attack.png"],
   ["assets/characters/a_luo/a_luo-walk-anchored.png", "wechat-minigame/character-pack/companion.png"],
@@ -15,6 +17,18 @@ const files = [
   ["assets/characters/medicine_vendor/medicine_vendor-walk-anchored.png", "wechat-minigame/character-pack/vendor.png"],
   ["assets/characters/inn_keeper/inn_keeper-walk-anchored.png", "wechat-minigame/character-pack/keeper.png"],
   ["assets/generated/npcs/xiaoyao-daoist-master-spritesheet-alpha.png", "wechat-minigame/character-pack/daoist-master.png"],
+  ["assets/characters/qin_wanyao/qin_wanyao-walk-anchored.png", "wechat-minigame/character-pack/qin-wanyao.png"],
+  ["assets/characters/mu_zhiyan/mu_zhiyan-walk-anchored.png", "wechat-minigame/character-pack/mu-zhiyan.png"],
+  ["assets/characters/moon_valley_disciple/moon_valley_disciple-walk-anchored.png", "wechat-minigame/character-pack/moon-valley-disciple.png"],
+  ["assets/characters/moon_valley_traitor/moon_valley_traitor-walk-anchored.png", "wechat-minigame/character-pack/moon-valley-traitor.png"],
+  ["assets/characters/xiao_beichen/xiao_beichen-walk-anchored.png", "wechat-minigame/character-pack/xiao-beichen.png"],
+  ["assets/characters/xu_yunsheng/xu_yunsheng-walk-anchored.png", "wechat-minigame/character-pack/xu-yunsheng.png"],
+  ["assets/characters/lian_zhao/lian_zhao-walk-anchored.png", "wechat-minigame/character-pack/lian-zhao.png"],
+  ["assets/characters/rong_qingxuan/rong_qingxuan-walk-anchored.png", "wechat-minigame/character-pack/rong-qingxuan.png"],
+  ["assets/characters/xiao_cangming/xiao_cangming-walk-anchored.png", "wechat-minigame/character-pack/xiao-cangming.png"],
+  ["assets/characters/rong_jinghuai/rong_jinghuai-walk-anchored.png", "wechat-minigame/character-pack/rong-jinghuai.png"],
+  ["assets/characters/wu_chenseng/wu_chenseng-walk-anchored.png", "wechat-minigame/character-pack/wu-chenseng.png"],
+  ["assets/characters/shen_yuanhe/shen_yuanhe-walk-anchored.png", "wechat-minigame/character-pack/shen-yuanhe.png"],
   ["assets/audio/cangshan-road-mobile.m4a", "wechat-minigame/audio-pack/cangshan-road.m4a"],
   ["assets/audio/iron-fan-valley.mp3", "wechat-minigame/audio-pack/iron-fan-valley.mp3"],
   ["assets/generated/videos/xiaoyao-daoist-fuyao.mp4", "wechat-minigame/video-pack/fuyao-teaching.mp4"],
@@ -27,6 +41,7 @@ await rm(path.join(root, "wechat-minigame/map-pack"), { recursive: true, force: 
 await rm(path.join(root, "wechat-minigame/world-pack"), { recursive: true, force: true });
 await rm(path.join(root, "wechat-minigame/world-west-pack"), { recursive: true, force: true });
 await rm(path.join(root, "wechat-minigame/world-east-pack"), { recursive: true, force: true });
+await rm(path.join(root, "wechat-minigame/moon-valley-pack"), { recursive: true, force: true });
 await rm(path.join(root, "wechat-minigame/room-pack"), { recursive: true, force: true });
 await rm(path.join(root, "wechat-minigame/world-map-pack"), { recursive: true, force: true });
 await rm(path.join(root, "wechat-minigame/character-pack"), { recursive: true, force: true });
@@ -70,6 +85,14 @@ await sharp(worldMapSource)
   .png({ palette: true, quality: 88, compressionLevel: 9 })
   .toFile(worldMapTarget);
 
+const moonValleyTarget = path.join(root, "wechat-minigame/moon-valley-pack/moon-valley.png");
+await mkdir(path.dirname(moonValleyTarget), { recursive: true });
+await sharp(path.join(root, "assets/generated/wechat-moon-valley/moon-valley-map-runtime.png"))
+  .resize({ width: 780, height: 1688, fit: "cover", position: "attention" })
+  .modulate({ saturation: 0.94, brightness: 0.88 })
+  .png({ palette: true, quality: 90, compressionLevel: 9 })
+  .toFile(moonValleyTarget);
+
 const roomVariants = [
   ["assets/generated/wechat-rooms/apothecary-room-imagegen.png", "apothecary-room.png"],
   ["assets/generated/wechat-rooms/teahouse-room-imagegen.png", "teahouse-room.png"]
@@ -105,11 +128,11 @@ await writeUiSfx(path.join(root, "wechat-minigame/audio-pack/prompt.wav"), { typ
 await writeUiSfx(path.join(root, "wechat-minigame/audio-pack/buy.wav"), { type: "buy" });
 await writeUiSfx(path.join(root, "wechat-minigame/audio-pack/wait.wav"), { type: "wait" });
 
-for (const pack of ["world-west-pack", "world-east-pack", "world-map-pack", "room-pack", "character-pack", "audio-pack", "battle-pack", "video-pack"]) {
+for (const pack of ["world-west-pack", "world-east-pack", "world-map-pack", "moon-valley-pack", "room-pack", "character-pack", "audio-pack", "battle-pack", "video-pack"]) {
   await writeFile(path.join(root, "wechat-minigame", pack, "game.js"), "module.exports = {};\n");
 }
 
-console.log(`Prepared ${files.length + 13} compressed runtime assets.`);
+console.log(`Prepared ${files.length + 14} compressed runtime assets.`);
 
 async function writeHitSfx(target) {
   await mkdir(path.dirname(target), { recursive: true });

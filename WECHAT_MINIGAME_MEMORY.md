@@ -58,6 +58,7 @@
 ## HTML 端口调试踩坑
 
 - `4174` 是当前微信端 HTML 调试端口，入口固定为 `http://127.0.0.1:4174/wechat-debug/`。不要与网页主版本的 `5173` 端口混淆。
+- 用户要求“浏览器里跑小游戏/微信竖屏界面”时，默认打开 `http://127.0.0.1:4174/wechat-debug/`，这是同一套 `wechat-minigame/game.js` + Canvas + wx shim 的真实竖屏游戏界面。`story-planner.html` 只是剧情设计/数据检查页，不能当作游戏验收入口。
 - `npm run wechat:test` 不负责启动服务；运行前先执行 `npm run wechat:debug`，并确认端口仍在监听：
 
 ```bash
@@ -80,6 +81,13 @@ lsof -nP -iTCP:4174 -sTCP:LISTEN
 - imagegen 生成的正式地图/房间原图要先保存到 `assets/generated/...`，再由 `scripts/copy-wechat-assets.mjs` 压缩到 `wechat-minigame/*-pack/`。不要只手动覆盖微信运行包，否则下一次 `npm run wechat:assets` 会把图刷回旧版本。
 - 微信竖屏舆图必须按 `390x844` 同比例设计，运行包用 `780x1688`。不要把横图或宽图压成 `780x624` 后再画到竖屏 canvas，那会产生非等比拉伸。
 - 微信小游戏没有 DOM 面板，背包/商店都要做 canvas 版 UI。商店购买验收用 `npm run wechat:shop:test`，必须断言扣银两、物品数量增加、`lastShopAudit.ok` 为 true，并保存 `screenshots/wechat-shop/`。
+- 新 imagegen 场景验收用 `npm run wechat:moon:test`。当前“月华谷”流程覆盖 `moonValley`、`moonMedicineHall`、`moonStudy`、剧情 NPC 对话、门口触发、debug 碰撞截图，输出在 `screenshots/wechat-moon-valley/`。
+- `npm run wechat:moon:test` 现在必须自然覆盖“苍山旧道 -> 月华谷”地图切换、月华谷入场剧情、秦晚瑶给王府请帖、穆芷烟给调包线索、药庐/书房进入、谷中叛徒战斗胜利和奖励。不要退回只用 `enterMap("moonValley")` 的局部测试。
+- 长线剧情脚本契约使用 `npm run story:campaign:test`，输出 `screenshots/story-campaign/audit.json`。它不替代 Canvas E2E，但能验证 `wuxiaCampaignScripts` 的 flags、quests、party、world node unlock 和 battle request 是否连贯。
+- 长线剧情目前缺专属运行时 NPC 素材：萧北辰、许云生、莲照法师、容青玄、沈远鹤、萧沧溟、容靖怀、无尘僧。月华谷的谷中叛徒已生成独立静态 NPC 素材 `assets/characters/moon_valley_traitor/`，但步态审计未通过，不能作为可移动角色使用。
+- 2026-06-24 已补齐长线人物静态运行时素材：`assets/characters/xiao_beichen/`、`xu_yunsheng/`、`lian_zhao/`、`rong_qingxuan/`、`shen_yuanhe/`、`xiao_cangming/`、`rong_jinghuai/`、`wu_chenseng/`，并复制到 `wechat-minigame/character-pack/`。总览图在 `screenshots/story-campaign/character-roster.png`。这些角色的 `*-walk-anchored.json` 仍然 `regenerate: true`，只能作为静态剧情 NPC；萧北辰/许云生要作为可移动队友前必须重生或手修步态帧。
+- 新增 imagegen 场景分包时必须同步改 `scripts/copy-wechat-assets.mjs`、`wechat-minigame/game.json`、`wechat-minigame/js/platform.js`、`wechat-minigame/js/config.js`；漏掉任意一处都会出现 Chrome shim 能跑但微信资源缺失，或下一次资产构建覆盖新图。
+- imagegen NPC 走路图即使能被标准化，也必须看 `*-walk-anchored.json`。如果 `regenerate: true` 或上下/左右步态审计失败，只能临时作为静态剧情 NPC 使用；不要把它接成巡逻、跟随、战斗移动角色，也不要在交付说明里说它通过了动画工作流。
 
 ## 微信开发者工具踩坑
 

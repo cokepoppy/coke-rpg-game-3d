@@ -15,6 +15,10 @@
       "root": "world-map-pack/"
     },
     {
+      "name": "moonValleyPack",
+      "root": "moon-valley-pack/"
+    },
+    {
       "name": "roomPack",
       "root": "room-pack/"
     },

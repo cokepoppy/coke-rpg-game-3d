@@ -6,7 +6,8 @@ const root = process.cwd();
 const dist = path.join(root, "dist");
 
 await rm(dist, { recursive: true, force: true });
-await mkdir(path.join(dist, "wechat-debug", ".generated"), { recursive: true });
+await mkdir(path.join(dist, "wechat-debug", "generated"), { recursive: true });
+await writeFile(path.join(dist, ".nojekyll"), "");
 
 await writeFile(path.join(dist, "index.html"), `<!doctype html>
 <html lang="zh-CN">
@@ -24,7 +25,11 @@ await writeFile(path.join(dist, "index.html"), `<!doctype html>
 </html>
 `);
 
-await cp(path.join(root, "wechat-debug/index.html"), path.join(dist, "wechat-debug/index.html"));
+const debugHtml = await import("node:fs/promises").then((fs) => fs.readFile(path.join(root, "wechat-debug/index.html"), "utf8"));
+await writeFile(
+  path.join(dist, "wechat-debug/index.html"),
+  debugHtml.replace("./.generated/game-debug.js", "./generated/game-debug.js")
+);
 
 await esbuild.build({
   entryPoints: [path.join(root, "wechat-debug/entry.js")],
@@ -32,7 +37,7 @@ await esbuild.build({
   sourcemap: true,
   format: "iife",
   platform: "browser",
-  outfile: path.join(dist, "wechat-debug/.generated/game-debug.js")
+  outfile: path.join(dist, "wechat-debug/generated/game-debug.js")
 });
 
 const runtimeDirs = [

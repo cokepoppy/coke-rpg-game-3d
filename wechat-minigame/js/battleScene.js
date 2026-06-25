@@ -13,6 +13,9 @@ class BattleScene {
     this.playerModifiers = playerModifiers;
     this.unlockedSkillIds = unlockedSkillIds;
     this.active = false;
+    this.impactEffects = [];
+    this.screenShake = 0;
+    this.hitStop = 0;
     this.audit = { attacks: [], moves: [], enemyActions: [], animations: [], renderedAttackFrames: [], result: null };
   }
 
@@ -48,6 +51,9 @@ class BattleScene {
     this.message = `${this.selected.name} 待命`;
     this.highlights = this.movesFor(this.selected);
     this.turnNotice = { text: "我方回合", time: 1.2 };
+    this.impactEffects = [];
+    this.screenShake = 0;
+    this.hitStop = 0;
     this.active = true;
   }
 
@@ -57,18 +63,25 @@ class BattleScene {
 
   update(dt) {
     if (!this.active) return;
+    const frozen = this.hitStop > 0;
+    if (this.hitStop > 0) this.hitStop = Math.max(0, this.hitStop - dt);
+    const animationDt = frozen ? dt * 0.18 : dt;
     for (const unit of this.units) {
-      unit.frameTime += dt;
+      unit.frameTime += animationDt;
       if (unit.frameTime > 0.16) {
         unit.frameTime = 0;
         unit.frame = (unit.frame + 1) % 4;
       }
       if (unit.animation) {
-        unit.animation.time -= dt;
+        unit.animation.time -= animationDt;
         if (unit.animation.time <= 0) unit.animation = null;
       }
-      unit.displayHp += (unit.hp - unit.displayHp) * Math.min(1, dt * 7.5);
+      unit.displayHp += (unit.hp - unit.displayHp) * Math.min(1, dt * 6.2);
     }
+    this.impactEffects = this.impactEffects
+      .map((effect) => ({ ...effect, time: effect.time - dt }))
+      .filter((effect) => effect.time > 0);
+    if (this.screenShake > 0) this.screenShake = Math.max(0, this.screenShake - dt);
     if (this.turnNotice) {
       this.turnNotice.time -= dt;
       if (this.turnNotice.time <= 0) this.turnNotice = null;
@@ -202,8 +215,8 @@ class BattleScene {
     for (const item of targets) this.applyDamage(attacker, item, skill);
     attacker.moved = true;
     attacker.acted = true;
-    attacker.animation = { type: "attack", targetX: target.x, targetY: target.y, time: 0.36, duration: 0.36, skill };
-    this.audit.animations.push({ id: attacker.id, type: "attack", sprite: attacker.attackSprite || attacker.sprite, direction: attacker.direction, frames: [0, 1, 2, 3], duration: 0.36 });
+    attacker.animation = { type: "attack", targetX: target.x, targetY: target.y, time: 0.42, duration: 0.42, skill };
+    this.audit.animations.push({ id: attacker.id, type: "attack", sprite: attacker.attackSprite || attacker.sprite, direction: attacker.direction, frames: [0, 1, 2, 3], duration: 0.42 });
     this.playSkillSfx(skill);
     this.message = `${attacker.name} 使用${skill.name}，命中 ${targets.length} 个目标`;
     this.phase = "select";
@@ -221,7 +234,11 @@ class BattleScene {
     target.hp = Math.max(0, target.hp - damage);
     target.alive = target.hp > 0;
     if (skill.status) target.status[skill.status] = skill.statusTurns || 1;
-    target.animation = { type: "hit", damage, time: 0.56, duration: 0.56, skill, fromHp: target.displayHp, toHp: target.hp };
+    const duration = skill.kind === "basic" ? 0.62 : 0.68;
+    target.animation = { type: "hit", damage, time: duration, duration, skill, fromHp: target.displayHp, toHp: target.hp };
+    this.impactEffects.push({ x: target.x, y: target.y, time: 0.34, duration: 0.34, skill, damage, side: target.side });
+    this.screenShake = Math.max(this.screenShake, skill.kind === "aoe" ? 0.22 : 0.16);
+    this.hitStop = Math.max(this.hitStop, skill.kind === "basic" ? 0.07 : 0.085);
     this.audit.attacks.push({ attackerId: attacker.id, targetId: target.id, skillId: skill.id, damage, targetHp: target.hp, status: skill.status || null });
   }
 
@@ -332,8 +349,8 @@ class BattleScene {
     this.applyDamage(enemy, target, skill);
     enemy.moved = true;
     enemy.acted = true;
-    enemy.animation = { type: "attack", targetX: target.x, targetY: target.y, time: 0.36, duration: 0.36, skill };
-    this.audit.animations.push({ id: enemy.id, type: "attack", sprite: enemy.attackSprite || enemy.sprite, direction: enemy.direction, frames: [0, 1, 2, 3], duration: 0.36 });
+    enemy.animation = { type: "attack", targetX: target.x, targetY: target.y, time: 0.42, duration: 0.42, skill };
+    this.audit.animations.push({ id: enemy.id, type: "attack", sprite: enemy.attackSprite || enemy.sprite, direction: enemy.direction, frames: [0, 1, 2, 3], duration: 0.42 });
     this.playSkillSfx(skill);
     this.message = `${enemy.name} 攻击 ${target.name}`;
     this.audit.enemyActions.push({ id: enemy.id, action: "attack", targetId: target.id, skillId: skill.id });
@@ -466,6 +483,8 @@ class BattleScene {
     context.beginPath();
     context.rect(field.x, field.y, field.width, field.height);
     context.clip();
+    const shake = this.shakeOffset();
+    context.translate(shake.x, shake.y);
     context.fillStyle = "#121511";
     context.fillRect(field.x, field.y, field.width, field.height);
     const background = this.images[this.mapKey] || this.images.battleTemple;
@@ -499,6 +518,7 @@ class BattleScene {
       context.stroke();
     }
     this.drawUnits(context);
+    this.drawImpactEffects(context);
     this.drawTurnNotice(context, field);
     context.restore();
   }
@@ -507,22 +527,23 @@ class BattleScene {
     const units = this.units.filter((unit) => unit.alive || unit.animation).sort((a, b) => a.y - b.y);
     for (const unit of units) {
       const center = this.cellCenter(unit);
-      const hit = unit.animation?.type === "hit" ? Math.sin(unit.animation.time * 92) * 7 : 0;
+      const hit = unit.animation?.type === "hit" ? hitReactionOffset(unit) : { x: 0, y: 0 };
       const attacking = unit.animation?.type === "attack";
       const lunge = attacking ? attackLunge(unit) : { x: 0, y: 0 };
-      const alpha = unit.animation?.type === "hit" && Math.floor(unit.animation.time * 34) % 2 === 0 ? 0.32 : 1;
+      const alpha = unit.animation?.type === "hit" && Math.floor(unit.animation.time * 42) % 2 === 0 ? 0.45 : 1;
       const spriteKey = attacking && unit.attackSprite && this.images[unit.attackSprite] ? unit.attackSprite : unit.sprite;
       const frame = attacking ? attackAnimationFrame(unit.animation) : unit.frame;
       if (attacking && !this.audit.renderedAttackFrames.some((event) => event.id === unit.id && event.frame === frame)) {
         this.audit.renderedAttackFrames.push({ id: unit.id, sprite: spriteKey, direction: unit.direction, frame });
       }
       context.globalAlpha = alpha;
-      drawSprite(context, this.images[spriteKey], center.x + hit + lunge.x, center.y + 22 + lunge.y, unit.direction, frame, 70, 70);
+      drawSprite(context, this.images[spriteKey], center.x + hit.x + lunge.x, center.y + 22 + hit.y + lunge.y, unit.direction, frame, 70, 70);
       context.globalAlpha = 1;
       if (unit.animation?.type === "hit") {
-        context.fillStyle = "rgba(255, 246, 210, 0.35)";
+        const flashProgress = 1 - Math.max(0, unit.animation.time) / (unit.animation.duration || 0.56);
+        context.fillStyle = `rgba(255, 246, 210, ${0.48 * (1 - flashProgress)})`;
         context.beginPath();
-        context.arc(center.x, center.y + 2, 34, 0, Math.PI * 2);
+        context.arc(center.x + hit.x * 0.35, center.y + 2 + hit.y * 0.35, 34 + flashProgress * 16, 0, Math.PI * 2);
         context.fill();
       }
       context.fillStyle = "#f5ead2";
@@ -532,10 +553,11 @@ class BattleScene {
       context.fillStyle = "rgba(20, 14, 10, 0.86)";
       context.fillRect(center.x - 24, center.y + 29, 48, 5);
       context.fillStyle = unit.side === "player" ? "#65d28c" : "#e65d50";
-      context.fillRect(center.x - 24, center.y + 29, 48 * Math.max(0, unit.displayHp / unit.maxHp), 5);
-      if (unit.animation?.type === "hit" && unit.animation.fromHp > unit.hp) {
-        const fromWidth = 48 * Math.max(0, unit.animation.fromHp / unit.maxHp);
-        const toWidth = 48 * Math.max(0, unit.hp / unit.maxHp);
+      const hpWidth = 48 * Math.max(0, unit.hp / unit.maxHp);
+      context.fillRect(center.x - 24, center.y + 29, hpWidth, 5);
+      if (unit.displayHp > unit.hp) {
+        const fromWidth = 48 * Math.max(0, unit.displayHp / unit.maxHp);
+        const toWidth = hpWidth;
         context.fillStyle = "#ffd36b";
         context.fillRect(center.x - 24 + toWidth, center.y + 29, Math.max(0, fromWidth - toWidth), 5);
       }
@@ -545,12 +567,14 @@ class BattleScene {
         context.fillText(unit.status.stunned ? "晕" : "破", center.x + 28, center.y - 22);
       }
       if (unit.animation?.type === "hit" && unit.animation.damage) {
+        const progress = 1 - Math.max(0, unit.animation.time) / (unit.animation.duration || 0.56);
+        const textY = center.y - 46 - Math.sin(Math.min(1, progress) * Math.PI) * 18;
         context.fillStyle = "#ffd36b";
         context.strokeStyle = "rgba(22, 10, 8, 0.9)";
         context.lineWidth = 3;
-        context.font = "700 16px sans-serif";
-        context.strokeText(`-${unit.animation.damage}`, center.x, center.y - 48);
-        context.fillText(`-${unit.animation.damage}`, center.x, center.y - 48);
+        context.font = "800 19px sans-serif";
+        context.strokeText(`-${unit.animation.damage}`, center.x, textY);
+        context.fillText(`-${unit.animation.damage}`, center.x, textY);
       }
       if (unit.animation?.type === "heal") {
         context.fillStyle = "#9dffad";
@@ -558,6 +582,43 @@ class BattleScene {
         context.fillText(`+${unit.animation.amount}`, center.x, center.y - 48);
       }
       if (attacking && (unit.animation.skill?.kind !== "basic" || !unit.attackSprite)) this.drawAttackLine(context, unit);
+    }
+  }
+
+  drawImpactEffects(context) {
+    for (const effect of this.impactEffects) {
+      const center = this.cellCenter(effect);
+      const progress = 1 - Math.max(0, effect.time) / (effect.duration || 0.34);
+      const alpha = Math.max(0, 1 - progress);
+      const radius = 12 + progress * 30;
+      const isAoe = effect.skill?.kind === "aoe";
+      const isStun = effect.skill?.status === "stunned";
+      context.save();
+      context.translate(center.x, center.y + 4);
+      context.globalAlpha = alpha;
+      context.strokeStyle = isStun ? "#ffe57a" : isAoe ? "#ff9050" : "#fff0bd";
+      context.fillStyle = isStun ? "rgba(255, 229, 122, 0.28)" : isAoe ? "rgba(255, 118, 66, 0.24)" : "rgba(255, 244, 205, 0.26)";
+      context.lineWidth = isAoe ? 6 : 5;
+      context.beginPath();
+      context.arc(0, 0, radius, 0, Math.PI * 2);
+      context.fill();
+      context.beginPath();
+      context.moveTo(-30 - progress * 12, -22 + progress * 8);
+      context.lineTo(26 + progress * 18, 19 - progress * 6);
+      context.moveTo(-18, 24 + progress * 4);
+      context.lineTo(28 + progress * 12, -26 - progress * 8);
+      context.stroke();
+      context.lineWidth = 2;
+      for (let i = 0; i < 7; i += 1) {
+        const angle = -0.9 + i * 0.3;
+        const inner = 9 + progress * 10;
+        const outer = 24 + progress * 26;
+        context.beginPath();
+        context.moveTo(Math.cos(angle) * inner, Math.sin(angle) * inner);
+        context.lineTo(Math.cos(angle) * outer, Math.sin(angle) * outer);
+        context.stroke();
+      }
+      context.restore();
     }
   }
 
@@ -602,6 +663,15 @@ class BattleScene {
     context.fillText(this.turnNotice.text, this.viewport.width / 2, y + 21);
     context.textBaseline = "alphabetic";
     context.restore();
+  }
+
+  shakeOffset() {
+    if (!this.screenShake) return { x: 0, y: 0 };
+    const strength = Math.min(7, 2 + this.screenShake * 28);
+    return {
+      x: Math.sin(this.screenShake * 173) * strength,
+      y: Math.cos(this.screenShake * 211) * strength * 0.62
+    };
   }
 
   drawPanel(context, ui) {
@@ -665,11 +735,21 @@ function directionTo(from, to) {
 
 function attackLunge(unit) {
   const progress = 1 - Math.max(0, unit.animation.time) / (unit.animation.duration || 0.26);
-  const distance = Math.sin(Math.min(1, progress) * Math.PI) * 8;
+  const distance = Math.sin(Math.min(1, progress) * Math.PI) * 15;
   if (unit.direction === "left") return { x: -distance, y: 0 };
   if (unit.direction === "right") return { x: distance, y: 0 };
   if (unit.direction === "up") return { x: 0, y: -distance };
   return { x: 0, y: distance };
+}
+
+function hitReactionOffset(unit) {
+  const progress = 1 - Math.max(0, unit.animation.time) / (unit.animation.duration || 0.56);
+  const recoil = Math.sin(Math.min(1, progress) * Math.PI) * 12;
+  const jitter = Math.sin(unit.animation.time * 118) * 3.5 * (1 - progress);
+  if (unit.direction === "left") return { x: recoil + jitter, y: 0 };
+  if (unit.direction === "right") return { x: -recoil + jitter, y: 0 };
+  if (unit.direction === "up") return { x: jitter, y: recoil };
+  return { x: jitter, y: -recoil };
 }
 
 function attackAnimationFrame(animation) {

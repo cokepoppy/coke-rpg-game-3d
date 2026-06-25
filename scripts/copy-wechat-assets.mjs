@@ -136,35 +136,33 @@ console.log(`Prepared ${files.length + 14} compressed runtime assets.`);
 
 async function writeHitSfx(target) {
   await mkdir(path.dirname(target), { recursive: true });
-  const sampleRate = 22050;
-  const duration = 0.28;
+  const sampleRate = 44100;
+  const duration = 0.42;
   const samples = Math.floor(sampleRate * duration);
   const data = Buffer.alloc(samples * 2);
+  let seed = 1234567;
+  const random = () => {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    return seed / 0xffffffff * 2 - 1;
+  };
+  const envelope = (t, attack, decay) => {
+    if (t < attack) return t / attack;
+    return Math.exp(-(t - attack) / decay);
+  };
   for (let index = 0; index < samples; index += 1) {
     const t = index / sampleRate;
-    const impactA = Math.exp(-t * 38);
-    const impactB = t > 0.055 ? Math.exp(-(t - 0.055) * 28) : 0;
-    const metal = Math.sin(Math.PI * 2 * 840 * t) * Math.exp(-t * 12) * 0.22;
-    const low = Math.sin(Math.PI * 2 * (145 - t * 240) * t) * 0.86 * impactA;
-    const snap = deterministicNoise(index, 11) * (0.62 * impactA + 0.48 * impactB);
-    const value = Math.max(-1, Math.min(1, low + snap + metal));
-    data.writeInt16LE(Math.round(value * 32767), index * 2);
+    const slashEnv = envelope(t, 0.006, 0.075);
+    const hitEnv = t > 0.075 ? envelope(t - 0.075, 0.002, 0.055) : 0;
+    const tailEnv = t > 0.11 ? envelope(t - 0.11, 0.004, 0.12) : 0;
+    const highNoise = random() * slashEnv * 0.72;
+    const blade = Math.sin(Math.PI * 2 * (1850 - t * 1800) * t) * slashEnv * 0.46;
+    const crack = (random() * 0.8 + Math.sin(Math.PI * 2 * 720 * t) * 0.55) * hitEnv * 0.92;
+    const thump = Math.sin(Math.PI * 2 * 92 * t) * tailEnv * 0.55;
+    const click = t > 0.072 && t < 0.09 ? random() * 0.95 : 0;
+    const value = Math.max(-1, Math.min(1, highNoise + blade + crack + thump + click));
+    data.writeInt16LE(Math.round(value * 32767 * 0.9), index * 2);
   }
-  const header = Buffer.alloc(44);
-  header.write("RIFF", 0);
-  header.writeUInt32LE(36 + data.length, 4);
-  header.write("WAVE", 8);
-  header.write("fmt ", 12);
-  header.writeUInt32LE(16, 16);
-  header.writeUInt16LE(1, 20);
-  header.writeUInt16LE(1, 22);
-  header.writeUInt32LE(sampleRate, 24);
-  header.writeUInt32LE(sampleRate * 2, 28);
-  header.writeUInt16LE(2, 32);
-  header.writeUInt16LE(16, 34);
-  header.write("data", 36);
-  header.writeUInt32LE(data.length, 40);
-  await writeFile(target, Buffer.concat([header, data]));
+  await writeFile(target, Buffer.concat([wavHeader(data.length, sampleRate), data]));
 }
 
 async function writeToneSfx(target, { type }) {

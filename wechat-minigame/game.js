@@ -9,4 +9,5 @@ game.start()
   })
   .catch((error) => {
     console.error("Failed to start Cangshan RPG", error);
+    globalThis.__cangshanLoading?.error?.("游戏启动失败", error?.message || String(error));
   });

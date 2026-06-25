@@ -51,8 +51,11 @@ class GameApp {
   }
 
   async start() {
+    this.loadingSet("加载资源分包", "准备地图、角色、音频和剧情动画。", 0.1);
     await loadAssetPacks();
+    this.loadingSet("加载图片资源", "开始读取地图和角色图像。", 0.25);
     await this.loadAssets();
+    this.loadingSet("初始化游戏世界", "创建地图、角色、剧情和音频系统。", 0.9);
     this.mapManager = new MapManager(this.images, this.viewport);
     this.player = new Player(this.images.hero, this.mapManager.map.spawn);
     this.audio = createAudio(ASSETS.bgm);
@@ -68,12 +71,24 @@ class GameApp {
     this.promptSfx = createSfx(ASSETS.promptSfx);
     this.buySfx = createSfx(ASSETS.buySfx);
     this.bindTouch();
+    this.loadingSet("准备进入江湖", "正在绘制第一帧。", 0.96);
     this.frame();
+    globalThis.__cangshanLoading?.done?.();
   }
 
   async loadAssets() {
     const entries = Object.entries(ASSETS).filter(([key]) => !key.endsWith("Sfx") && !key.endsWith("Bgm") && key !== "bgm");
-    await Promise.all(entries.map(async ([key, source]) => { this.images[key] = await loadImage(this.canvas, source); }));
+    let loaded = 0;
+    for (const [key, source] of entries) {
+      this.loadingSet("加载图片资源", `${loaded + 1}/${entries.length} ${source}`, 0.25 + (loaded / entries.length) * 0.62);
+      this.images[key] = await loadImage(this.canvas, source);
+      loaded += 1;
+      this.loadingSet("加载图片资源", `${loaded}/${entries.length} ${source}`, 0.25 + (loaded / entries.length) * 0.62);
+    }
+  }
+
+  loadingSet(stage, detail, progress) {
+    globalThis.__cangshanLoading?.set?.(stage, detail, progress);
   }
 
   frame() {

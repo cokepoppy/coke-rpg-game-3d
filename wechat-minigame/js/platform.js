@@ -25,7 +25,7 @@ function loadImage(canvas, source) {
   return new Promise((resolve, reject) => {
     const image = canvas.createImage ? canvas.createImage() : wx.createImage();
     image.onload = () => resolve(image);
-    image.onerror = reject;
+    image.onerror = () => reject(new Error(`Image failed to load: ${source}`));
     image.src = `${wx.__assetBase || ""}${source}`;
   });
 }
@@ -79,8 +79,18 @@ function createSfx(source) {
 
 function loadAssetPacks() {
   if (!wx.loadSubpackage) return Promise.resolve();
-  const load = (name) => new Promise((resolve, reject) => wx.loadSubpackage({ name, success: resolve, fail: reject }));
-  return Promise.all([load("worldWestPack"), load("worldEastPack"), load("worldMapPack"), load("moonValleyPack"), load("roomPack"), load("characterPack"), load("audioPack"), load("battlePack"), load("videoPack")]);
+  const packs = ["worldWestPack", "worldEastPack", "worldMapPack", "moonValleyPack", "roomPack", "characterPack", "audioPack", "battlePack", "videoPack"];
+  let loaded = 0;
+  const load = (name) => new Promise((resolve, reject) => wx.loadSubpackage({
+    name,
+    success: () => {
+      loaded += 1;
+      globalThis.__cangshanLoading?.set("加载资源分包", `${loaded}/${packs.length} ${name}`, 0.1 + (loaded / packs.length) * 0.14);
+      resolve();
+    },
+    fail: (error) => reject(new Error(`Subpackage failed to load: ${name} ${error?.errMsg || ""}`))
+  }));
+  return Promise.all(packs.map(load));
 }
 
 function readSave(key) {

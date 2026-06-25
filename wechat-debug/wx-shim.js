@@ -2,6 +2,8 @@ const canvas = document.querySelector("#game");
 const listeners = { start: [], move: [], end: [], cancel: [] };
 const storage = new Map();
 
+window.__cangshanLoading?.set("准备浏览器调试环境", "初始化触摸、音频和视频模拟器。", 0.08);
+
 function eventFromPointer(event) {
   const rect = canvas.getBoundingClientRect();
   return { changedTouches: [{ identifier: event.pointerId || 0, clientX: event.clientX - rect.left, clientY: event.clientY - rect.top }] };

@@ -10,11 +10,85 @@
       html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #10100e; }
       body { display: grid; place-items: center; }
       canvas { width: min(100vw, 390px); height: min(100vh, 844px); aspect-ratio: 390 / 844; image-rendering: pixelated; background: #171510; touch-action: none; box-shadow: 0 0 0 1px #413827; }
+      .loading {
+        position: fixed;
+        inset: 0;
+        z-index: 20;
+        display: grid;
+        place-items: center;
+        padding: 28px;
+        background:
+          radial-gradient(circle at 50% 28%, rgba(120, 87, 45, 0.28), transparent 36%),
+          #10100e;
+        color: #fff3d0;
+        font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+        transition: opacity 220ms ease;
+      }
+      .loading.is-hidden { opacity: 0; pointer-events: none; }
+      .loading__inner { width: min(100%, 330px); }
+      .loading__title { margin: 0 0 12px; font-size: 30px; line-height: 1.15; letter-spacing: 0; }
+      .loading__status { margin: 0 0 16px; min-height: 24px; color: #d8c99a; font-size: 15px; line-height: 1.6; }
+      .loading__bar { width: 100%; height: 10px; overflow: hidden; border: 1px solid rgba(224, 203, 139, 0.5); background: rgba(30, 27, 20, 0.88); }
+      .loading__fill { width: 3%; height: 100%; background: linear-gradient(90deg, #b7352d, #efc46a); transition: width 180ms ease; }
+      .loading__detail { margin-top: 12px; min-height: 38px; color: rgba(255, 243, 208, 0.72); font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
+      .loading__error { color: #ffb1a6; }
       @media (max-width: 390px), (max-height: 844px) { canvas { width: 100vw; height: 100vh; } }
     </style>
   </head>
   <body>
+    <div id="loading" class="loading" role="status" aria-live="polite">
+      <div class="loading__inner">
+        <h1 class="loading__title">苍山侠影</h1>
+        <p id="loadingStatus" class="loading__status">正在加载游戏脚本...</p>
+        <div class="loading__bar" aria-hidden="true"><div id="loadingBar" class="loading__fill"></div></div>
+        <div id="loadingDetail" class="loading__detail">首次打开需要下载地图、角色、音频和剧情动画。</div>
+      </div>
+    </div>
     <canvas id="game" aria-label="苍山侠影竖屏游戏画面"></canvas>
+    <script>
+      (() => {
+        const root = document.getElementById("loading");
+        const status = document.getElementById("loadingStatus");
+        const detail = document.getElementById("loadingDetail");
+        const bar = document.getElementById("loadingBar");
+        let done = false;
+        const clamp = (value) => Math.max(0.03, Math.min(1, Number(value) || 0.03));
+        window.__cangshanLoading = {
+          set(stage, message, progress) {
+            if (done) return;
+            if (status) status.textContent = stage || "正在加载...";
+            if (detail && message) detail.textContent = message;
+            if (bar) bar.style.width = `${Math.round(clamp(progress) * 100)}%`;
+          },
+          error(stage, message) {
+            done = false;
+            root?.classList.remove("is-hidden");
+            if (status) {
+              status.textContent = stage || "游戏启动失败";
+              status.classList.add("loading__error");
+            }
+            if (detail) detail.textContent = message || "请刷新页面重试，或把这段错误信息发给 Codex 排查。";
+            if (bar) bar.style.width = "100%";
+          },
+          done() {
+            done = true;
+            if (bar) bar.style.width = "100%";
+            if (status) status.textContent = "进入江湖";
+            setTimeout(() => root?.classList.add("is-hidden"), 120);
+            setTimeout(() => root?.remove(), 520);
+          }
+        };
+        window.addEventListener("error", (event) => {
+          window.__cangshanLoading?.error("游戏脚本加载失败", event.message || String(event.error || event));
+        });
+        window.addEventListener("unhandledrejection", (event) => {
+          const reason = event.reason;
+          window.__cangshanLoading?.error("游戏资源加载失败", reason?.message || String(reason));
+        });
+        setTimeout(() => window.__cangshanLoading?.set("资源仍在加载", "地图和音频资源较大，请保持页面打开。", 0.35), 10000);
+        setTimeout(() => window.__cangshanLoading?.set("继续等待资源", "如果长时间停在这里，可以刷新页面或切换网络。", 0.55), 30000);
+      })();
+    </script>
     <script src="./.generated/game-debug.js"></script>
   </body>
 </html>

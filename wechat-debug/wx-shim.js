@@ -10,14 +10,27 @@ function eventFromPointer(event) {
 }
 
 canvas.addEventListener("pointerdown", (event) => {
+  event.preventDefault();
   canvas.setPointerCapture(event.pointerId);
   listeners.start.forEach((handler) => handler(eventFromPointer(event)));
 });
 canvas.addEventListener("pointermove", (event) => {
+  event.preventDefault();
   if (event.buttons) listeners.move.forEach((handler) => handler(eventFromPointer(event)));
 });
-canvas.addEventListener("pointerup", (event) => listeners.end.forEach((handler) => handler(eventFromPointer(event))));
-canvas.addEventListener("pointercancel", (event) => listeners.cancel.forEach((handler) => handler(eventFromPointer(event))));
+canvas.addEventListener("pointerup", (event) => {
+  event.preventDefault();
+  listeners.end.forEach((handler) => handler(eventFromPointer(event)));
+});
+canvas.addEventListener("pointercancel", (event) => {
+  event.preventDefault();
+  listeners.cancel.forEach((handler) => handler(eventFromPointer(event)));
+});
+canvas.addEventListener("contextmenu", (event) => event.preventDefault());
+canvas.addEventListener("selectstart", (event) => event.preventDefault());
+for (const type of ["touchstart", "touchmove", "touchend", "touchcancel"]) {
+  canvas.addEventListener(type, (event) => event.preventDefault(), { passive: false });
+}
 
 window.wx = {
   __assetBase: "../wechat-minigame/",
@@ -80,8 +93,9 @@ function createBrowserVideo(options) {
   video.style.background = options.backgroundColor || "#000";
   const place = () => {
     const rect = canvas.getBoundingClientRect();
-    const scaleX = rect.width / canvas.width;
-    const scaleY = rect.height / canvas.height;
+    const viewport = wx.getSystemInfoSync();
+    const scaleX = rect.width / viewport.windowWidth;
+    const scaleY = rect.height / viewport.windowHeight;
     video.style.left = `${rect.left + options.x * scaleX}px`;
     video.style.top = `${rect.top + options.y * scaleY}px`;
     video.style.width = `${options.width * scaleX}px`;

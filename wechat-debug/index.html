@@ -7,9 +7,9 @@
     <title>苍山侠影 · 微信小游戏调试</title>
     <style>
       * { box-sizing: border-box; }
-      html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #10100e; }
+      html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #10100e; overscroll-behavior: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
       body { display: grid; place-items: center; }
-      canvas { width: min(100vw, 390px); height: 100vh; max-height: 844px; image-rendering: pixelated; background: #171510; touch-action: none; box-shadow: 0 0 0 1px #413827; }
+      canvas { width: min(100vw, 390px); height: min(100vh, 844px); image-rendering: pixelated; background: #171510; touch-action: none; box-shadow: 0 0 0 1px #413827; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
       .loading {
         position: fixed;
         inset: 0;
@@ -32,7 +32,7 @@
       .loading__fill { width: 3%; height: 100%; background: linear-gradient(90deg, #b7352d, #efc46a); transition: width 180ms ease; }
       .loading__detail { margin-top: 12px; min-height: 38px; color: rgba(255, 243, 208, 0.72); font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
       .loading__error { color: #ffb1a6; }
-      @media (max-width: 390px), (max-height: 844px) { canvas { width: 100vw; height: 100vh; } }
+      @media (max-width: 390px) { canvas { width: 100vw; height: 100vh; } }
     </style>
   </head>
   <body>

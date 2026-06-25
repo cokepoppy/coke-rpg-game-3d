@@ -53,6 +53,7 @@ const ASSETS = {
   battleTemple: "battle-pack/battle-temple.png",
   battleFerry: "battle-pack/battle-ferry.png",
   battleBamboo: "battle-pack/battle-bamboo.png",
+  swordImpact: "battle-pack/sword-impact.png",
   daoistCutscenePoster: "video-pack/fuyao-poster.png",
   bgm: "audio-pack/cangshan-road.m4a",
   battleBgm: "audio-pack/iron-fan-valley.mp3",

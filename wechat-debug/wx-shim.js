@@ -23,8 +23,22 @@ window.wx = {
   __assetBase: "../wechat-minigame/",
   createCanvas: () => canvas,
   createImage: () => new Image(),
-  getSystemInfoSync: () => ({ windowWidth: 390, windowHeight: 844, screenWidth: 390, screenHeight: 844, pixelRatio: Math.min(2, window.devicePixelRatio || 1), safeArea: { top: 0, bottom: 844 } }),
-  getMenuButtonBoundingClientRect: () => ({ top: 10, right: 378, bottom: 44, left: 292, width: 86, height: 34 }),
+  getSystemInfoSync: () => {
+    const width = Math.round(Math.min(window.innerWidth || 390, 390));
+    const height = Math.round(window.innerHeight || 844);
+    return {
+      windowWidth: width,
+      windowHeight: height,
+      screenWidth: width,
+      screenHeight: height,
+      pixelRatio: Math.min(2, window.devicePixelRatio || 1),
+      safeArea: { top: 0, bottom: height }
+    };
+  },
+  getMenuButtonBoundingClientRect: () => {
+    const width = Math.round(Math.min(window.innerWidth || 390, 390));
+    return { top: 10, right: width - 12, bottom: 44, left: width - 98, width: 86, height: 34 };
+  },
   onTouchStart: (handler) => listeners.start.push(handler),
   onTouchMove: (handler) => listeners.move.push(handler),
   onTouchEnd: (handler) => listeners.end.push(handler),

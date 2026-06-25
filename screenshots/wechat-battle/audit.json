@@ -6,7 +6,7 @@
   "mode": "game",
   "dialog": {
     "speaker": "战斗",
-    "text": "伏兵败退。你获得 18 两银子，止血散×1、清心丸×1、雁翎刀×1。还剩 5 处密探据点。"
+    "text": "伏兵败退。你获得 23 两银子，止血散×1。还剩 5 处密探据点。"
   },
   "battle": {
     "attacks": [
@@ -70,31 +70,20 @@
     ],
     "result": "victory",
     "rewards": {
-      "money": 18,
+      "money": 23,
       "items": [
         {
           "itemId": "hemostatic_powder",
           "name": "止血散",
           "amount": 1
-        },
-        {
-          "itemId": "qingxin_pill",
-          "name": "清心丸",
-          "amount": 1
-        },
-        {
-          "itemId": "steel_saber",
-          "name": "雁翎刀",
-          "amount": 1
         }
       ]
     }
   },
-  "money": 138,
+  "money": 143,
   "items": {
     "hemostatic_powder": 3,
-    "qingxin_pill": 2,
-    "steel_saber": 1
+    "qingxin_pill": 1
   },
   "audio": {
     "world": {

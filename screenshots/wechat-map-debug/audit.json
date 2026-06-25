@@ -9,7 +9,7 @@
       },
       "trigger": "inn",
       "collisions": 7,
-      "triggers": 10
+      "triggers": 12
     },
     {
       "name": "02-scout",
@@ -18,9 +18,9 @@
         "x": 895,
         "y": 745
       },
-      "trigger": "scout",
+      "trigger": null,
       "collisions": 7,
-      "triggers": 10
+      "triggers": 12
     },
     {
       "name": "03-apothecary-door",
@@ -31,7 +31,7 @@
       },
       "trigger": "apothecaryDoor",
       "collisions": 7,
-      "triggers": 10
+      "triggers": 12
     },
     {
       "name": "04-teahouse-door",
@@ -42,7 +42,7 @@
       },
       "trigger": "teahouseDoor",
       "collisions": 7,
-      "triggers": 10
+      "triggers": 12
     },
     {
       "name": "05-scout-bridge",
@@ -51,9 +51,9 @@
         "x": 1620,
         "y": 2585
       },
-      "trigger": "scout_bridge",
+      "trigger": null,
       "collisions": 7,
-      "triggers": 10
+      "triggers": 12
     },
     {
       "name": "06-scout-archer",
@@ -64,7 +64,7 @@
       },
       "trigger": "scout_archer",
       "collisions": 7,
-      "triggers": 10
+      "triggers": 12
     },
     {
       "name": "07-scout-monk",
@@ -73,9 +73,9 @@
         "x": 2970,
         "y": 1245
       },
-      "trigger": "scout_monk",
+      "trigger": null,
       "collisions": 7,
-      "triggers": 10
+      "triggers": 12
     },
     {
       "name": "08-room",

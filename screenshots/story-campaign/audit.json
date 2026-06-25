@@ -1,0 +1,704 @@
+{
+  "scriptOrder": [
+    "daoist_master_teach",
+    "moon_valley_arrival",
+    "qin_letter",
+    "mu_poison_choice",
+    "xiao_beichen_join",
+    "border_massacre_reveal",
+    "red_lotus_debate",
+    "fu_state_collapse",
+    "wuchen_three_questions",
+    "final_truth_choice",
+    "carefree_epilogue"
+  ],
+  "results": [
+    {
+      "id": "daoist_master_teach",
+      "result": {
+        "kind": "cutscene-requested",
+        "cutsceneId": "xiaoyao_daoist_fuyou"
+      }
+    },
+    {
+      "id": "moon_valley_arrival",
+      "result": null
+    },
+    {
+      "id": "qin_letter",
+      "result": null
+    },
+    {
+      "id": "mu_poison_choice",
+      "result": {
+        "kind": "battle-requested",
+        "type": "startBattle",
+        "enemyId": "masked_scout",
+        "battleId": "poison_needles"
+      }
+    },
+    {
+      "id": "xiao_beichen_join",
+      "result": null
+    },
+    {
+      "id": "border_massacre_reveal",
+      "result": null
+    },
+    {
+      "id": "red_lotus_debate",
+      "result": null
+    },
+    {
+      "id": "fu_state_collapse",
+      "result": null
+    },
+    {
+      "id": "wuchen_three_questions",
+      "result": null
+    },
+    {
+      "id": "final_truth_choice",
+      "result": {
+        "kind": "battle-requested",
+        "type": "startBattle",
+        "enemyId": "yipintang_leader",
+        "battleId": "two_fathers_boss"
+      }
+    },
+    {
+      "id": "carefree_epilogue",
+      "result": null
+    }
+  ],
+  "flags": [
+    "learned_fuyou_step",
+    "moon_valley_reached",
+    "protected_su_luo",
+    "xiao_beichen_joined",
+    "border_truth_fragment_found",
+    "lianzhao_spared",
+    "rong_qingxuan_broken",
+    "carefree_path_chosen",
+    "carefree_ending_seen"
+  ],
+  "inventory": [
+    [
+      "palace_invitation",
+      1
+    ],
+    [
+      "truth_fragment_yanyun",
+      1
+    ],
+    [
+      "truth_fragment_lotus",
+      1
+    ]
+  ],
+  "quests": [
+    [
+      "moon_valley_letter",
+      {
+        "id": "moon_valley_letter",
+        "title": "月华旧信",
+        "description": "在月华谷查找苏萝母亲留下的旧信，弄清王府玉佩为何会被谷中人忌惮。",
+        "status": "active"
+      }
+    ]
+  ],
+  "party": [
+    "shen_linchuan",
+    "su_luo",
+    "xiao_beichen"
+  ],
+  "learnedSkills": [
+    [
+      "shen_linchuan",
+      [
+        "fuyou_step"
+      ]
+    ]
+  ],
+  "unlockedWorldNodes": [
+    "cangshan_road",
+    "southern_palace",
+    "red_lotus_temple",
+    "hidden_library"
+  ],
+  "battles": [
+    {
+      "type": "startBattle",
+      "enemyId": "masked_scout",
+      "battleId": "poison_needles"
+    },
+    {
+      "type": "startBattle",
+      "enemyId": "yipintang_leader",
+      "battleId": "two_fathers_boss"
+    }
+  ],
+  "dialogTrace": [
+    {
+      "speaker": "逍遥道人",
+      "text": "北冥有鱼，化而为鹏。你脚下拘于旧道，心里却还有一线清风。",
+      "choices": [
+        "继续"
+      ]
+    },
+    {
+      "speaker": "沈临川",
+      "text": "前辈说的清风，是能解这苍山旧案的武功，还是能解我心里的疑团？",
+      "choices": [
+        "请前辈传授扶游步",
+        "先问旧案"
+      ]
+    },
+    {
+      "speaker": "逍遥道人",
+      "text": "步法只是形。记住：乘天地之正，御六气之辩，不为名牵，不为仇缚。",
+      "choices": [
+        "继续"
+      ]
+    },
+    {
+      "speaker": "苏萝",
+      "text": "前面就是月华谷。这里的人不爱见外客，尤其不爱见带着王府玉佩的人。",
+      "choices": [
+        "继续"
+      ]
+    },
+    {
+      "speaker": "月华谷弟子",
+      "text": "谷主失踪后，外人不得入药庐。你们若要查旧信，先证明不是南岭王府派来的。",
+      "choices": [
+        "继续"
+      ]
+    },
+    {
+      "speaker": "秦晚瑶",
+      "text": "这封请帖能让你进南岭王府。但进去以后，听到什么都不要立刻相信。",
+      "choices": [
+        "收下请帖",
+        "追问她为何帮忙"
+      ]
+    },
+    {
+      "speaker": "沈临川",
+      "text": "多谢。若王府真和我身世有关，我会亲自问清。",
+      "choices": [
+        "继续"
+      ]
+    },
+    {
+      "speaker": "穆芷烟",
+      "text": "你若真想查旧案，就先尝尝被旧案丢下的人是什么滋味。",
+      "choices": [
+        "挡下毒针",
+        "劝她说出线索"
+      ]
+    },
+    {
+      "speaker": "苏萝",
+      "text": "你疯了吗？这针上是月华谷禁毒。",
+      "choices": [
+        "继续"
+      ]
+    },
+    {
+      "speaker": "萧北辰",
+      "text": "我不管你是王府的人，还是复衡旧部的人。今夜先救难民，旧账明日再算。",
+      "choices": [
+        "继续"
+      ]
+    },
+    {
+      "speaker": "沈临川",
+      "text": "若真相在燕云关，我们同路。",
+      "choices": [
+        "继续"
+      ]
+    },
+    {
+      "speaker": "旧城遗址",
+      "text": "残墙里的箭簇分属两派：一枚刻着燕云暗纹，另一枚却是复衡旧部的军制。",
+      "choices": [
+        "继续"
+      ]
+    },
+    {
+      "speaker": "萧北辰",
+      "text": "有人故意把两边都拖进血案。若我父亲还活着，他也许早就知道。",
+      "choices": [
+        "继续"
+      ]
+    },
+    {
+      "speaker": "莲照法师",
+      "text": "我求天下武学，不为杀人。只是心魔日日逼问：万法若不能归一，修行又有何用？",
+      "choices": [
+        "以齐物心诀相劝",
+        "以武试心魔"
+      ]
+    },
+    {
+      "speaker": "沈临川",
+      "text": "万法归一，也许不是归到胜负，而是归到不必胜负。",
+      "choices": [
+        "继续"
+      ]
+    },
+    {
+      "speaker": "容青玄",
+      "text": "你们说我疯了？旧国若不能复，我这一生温良恭俭，又算什么？",
+      "choices": [
+        "继续"
+      ]
+    },
+    {
+      "speaker": "沈临川",
+      "text": "若所有人都只是你复国的柴薪，那你想复的也不是国，是你自己的执念。",
+      "choices": [
+        "继续"
+      ]
+    },
+    {
+      "speaker": "无尘僧",
+      "text": "第一问：若真相会伤无辜，你还要公开吗？",
+      "choices": [
+        "公开，但承担余波",
+        "封存真相"
+      ]
+    },
+    {
+      "speaker": "无尘僧",
+      "text": "第二问：若父辈皆有罪，你愿不愿放过能悔改的人？",
+      "choices": [
+        "愿意，但不抹去罪责",
+        "血债只能血偿"
+      ]
+    },
+    {
+      "speaker": "无尘僧",
+      "text": "第三问：你要做谁的儿子，谁的情人，谁的仇人，还是先做你自己？",
+      "choices": [
+        "继续"
+      ]
+    },
+    {
+      "speaker": "萧沧溟",
+      "text": "他们毁我满城，我便毁他们半个江湖。你凭什么说我错？",
+      "choices": [
+        "继续"
+      ]
+    },
+    {
+      "speaker": "容靖怀",
+      "text": "旧国要活，江湖本就该流血。你们的慈悲，不过是不敢赢。",
+      "choices": [
+        "继续"
+      ]
+    },
+    {
+      "speaker": "沈临川",
+      "text": "江湖从来不缺答案，缺的是不被答案困住的人。",
+      "choices": [
+        "继续"
+      ]
+    },
+    {
+      "speaker": "苏萝",
+      "text": "那接下来去哪？月华谷、燕云关，还是找个没有旧案的地方喝茶？",
+      "choices": [
+        "继续"
+      ]
+    },
+    {
+      "speaker": "沈临川",
+      "text": "风往哪里去，我们就往哪里去。",
+      "choices": [
+        "继续"
+      ]
+    }
+  ],
+  "bibleCharacters": [
+    {
+      "id": "shen_linchuan",
+      "name": "沈临川",
+      "playable": true,
+      "faction": "cangshan_house",
+      "combatRole": "机动剑客",
+      "asset": {
+        "exists": true,
+        "pass": true,
+        "regenerate": false,
+        "failures": []
+      }
+    },
+    {
+      "id": "su_luo",
+      "name": "苏萝",
+      "playable": true,
+      "faction": "yuehua_valley",
+      "combatRole": "药术支援",
+      "asset": {
+        "exists": true,
+        "pass": true,
+        "regenerate": false,
+        "failures": []
+      }
+    },
+    {
+      "id": "qin_wanyao",
+      "name": "秦晚瑶",
+      "playable": false,
+      "faction": "nanling_court",
+      "combatRole": "琴阵控制",
+      "asset": {
+        "exists": true,
+        "pass": false,
+        "regenerate": true,
+        "failures": [
+          "down walk does not alternate feet: frame1 5px, frame3 -2px",
+          "up walk does not alternate feet: frame1 2px, frame3 1px"
+        ]
+      }
+    },
+    {
+      "id": "mu_zhiyan",
+      "name": "穆芷烟",
+      "playable": false,
+      "faction": "yuehua_valley",
+      "combatRole": "毒针刺客",
+      "asset": {
+        "exists": true,
+        "pass": false,
+        "regenerate": true,
+        "failures": [
+          "up walk does not alternate feet: frame1 5px, frame3 6px"
+        ]
+      }
+    },
+    {
+      "id": "xiao_beichen",
+      "name": "萧北辰",
+      "playable": true,
+      "faction": "yanyun_brotherhood",
+      "combatRole": "重刀坦克",
+      "asset": {
+        "exists": true,
+        "pass": false,
+        "regenerate": true,
+        "failures": [
+          "down walk does not alternate feet: frame1 5px, frame3 5px"
+        ]
+      }
+    },
+    {
+      "id": "xu_yunsheng",
+      "name": "许云生",
+      "playable": true,
+      "faction": "hidden_library",
+      "combatRole": "内功奇术",
+      "asset": {
+        "exists": true,
+        "pass": false,
+        "regenerate": true,
+        "failures": [
+          "down walk does not alternate feet: frame1 6px, frame3 2px"
+        ]
+      }
+    },
+    {
+      "id": "lian_zhao",
+      "name": "莲照法师",
+      "playable": false,
+      "faction": "red_lotus_temple",
+      "combatRole": "远程法印",
+      "asset": {
+        "exists": true,
+        "pass": false,
+        "regenerate": true,
+        "failures": [
+          "down walk does not alternate feet: frame1 -2px, frame3 -3px",
+          "up walk does not alternate feet: frame1 1px, frame3 -3px"
+        ]
+      }
+    },
+    {
+      "id": "rong_qingxuan",
+      "name": "容青玄",
+      "playable": false,
+      "faction": "fu_state_remnant",
+      "combatRole": "谋士剑客",
+      "asset": {
+        "exists": true,
+        "pass": false,
+        "regenerate": true,
+        "failures": [
+          "down walk does not alternate feet: frame1 0px, frame3 -3px",
+          "up walk does not alternate feet: frame1 2px, frame3 -3px"
+        ]
+      }
+    },
+    {
+      "id": "shen_yuanhe",
+      "name": "沈远鹤",
+      "playable": false,
+      "faction": "nanling_court",
+      "combatRole": "王府剑法",
+      "asset": {
+        "exists": true,
+        "pass": false,
+        "regenerate": true,
+        "failures": [
+          "down walk does not alternate feet: frame1 3px, frame3 1px"
+        ]
+      }
+    },
+    {
+      "id": "xiao_cangming",
+      "name": "萧沧溟",
+      "playable": false,
+      "faction": "yanyun_brotherhood",
+      "combatRole": "终局重刀",
+      "asset": {
+        "exists": true,
+        "pass": false,
+        "regenerate": true,
+        "failures": [
+          "down walk does not alternate feet: frame1 -15px, frame3 1px"
+        ]
+      }
+    },
+    {
+      "id": "rong_jinghuai",
+      "name": "容靖怀",
+      "playable": false,
+      "faction": "fu_state_remnant",
+      "combatRole": "终局机关阵",
+      "asset": {
+        "exists": true,
+        "pass": false,
+        "regenerate": true,
+        "failures": [
+          "down walk does not alternate feet: frame1 -12px, frame3 -10px"
+        ]
+      }
+    },
+    {
+      "id": "wu_chenseng",
+      "name": "无尘僧",
+      "playable": false,
+      "faction": "hidden_library",
+      "combatRole": "不可战胜的劝止者",
+      "asset": {
+        "exists": true,
+        "pass": false,
+        "regenerate": true,
+        "failures": [
+          "up walk does not alternate feet: frame1 -21px, frame3 -21px"
+        ]
+      }
+    }
+  ],
+  "missingRuntimeAssets": [],
+  "staticOnlyRuntimeAssets": [
+    {
+      "id": "qin_wanyao",
+      "name": "秦晚瑶",
+      "playable": false,
+      "faction": "nanling_court",
+      "combatRole": "琴阵控制",
+      "asset": {
+        "exists": true,
+        "pass": false,
+        "regenerate": true,
+        "failures": [
+          "down walk does not alternate feet: frame1 5px, frame3 -2px",
+          "up walk does not alternate feet: frame1 2px, frame3 1px"
+        ]
+      },
+      "reason": "sprite exists but gait/anchor contract does not pass; use as static NPC only",
+      "failures": [
+        "down walk does not alternate feet: frame1 5px, frame3 -2px",
+        "up walk does not alternate feet: frame1 2px, frame3 1px"
+      ]
+    },
+    {
+      "id": "mu_zhiyan",
+      "name": "穆芷烟",
+      "playable": false,
+      "faction": "yuehua_valley",
+      "combatRole": "毒针刺客",
+      "asset": {
+        "exists": true,
+        "pass": false,
+        "regenerate": true,
+        "failures": [
+          "up walk does not alternate feet: frame1 5px, frame3 6px"
+        ]
+      },
+      "reason": "sprite exists but gait/anchor contract does not pass; use as static NPC only",
+      "failures": [
+        "up walk does not alternate feet: frame1 5px, frame3 6px"
+      ]
+    },
+    {
+      "id": "xiao_beichen",
+      "name": "萧北辰",
+      "playable": true,
+      "faction": "yanyun_brotherhood",
+      "combatRole": "重刀坦克",
+      "asset": {
+        "exists": true,
+        "pass": false,
+        "regenerate": true,
+        "failures": [
+          "down walk does not alternate feet: frame1 5px, frame3 5px"
+        ]
+      },
+      "reason": "sprite exists but gait/anchor contract does not pass; use as static NPC only",
+      "failures": [
+        "down walk does not alternate feet: frame1 5px, frame3 5px"
+      ]
+    },
+    {
+      "id": "xu_yunsheng",
+      "name": "许云生",
+      "playable": true,
+      "faction": "hidden_library",
+      "combatRole": "内功奇术",
+      "asset": {
+        "exists": true,
+        "pass": false,
+        "regenerate": true,
+        "failures": [
+          "down walk does not alternate feet: frame1 6px, frame3 2px"
+        ]
+      },
+      "reason": "sprite exists but gait/anchor contract does not pass; use as static NPC only",
+      "failures": [
+        "down walk does not alternate feet: frame1 6px, frame3 2px"
+      ]
+    },
+    {
+      "id": "lian_zhao",
+      "name": "莲照法师",
+      "playable": false,
+      "faction": "red_lotus_temple",
+      "combatRole": "远程法印",
+      "asset": {
+        "exists": true,
+        "pass": false,
+        "regenerate": true,
+        "failures": [
+          "down walk does not alternate feet: frame1 -2px, frame3 -3px",
+          "up walk does not alternate feet: frame1 1px, frame3 -3px"
+        ]
+      },
+      "reason": "sprite exists but gait/anchor contract does not pass; use as static NPC only",
+      "failures": [
+        "down walk does not alternate feet: frame1 -2px, frame3 -3px",
+        "up walk does not alternate feet: frame1 1px, frame3 -3px"
+      ]
+    },
+    {
+      "id": "rong_qingxuan",
+      "name": "容青玄",
+      "playable": false,
+      "faction": "fu_state_remnant",
+      "combatRole": "谋士剑客",
+      "asset": {
+        "exists": true,
+        "pass": false,
+        "regenerate": true,
+        "failures": [
+          "down walk does not alternate feet: frame1 0px, frame3 -3px",
+          "up walk does not alternate feet: frame1 2px, frame3 -3px"
+        ]
+      },
+      "reason": "sprite exists but gait/anchor contract does not pass; use as static NPC only",
+      "failures": [
+        "down walk does not alternate feet: frame1 0px, frame3 -3px",
+        "up walk does not alternate feet: frame1 2px, frame3 -3px"
+      ]
+    },
+    {
+      "id": "shen_yuanhe",
+      "name": "沈远鹤",
+      "playable": false,
+      "faction": "nanling_court",
+      "combatRole": "王府剑法",
+      "asset": {
+        "exists": true,
+        "pass": false,
+        "regenerate": true,
+        "failures": [
+          "down walk does not alternate feet: frame1 3px, frame3 1px"
+        ]
+      },
+      "reason": "sprite exists but gait/anchor contract does not pass; use as static NPC only",
+      "failures": [
+        "down walk does not alternate feet: frame1 3px, frame3 1px"
+      ]
+    },
+    {
+      "id": "xiao_cangming",
+      "name": "萧沧溟",
+      "playable": false,
+      "faction": "yanyun_brotherhood",
+      "combatRole": "终局重刀",
+      "asset": {
+        "exists": true,
+        "pass": false,
+        "regenerate": true,
+        "failures": [
+          "down walk does not alternate feet: frame1 -15px, frame3 1px"
+        ]
+      },
+      "reason": "sprite exists but gait/anchor contract does not pass; use as static NPC only",
+      "failures": [
+        "down walk does not alternate feet: frame1 -15px, frame3 1px"
+      ]
+    },
+    {
+      "id": "rong_jinghuai",
+      "name": "容靖怀",
+      "playable": false,
+      "faction": "fu_state_remnant",
+      "combatRole": "终局机关阵",
+      "asset": {
+        "exists": true,
+        "pass": false,
+        "regenerate": true,
+        "failures": [
+          "down walk does not alternate feet: frame1 -12px, frame3 -10px"
+        ]
+      },
+      "reason": "sprite exists but gait/anchor contract does not pass; use as static NPC only",
+      "failures": [
+        "down walk does not alternate feet: frame1 -12px, frame3 -10px"
+      ]
+    },
+    {
+      "id": "wu_chenseng",
+      "name": "无尘僧",
+      "playable": false,
+      "faction": "hidden_library",
+      "combatRole": "不可战胜的劝止者",
+      "asset": {
+        "exists": true,
+        "pass": false,
+        "regenerate": true,
+        "failures": [
+          "up walk does not alternate feet: frame1 -21px, frame3 -21px"
+        ]
+      },
+      "reason": "sprite exists but gait/anchor contract does not pass; use as static NPC only",
+      "failures": [
+        "up walk does not alternate feet: frame1 -21px, frame3 -21px"
+      ]
+    }
+  ]
+}

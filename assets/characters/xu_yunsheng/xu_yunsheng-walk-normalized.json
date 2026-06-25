@@ -1,0 +1,307 @@
+{
+  "input": "/Users/shangguanchenhuan/Documents/home2025/coke-game-rpg/assets/characters/xu_yunsheng/xu_yunsheng-walk-raw.png",
+  "output": "/Users/shangguanchenhuan/Documents/home2025/coke-game-rpg/assets/characters/xu_yunsheng/xu_yunsheng-walk-normalized.png",
+  "rows": 4,
+  "cols": 4,
+  "motion": "walk",
+  "width": 1252,
+  "height": 1252,
+  "cell": {
+    "width": 313,
+    "height": 313
+  },
+  "keyColor": [
+    237,
+    22,
+    229
+  ],
+  "drift": {
+    "before": [
+      {
+        "row": 0,
+        "xDrift": 83,
+        "footDrift": 0
+      },
+      {
+        "row": 1,
+        "xDrift": 91,
+        "footDrift": 0
+      },
+      {
+        "row": 2,
+        "xDrift": 79,
+        "footDrift": 0
+      },
+      {
+        "row": 3,
+        "xDrift": 87,
+        "footDrift": 1
+      }
+    ],
+    "after": [
+      {
+        "row": 0,
+        "xDrift": 0,
+        "footDrift": 0
+      },
+      {
+        "row": 1,
+        "xDrift": 0,
+        "footDrift": 0
+      },
+      {
+        "row": 2,
+        "xDrift": 0,
+        "footDrift": 0
+      },
+      {
+        "row": 3,
+        "xDrift": 0,
+        "footDrift": 0
+      }
+    ]
+  },
+  "frames": [
+    {
+      "row": 0,
+      "col": 0,
+      "bounds": {
+        "left": 136,
+        "top": 51,
+        "right": 273,
+        "bottom": 312,
+        "centerX": 205
+      },
+      "offset": {
+        "x": -48,
+        "y": 0
+      }
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "bounds": {
+        "left": 104,
+        "top": 51,
+        "right": 240,
+        "bottom": 312,
+        "centerX": 172
+      },
+      "offset": {
+        "x": -15,
+        "y": 0
+      }
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "bounds": {
+        "left": 84,
+        "top": 51,
+        "right": 222,
+        "bottom": 312,
+        "centerX": 153
+      },
+      "offset": {
+        "x": 4,
+        "y": 0
+      }
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "bounds": {
+        "left": 53,
+        "top": 51,
+        "right": 191,
+        "bottom": 312,
+        "centerX": 122
+      },
+      "offset": {
+        "x": 35,
+        "y": 0
+      }
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "bounds": {
+        "left": 135,
+        "top": 43,
+        "right": 272,
+        "bottom": 280,
+        "centerX": 204
+      },
+      "offset": {
+        "x": -47,
+        "y": 0
+      }
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "bounds": {
+        "left": 97,
+        "top": 43,
+        "right": 236,
+        "bottom": 280,
+        "centerX": 167
+      },
+      "offset": {
+        "x": -10,
+        "y": 0
+      }
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "bounds": {
+        "left": 83,
+        "top": 43,
+        "right": 220,
+        "bottom": 280,
+        "centerX": 152
+      },
+      "offset": {
+        "x": 5,
+        "y": 0
+      }
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "bounds": {
+        "left": 42,
+        "top": 42,
+        "right": 184,
+        "bottom": 280,
+        "centerX": 113
+      },
+      "offset": {
+        "x": 44,
+        "y": 0
+      }
+    },
+    {
+      "row": 2,
+      "col": 0,
+      "bounds": {
+        "left": 129,
+        "top": 19,
+        "right": 265,
+        "bottom": 312,
+        "centerX": 197
+      },
+      "offset": {
+        "x": -40,
+        "y": 0
+      }
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "bounds": {
+        "left": 94,
+        "top": 19,
+        "right": 229,
+        "bottom": 312,
+        "centerX": 162
+      },
+      "offset": {
+        "x": -5,
+        "y": 0
+      }
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "bounds": {
+        "left": 77,
+        "top": 19,
+        "right": 213,
+        "bottom": 312,
+        "centerX": 145
+      },
+      "offset": {
+        "x": 12,
+        "y": 0
+      }
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "bounds": {
+        "left": 48,
+        "top": 19,
+        "right": 188,
+        "bottom": 312,
+        "centerX": 118
+      },
+      "offset": {
+        "x": 39,
+        "y": 0
+      }
+    },
+    {
+      "row": 3,
+      "col": 0,
+      "bounds": {
+        "left": 142,
+        "top": 0,
+        "right": 260,
+        "bottom": 235,
+        "centerX": 201
+      },
+      "offset": {
+        "x": -44,
+        "y": 0
+      }
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "bounds": {
+        "left": 107,
+        "top": 0,
+        "right": 226,
+        "bottom": 235,
+        "centerX": 167
+      },
+      "offset": {
+        "x": -10,
+        "y": 0
+      }
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "bounds": {
+        "left": 89,
+        "top": 0,
+        "right": 208,
+        "bottom": 235,
+        "centerX": 149
+      },
+      "offset": {
+        "x": 8,
+        "y": 0
+      }
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "bounds": {
+        "left": 54,
+        "top": 0,
+        "right": 173,
+        "bottom": 234,
+        "centerX": 114
+      },
+      "offset": {
+        "x": 43,
+        "y": 1
+      }
+    }
+  ],
+  "generatedAt": "2026-06-24T02:47:49.825Z"
+}

@@ -6,7 +6,15 @@ class UiRenderer {
     this.buttons = [];
     const capsuleBottom = viewport.menuButton?.bottom || 44;
     this.headerHeight = Math.max(126, capsuleBottom + 78);
-    this.playRect = { x: 0, y: this.headerHeight, width: viewport.width, height: viewport.height - this.headerHeight - 122 };
+    this.controlHeight = viewport.height < 740 ? 150 : 132;
+    this.controlBottomInset = viewport.height < 740 ? 18 : 10;
+    this.controlButtonSize = viewport.height < 740 ? 60 : 68;
+    this.playRect = {
+      x: 0,
+      y: this.headerHeight,
+      width: viewport.width,
+      height: Math.max(260, viewport.height - this.headerHeight - this.controlHeight)
+    };
   }
 
   render(context, state) {
@@ -120,20 +128,24 @@ class UiRenderer {
   renderControls(context, trigger) {
     const h = this.viewport.height;
     context.fillStyle = "#171510";
-    context.fillRect(0, this.playRect.y + this.playRect.height, this.viewport.width, h);
-    const baseY = h - 72;
-    this.directionButton(context, "left", 18, baseY - 34, 68, "left");
-    this.directionButton(context, "up", 88, baseY - 70, 68, "up");
-    this.directionButton(context, "down", 88, baseY + 2, 68, "down");
-    this.directionButton(context, "right", 158, baseY - 34, 68, "right");
-    this.button(context, "interact", this.viewport.width - 92, baseY - 38, 68, 68, trigger ? "交互" : "查看", trigger ? "primaryRound" : "disabledRound");
-    this.button(context, "inventory", this.viewport.width - 166, baseY - 88, 68, 34, "背包", "normal");
-    if (this.lastState?.worldMapUnlocked) this.button(context, "worldmap", this.viewport.width - 92, baseY - 88, 68, 34, "舆图", "normal");
+    context.fillRect(0, Math.max(0, h - this.controlHeight), this.viewport.width, this.controlHeight);
+    const size = this.controlButtonSize;
+    const gap = viewportGap(this.viewport.width);
+    const centerX = 18 + size + gap;
+    const centerY = h - this.controlBottomInset - gap - size;
+    this.directionButton(context, "left", centerX - size - gap, centerY - size / 2, size, "left");
+    this.directionButton(context, "up", centerX, centerY - size - gap, size, "up");
+    this.directionButton(context, "down", centerX, centerY + gap, size, "down");
+    this.directionButton(context, "right", centerX + size + gap, centerY - size / 2, size, "right");
+    const actionSize = size + 4;
+    this.button(context, "interact", this.viewport.width - actionSize - 24, centerY - actionSize / 2, actionSize, actionSize, trigger ? "交互" : "查看", trigger ? "primaryRound" : "disabledRound");
+    this.button(context, "inventory", this.viewport.width - actionSize - 98, centerY - actionSize - 18, 68, 34, "背包", "normal");
+    if (this.lastState?.worldMapUnlocked) this.button(context, "worldmap", this.viewport.width - actionSize - 24, centerY - actionSize - 18, 68, 34, "舆图", "normal");
     if (trigger) {
       context.textAlign = "right";
       context.font = "13px sans-serif";
       context.fillStyle = "#ead5a3";
-      context.fillText(trigger.label, this.viewport.width - 104, h - 76);
+      context.fillText(trigger.label, this.viewport.width - actionSize - 34, Math.max(h - this.controlHeight + 28, centerY - actionSize - 26));
     }
   }
 
@@ -425,6 +437,10 @@ function itemColor(rarity) {
   if (rarity === "精良") return "#83b9d7";
   if (rarity === "稀有") return "#d5b45f";
   return "#b9c28c";
+}
+
+function viewportGap(width) {
+  return width < 370 ? 5 : 8;
 }
 
 module.exports = { UiRenderer };

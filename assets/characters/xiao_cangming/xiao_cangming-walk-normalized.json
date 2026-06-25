@@ -1,0 +1,307 @@
+{
+  "input": "/Users/shangguanchenhuan/Documents/home2025/coke-game-rpg/assets/characters/xiao_cangming/xiao_cangming-walk-raw.png",
+  "output": "/Users/shangguanchenhuan/Documents/home2025/coke-game-rpg/assets/characters/xiao_cangming/xiao_cangming-walk-normalized.png",
+  "rows": 4,
+  "cols": 4,
+  "motion": "walk",
+  "width": 1252,
+  "height": 1252,
+  "cell": {
+    "width": 313,
+    "height": 313
+  },
+  "keyColor": [
+    231,
+    22,
+    230
+  ],
+  "drift": {
+    "before": [
+      {
+        "row": 0,
+        "xDrift": 75,
+        "footDrift": 0
+      },
+      {
+        "row": 1,
+        "xDrift": 76,
+        "footDrift": 1
+      },
+      {
+        "row": 2,
+        "xDrift": 85,
+        "footDrift": 0
+      },
+      {
+        "row": 3,
+        "xDrift": 82,
+        "footDrift": 5
+      }
+    ],
+    "after": [
+      {
+        "row": 0,
+        "xDrift": 0,
+        "footDrift": 0
+      },
+      {
+        "row": 1,
+        "xDrift": 0,
+        "footDrift": 0
+      },
+      {
+        "row": 2,
+        "xDrift": 0,
+        "footDrift": 0
+      },
+      {
+        "row": 3,
+        "xDrift": 0,
+        "footDrift": 0
+      }
+    ]
+  },
+  "frames": [
+    {
+      "row": 0,
+      "col": 0,
+      "bounds": {
+        "left": 105,
+        "top": 37,
+        "right": 296,
+        "bottom": 312,
+        "centerX": 201
+      },
+      "offset": {
+        "x": -44,
+        "y": 0
+      }
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "bounds": {
+        "left": 95,
+        "top": 43,
+        "right": 266,
+        "bottom": 312,
+        "centerX": 181
+      },
+      "offset": {
+        "x": -24,
+        "y": 0
+      }
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "bounds": {
+        "left": 56,
+        "top": 38,
+        "right": 243,
+        "bottom": 312,
+        "centerX": 150
+      },
+      "offset": {
+        "x": 7,
+        "y": 0
+      }
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "bounds": {
+        "left": 34,
+        "top": 41,
+        "right": 217,
+        "bottom": 312,
+        "centerX": 126
+      },
+      "offset": {
+        "x": 31,
+        "y": 0
+      }
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "bounds": {
+        "left": 120,
+        "top": 0,
+        "right": 280,
+        "bottom": 295,
+        "centerX": 200
+      },
+      "offset": {
+        "x": -43,
+        "y": 0
+      }
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "bounds": {
+        "left": 87,
+        "top": 0,
+        "right": 256,
+        "bottom": 295,
+        "centerX": 172
+      },
+      "offset": {
+        "x": -15,
+        "y": 0
+      }
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "bounds": {
+        "left": 71,
+        "top": 0,
+        "right": 228,
+        "bottom": 295,
+        "centerX": 150
+      },
+      "offset": {
+        "x": 7,
+        "y": 0
+      }
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "bounds": {
+        "left": 41,
+        "top": 0,
+        "right": 206,
+        "bottom": 294,
+        "centerX": 124
+      },
+      "offset": {
+        "x": 33,
+        "y": 1
+      }
+    },
+    {
+      "row": 2,
+      "col": 0,
+      "bounds": {
+        "left": 106,
+        "top": 16,
+        "right": 270,
+        "bottom": 312,
+        "centerX": 188
+      },
+      "offset": {
+        "x": -31,
+        "y": 0
+      }
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "bounds": {
+        "left": 67,
+        "top": 16,
+        "right": 238,
+        "bottom": 312,
+        "centerX": 153
+      },
+      "offset": {
+        "x": 4,
+        "y": 0
+      }
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "bounds": {
+        "left": 55,
+        "top": 16,
+        "right": 220,
+        "bottom": 312,
+        "centerX": 138
+      },
+      "offset": {
+        "x": 19,
+        "y": 0
+      }
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "bounds": {
+        "left": 19,
+        "top": 16,
+        "right": 186,
+        "bottom": 312,
+        "centerX": 103
+      },
+      "offset": {
+        "x": 54,
+        "y": 0
+      }
+    },
+    {
+      "row": 3,
+      "col": 0,
+      "bounds": {
+        "left": 92,
+        "top": 0,
+        "right": 265,
+        "bottom": 253,
+        "centerX": 179
+      },
+      "offset": {
+        "x": -22,
+        "y": 5
+      }
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "bounds": {
+        "left": 65,
+        "top": 0,
+        "right": 228,
+        "bottom": 258,
+        "centerX": 147
+      },
+      "offset": {
+        "x": 10,
+        "y": 0
+      }
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "bounds": {
+        "left": 42,
+        "top": 0,
+        "right": 214,
+        "bottom": 253,
+        "centerX": 128
+      },
+      "offset": {
+        "x": 29,
+        "y": 5
+      }
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "bounds": {
+        "left": 15,
+        "top": 0,
+        "right": 179,
+        "bottom": 258,
+        "centerX": 97
+      },
+      "offset": {
+        "x": 60,
+        "y": 0
+      }
+    }
+  ],
+  "generatedAt": "2026-06-24T02:47:58.306Z"
+}

@@ -1,0 +1,307 @@
+{
+  "input": "/Users/shangguanchenhuan/Documents/home2025/coke-game-rpg/assets/characters/moon_valley_traitor/moon_valley_traitor-walk-raw.png",
+  "output": "/Users/shangguanchenhuan/Documents/home2025/coke-game-rpg/assets/characters/moon_valley_traitor/moon_valley_traitor-walk-normalized.png",
+  "rows": 4,
+  "cols": 4,
+  "motion": "walk",
+  "width": 1252,
+  "height": 1252,
+  "cell": {
+    "width": 313,
+    "height": 313
+  },
+  "keyColor": [
+    240,
+    23,
+    237
+  ],
+  "drift": {
+    "before": [
+      {
+        "row": 0,
+        "xDrift": 81,
+        "footDrift": 4
+      },
+      {
+        "row": 1,
+        "xDrift": 89,
+        "footDrift": 0
+      },
+      {
+        "row": 2,
+        "xDrift": 77,
+        "footDrift": 0
+      },
+      {
+        "row": 3,
+        "xDrift": 86,
+        "footDrift": 6
+      }
+    ],
+    "after": [
+      {
+        "row": 0,
+        "xDrift": 0,
+        "footDrift": 0
+      },
+      {
+        "row": 1,
+        "xDrift": 0,
+        "footDrift": 0
+      },
+      {
+        "row": 2,
+        "xDrift": 0,
+        "footDrift": 0
+      },
+      {
+        "row": 3,
+        "xDrift": 0,
+        "footDrift": 0
+      }
+    ]
+  },
+  "frames": [
+    {
+      "row": 0,
+      "col": 0,
+      "bounds": {
+        "left": 136,
+        "top": 53,
+        "right": 269,
+        "bottom": 308,
+        "centerX": 203
+      },
+      "offset": {
+        "x": -46,
+        "y": 4
+      }
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "bounds": {
+        "left": 103,
+        "top": 53,
+        "right": 236,
+        "bottom": 312,
+        "centerX": 170
+      },
+      "offset": {
+        "x": -13,
+        "y": 0
+      }
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "bounds": {
+        "left": 86,
+        "top": 53,
+        "right": 218,
+        "bottom": 308,
+        "centerX": 152
+      },
+      "offset": {
+        "x": 5,
+        "y": 4
+      }
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "bounds": {
+        "left": 54,
+        "top": 53,
+        "right": 189,
+        "bottom": 312,
+        "centerX": 122
+      },
+      "offset": {
+        "x": 35,
+        "y": 0
+      }
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "bounds": {
+        "left": 135,
+        "top": 41,
+        "right": 267,
+        "bottom": 276,
+        "centerX": 201
+      },
+      "offset": {
+        "x": -44,
+        "y": 0
+      }
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "bounds": {
+        "left": 98,
+        "top": 41,
+        "right": 231,
+        "bottom": 276,
+        "centerX": 165
+      },
+      "offset": {
+        "x": -8,
+        "y": 0
+      }
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "bounds": {
+        "left": 83,
+        "top": 41,
+        "right": 215,
+        "bottom": 276,
+        "centerX": 149
+      },
+      "offset": {
+        "x": 8,
+        "y": 0
+      }
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "bounds": {
+        "left": 45,
+        "top": 41,
+        "right": 179,
+        "bottom": 276,
+        "centerX": 112
+      },
+      "offset": {
+        "x": 45,
+        "y": 0
+      }
+    },
+    {
+      "row": 2,
+      "col": 0,
+      "bounds": {
+        "left": 132,
+        "top": 17,
+        "right": 264,
+        "bottom": 312,
+        "centerX": 198
+      },
+      "offset": {
+        "x": -41,
+        "y": 0
+      }
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "bounds": {
+        "left": 97,
+        "top": 17,
+        "right": 229,
+        "bottom": 312,
+        "centerX": 163
+      },
+      "offset": {
+        "x": -6,
+        "y": 0
+      }
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "bounds": {
+        "left": 79,
+        "top": 17,
+        "right": 212,
+        "bottom": 312,
+        "centerX": 146
+      },
+      "offset": {
+        "x": 11,
+        "y": 0
+      }
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "bounds": {
+        "left": 55,
+        "top": 17,
+        "right": 187,
+        "bottom": 312,
+        "centerX": 121
+      },
+      "offset": {
+        "x": 36,
+        "y": 0
+      }
+    },
+    {
+      "row": 3,
+      "col": 0,
+      "bounds": {
+        "left": 129,
+        "top": 0,
+        "right": 256,
+        "bottom": 229,
+        "centerX": 193
+      },
+      "offset": {
+        "x": -36,
+        "y": 6
+      }
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "bounds": {
+        "left": 94,
+        "top": 0,
+        "right": 223,
+        "bottom": 235,
+        "centerX": 159
+      },
+      "offset": {
+        "x": -2,
+        "y": 0
+      }
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "bounds": {
+        "left": 77,
+        "top": 0,
+        "right": 204,
+        "bottom": 229,
+        "centerX": 141
+      },
+      "offset": {
+        "x": 16,
+        "y": 6
+      }
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "bounds": {
+        "left": 42,
+        "top": 0,
+        "right": 172,
+        "bottom": 235,
+        "centerX": 107
+      },
+      "offset": {
+        "x": 50,
+        "y": 0
+      }
+    }
+  ],
+  "generatedAt": "2026-06-24T02:12:55.671Z"
+}

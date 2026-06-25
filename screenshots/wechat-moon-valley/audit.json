@@ -1,0 +1,266 @@
+{
+  "points": [
+    {
+      "name": "world-moon-gate",
+      "mapId": "world",
+      "x": 3180,
+      "y": 1480,
+      "trigger": "moonValleyGate",
+      "collisions": 7,
+      "triggers": 12
+    },
+    {
+      "name": "valley-spawn",
+      "mapId": "moonValley",
+      "x": 390,
+      "y": 1575,
+      "trigger": "moonValleyExit",
+      "collisions": 16,
+      "triggers": 7
+    },
+    {
+      "name": "qin-wanyao",
+      "mapId": "moonValley",
+      "x": 390,
+      "y": 710,
+      "trigger": "qin_wanyao",
+      "collisions": 16,
+      "triggers": 7
+    },
+    {
+      "name": "mu-zhiyan",
+      "mapId": "moonValley",
+      "x": 555,
+      "y": 1160,
+      "trigger": "mu_zhiyan",
+      "collisions": 16,
+      "triggers": 7
+    },
+    {
+      "name": "medicine-door",
+      "mapId": "moonValley",
+      "x": 640,
+      "y": 1000,
+      "trigger": "moonMedicineDoor",
+      "collisions": 16,
+      "triggers": 7
+    },
+    {
+      "name": "medicine-room",
+      "mapId": "moonMedicineHall",
+      "x": 610,
+      "y": 650,
+      "trigger": null,
+      "collisions": 11,
+      "triggers": 3
+    },
+    {
+      "name": "study-door",
+      "mapId": "moonValley",
+      "x": 390,
+      "y": 345,
+      "trigger": "moonStudyDoor",
+      "collisions": 16,
+      "triggers": 7
+    },
+    {
+      "name": "study-room",
+      "mapId": "moonStudy",
+      "x": 610,
+      "y": 650,
+      "trigger": null,
+      "collisions": 12,
+      "triggers": 3
+    },
+    {
+      "name": "debug-collision-and-scout",
+      "mapId": "moonValley",
+      "x": 425,
+      "y": 575,
+      "trigger": "scout_moon",
+      "collisions": 16,
+      "triggers": 7
+    }
+  ],
+  "dialogs": [
+    {
+      "name": "world-moon-gate-dialog",
+      "speaker": "月华谷山口",
+      "text": "雾气从竹林深处涌出，石阶尽头隐约有灯火。",
+      "choices": [
+        "进入月华谷",
+        "暂时离开"
+      ]
+    },
+    {
+      "name": "moon-valley-arrival-1",
+      "speaker": "月华谷弟子",
+      "text": "谷主失踪后，外人不得入药庐。你们若要查旧信，先证明不是南岭王府派来的。",
+      "choices": []
+    },
+    {
+      "name": "qin-wanyao-dialog",
+      "speaker": "秦晚瑶",
+      "text": "谷中药账被人改过，少侠若要追查旧案，先从书房残图看起。这封王府请帖，也许能让你问到更深的真相。",
+      "choices": [
+        "收下王府请帖",
+        "请她配些伤药"
+      ]
+    },
+    {
+      "name": "qin-wanyao-invitation",
+      "choices": []
+    },
+    {
+      "name": "mu-zhiyan-dialog",
+      "speaker": "穆芷烟",
+      "text": "昨夜有人从桥后翻入药圃，只留下半枚青铜扣。那人应还藏在谷中。被调包的孩子，也许不止你以为的那一个。",
+      "choices": [
+        "记下调包线索",
+        "暂时离开"
+      ]
+    },
+    {
+      "name": "mu-zhiyan-clue",
+      "choices": []
+    },
+    {
+      "name": "medicine-door-dialog",
+      "speaker": "月华药庐",
+      "text": "药香透过门缝散出，里面有人正在研磨草药。",
+      "choices": [
+        "进入药庐",
+        "暂时离开"
+      ]
+    },
+    {
+      "name": "study-door-dialog",
+      "speaker": "月华书房",
+      "text": "窗内灯影未灭，案上似乎摊着一卷残图。",
+      "choices": [
+        "进入书房",
+        "暂时离开"
+      ]
+    },
+    {
+      "name": "moon-scout-dialog",
+      "speaker": "谷中叛徒",
+      "text": "你不该来月华谷。残图和药账，都得留在这里。",
+      "choices": [
+        "拔剑迎战",
+        "暂避锋芒"
+      ]
+    }
+  ],
+  "battle": {
+    "defeated": true,
+    "dialog": "战斗",
+    "audit": {
+      "attacks": [
+        {
+          "attackerId": "hero",
+          "targetId": "scoutA",
+          "skillId": "guiyuan_sword",
+          "damage": 38,
+          "targetHp": 0,
+          "status": null
+        }
+      ],
+      "moves": [
+        {
+          "id": "hero",
+          "x": 3,
+          "y": 7
+        }
+      ],
+      "enemyActions": [],
+      "animations": [
+        {
+          "id": "hero",
+          "type": "attack",
+          "sprite": "heroAttack",
+          "direction": "right",
+          "frames": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "duration": 0.36
+        }
+      ],
+      "renderedAttackFrames": [
+        {
+          "id": "hero",
+          "sprite": "heroAttack",
+          "direction": "right",
+          "frame": 0
+        },
+        {
+          "id": "hero",
+          "sprite": "heroAttack",
+          "direction": "right",
+          "frame": 1
+        },
+        {
+          "id": "hero",
+          "sprite": "heroAttack",
+          "direction": "right",
+          "frame": 2
+        },
+        {
+          "id": "hero",
+          "sprite": "heroAttack",
+          "direction": "right",
+          "frame": 3
+        }
+      ],
+      "result": "victory",
+      "rewards": {
+        "money": 22,
+        "items": [
+          {
+            "itemId": "hemostatic_powder",
+            "name": "止血散",
+            "amount": 1
+          }
+        ]
+      }
+    },
+    "money": 142,
+    "items": {
+      "hemostatic_powder": 3,
+      "qingxin_pill": 1,
+      "palace_invitation": 1
+    }
+  },
+  "story": {
+    "flags": [
+      "moon_valley_reached",
+      "palace_invitation_received",
+      "heard_swapped_children_clue"
+    ],
+    "log": [
+      {
+        "text": "穆芷烟透露旧案中存在多个被调包的孩子。",
+        "at": 1782269724820
+      },
+      {
+        "text": "秦晚瑶交出南岭王府请帖，并警告沈临川不要轻信王府密卷。",
+        "at": 1782269724470
+      },
+      {
+        "text": "苏萝带沈临川进入月华谷，月华弟子要求先查清王府玉佩来历。",
+        "at": 1782269723818
+      }
+    ],
+    "invitation": 1,
+    "qingxin": 1
+  },
+  "errors": [],
+  "canvas": {
+    "width": 390,
+    "height": 844,
+    "coloredSamples": 3236
+  }
+}

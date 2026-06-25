@@ -1,0 +1,307 @@
+{
+  "input": "/Users/shangguanchenhuan/Documents/home2025/coke-game-rpg/assets/characters/moon_valley_disciple/moon_valley_disciple-walk-raw.png",
+  "output": "/Users/shangguanchenhuan/Documents/home2025/coke-game-rpg/assets/characters/moon_valley_disciple/moon_valley_disciple-walk-normalized.png",
+  "rows": 4,
+  "cols": 4,
+  "motion": "walk",
+  "width": 1252,
+  "height": 1252,
+  "cell": {
+    "width": 313,
+    "height": 313
+  },
+  "keyColor": [
+    240,
+    23,
+    237
+  ],
+  "drift": {
+    "before": [
+      {
+        "row": 0,
+        "xDrift": 66,
+        "footDrift": 5
+      },
+      {
+        "row": 1,
+        "xDrift": 71,
+        "footDrift": 0
+      },
+      {
+        "row": 2,
+        "xDrift": 69,
+        "footDrift": 0
+      },
+      {
+        "row": 3,
+        "xDrift": 66,
+        "footDrift": 5
+      }
+    ],
+    "after": [
+      {
+        "row": 0,
+        "xDrift": 0,
+        "footDrift": 0
+      },
+      {
+        "row": 1,
+        "xDrift": 0,
+        "footDrift": 0
+      },
+      {
+        "row": 2,
+        "xDrift": 0,
+        "footDrift": 0
+      },
+      {
+        "row": 3,
+        "xDrift": 0,
+        "footDrift": 0
+      }
+    ]
+  },
+  "frames": [
+    {
+      "row": 0,
+      "col": 0,
+      "bounds": {
+        "left": 129,
+        "top": 63,
+        "right": 248,
+        "bottom": 291,
+        "centerX": 189
+      },
+      "offset": {
+        "x": -32,
+        "y": 5
+      }
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "bounds": {
+        "left": 111,
+        "top": 63,
+        "right": 230,
+        "bottom": 296,
+        "centerX": 171
+      },
+      "offset": {
+        "x": -14,
+        "y": 0
+      }
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "bounds": {
+        "left": 80,
+        "top": 63,
+        "right": 199,
+        "bottom": 291,
+        "centerX": 140
+      },
+      "offset": {
+        "x": 17,
+        "y": 5
+      }
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "bounds": {
+        "left": 64,
+        "top": 63,
+        "right": 182,
+        "bottom": 295,
+        "centerX": 123
+      },
+      "offset": {
+        "x": 34,
+        "y": 1
+      }
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "bounds": {
+        "left": 131,
+        "top": 54,
+        "right": 248,
+        "bottom": 264,
+        "centerX": 190
+      },
+      "offset": {
+        "x": -33,
+        "y": 0
+      }
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "bounds": {
+        "left": 107,
+        "top": 54,
+        "right": 230,
+        "bottom": 264,
+        "centerX": 169
+      },
+      "offset": {
+        "x": -12,
+        "y": 0
+      }
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "bounds": {
+        "left": 81,
+        "top": 54,
+        "right": 199,
+        "bottom": 264,
+        "centerX": 140
+      },
+      "offset": {
+        "x": 17,
+        "y": 0
+      }
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "bounds": {
+        "left": 57,
+        "top": 54,
+        "right": 180,
+        "bottom": 264,
+        "centerX": 119
+      },
+      "offset": {
+        "x": 38,
+        "y": 0
+      }
+    },
+    {
+      "row": 2,
+      "col": 0,
+      "bounds": {
+        "left": 122,
+        "top": 27,
+        "right": 242,
+        "bottom": 312,
+        "centerX": 182
+      },
+      "offset": {
+        "x": -25,
+        "y": 0
+      }
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "bounds": {
+        "left": 99,
+        "top": 28,
+        "right": 225,
+        "bottom": 312,
+        "centerX": 162
+      },
+      "offset": {
+        "x": -5,
+        "y": 0
+      }
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "bounds": {
+        "left": 72,
+        "top": 27,
+        "right": 193,
+        "bottom": 312,
+        "centerX": 133
+      },
+      "offset": {
+        "x": 24,
+        "y": 0
+      }
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "bounds": {
+        "left": 50,
+        "top": 27,
+        "right": 176,
+        "bottom": 312,
+        "centerX": 113
+      },
+      "offset": {
+        "x": 44,
+        "y": 0
+      }
+    },
+    {
+      "row": 3,
+      "col": 0,
+      "bounds": {
+        "left": 129,
+        "top": 0,
+        "right": 245,
+        "bottom": 219,
+        "centerX": 187
+      },
+      "offset": {
+        "x": -30,
+        "y": 5
+      }
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "bounds": {
+        "left": 109,
+        "top": 0,
+        "right": 227,
+        "bottom": 224,
+        "centerX": 168
+      },
+      "offset": {
+        "x": -11,
+        "y": 0
+      }
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "bounds": {
+        "left": 80,
+        "top": 0,
+        "right": 196,
+        "bottom": 219,
+        "centerX": 138
+      },
+      "offset": {
+        "x": 19,
+        "y": 5
+      }
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "bounds": {
+        "left": 62,
+        "top": 0,
+        "right": 180,
+        "bottom": 224,
+        "centerX": 121
+      },
+      "offset": {
+        "x": 36,
+        "y": 0
+      }
+    }
+  ],
+  "generatedAt": "2026-06-23T07:49:31.953Z"
+}

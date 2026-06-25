@@ -79,12 +79,12 @@ class GameApp {
   async loadAssets() {
     const entries = Object.entries(ASSETS).filter(([key]) => !key.endsWith("Sfx") && !key.endsWith("Bgm") && key !== "bgm");
     let loaded = 0;
-    for (const [key, source] of entries) {
-      this.loadingSet("加载图片资源", `${loaded + 1}/${entries.length} ${source}`, 0.25 + (loaded / entries.length) * 0.62);
+    this.loadingSet("加载图片资源", `0/${entries.length} 并行下载地图与角色资源。`, 0.25);
+    await Promise.all(entries.map(async ([key, source]) => {
       this.images[key] = await loadImage(this.canvas, source);
       loaded += 1;
       this.loadingSet("加载图片资源", `${loaded}/${entries.length} ${source}`, 0.25 + (loaded / entries.length) * 0.62);
-    }
+    }));
   }
 
   loadingSet(stage, detail, progress) {

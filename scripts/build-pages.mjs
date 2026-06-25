@@ -4,6 +4,7 @@ import esbuild from "esbuild";
 
 const root = process.cwd();
 const dist = path.join(root, "dist");
+const buildVersion = process.env.PAGES_BUILD_VERSION || Date.now().toString(36);
 
 await rm(dist, { recursive: true, force: true });
 await mkdir(path.join(dist, "wechat-debug", "generated"), { recursive: true });
@@ -28,7 +29,7 @@ await writeFile(path.join(dist, "index.html"), `<!doctype html>
 const debugHtml = await import("node:fs/promises").then((fs) => fs.readFile(path.join(root, "wechat-debug/index.html"), "utf8"));
 await writeFile(
   path.join(dist, "wechat-debug/index.html"),
-  debugHtml.replace("./.generated/game-debug.js", "./generated/game-debug.js")
+  debugHtml.replace("./.generated/game-debug.js", `./generated/game-debug.js?v=${buildVersion}`)
 );
 
 await esbuild.build({

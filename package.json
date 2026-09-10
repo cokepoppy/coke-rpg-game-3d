@@ -6,6 +6,7 @@
     "seedance:submit": "node scripts/seedance-submit.mjs",
     "wechat:assets": "node scripts/copy-wechat-assets.mjs",
     "wechat:debug": "npm run wechat:assets && node scripts/start-wechat-debug.mjs",
+    "wechat:boss:demo": "node scripts/demo-wechat-boss.mjs",
     "wechat:test": "node scripts/test-wechat-debug.mjs",
     "wechat:menu:test": "node scripts/test-wechat-menu.mjs",
     "wechat:battle:test": "node scripts/test-wechat-battle.mjs",

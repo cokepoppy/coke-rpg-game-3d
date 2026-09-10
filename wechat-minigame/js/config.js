@@ -167,11 +167,15 @@ const WORLD_OCCLUSIONS = [
   { x: 3072, y: 2460, width: 192, height: 64 }
 ];
 
+// Measured against the current 1280x768 inn-room.png. These are only the
+// front edges of furniture; broad desktop-era rectangles hide nearby actors.
 const ROOM_OCCLUSIONS = [
-  { x: 100, y: 250, width: 338, height: 100 },
-  { x: 488, y: 420, width: 313, height: 70 },
-  { x: 900, y: 300, width: 300, height: 210 },
-  { x: 200, y: 430, width: 263, height: 180 }
+  { name: "bed_front_edge", x: 92, y: 302, width: 270, height: 38 },
+  { name: "table_front_edge", x: 548, y: 430, width: 196, height: 30 },
+  { name: "table_front_chair_seat", x: 612, y: 422, width: 68, height: 32 },
+  { name: "table_front_chair_legs", x: 612, y: 454, width: 68, height: 40 },
+  { name: "storage_bottom_edge", x: 730, y: 194, width: 392, height: 30 },
+  { name: "screen_front_edge", x: 82, y: 654, width: 284, height: 34 }
 ];
 
 const ROOM_COLLISIONS = [

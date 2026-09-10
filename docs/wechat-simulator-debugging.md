@@ -79,11 +79,17 @@ can turn local tool failures into misleading connection errors.
 
 The portrait runtime keeps two different map contracts:
 
-- `MAPS[*].occlusions` are foreground rectangles copied from the source map
-  image after characters are drawn. This is what lets a roof, counter, bed, or
-  screen mask a character without changing the source artwork. The world map
-  is split into west/east images, so `MapManager.drawOcclusions()` must crop a
-  mask against each image layer instead of assuming one full-size image.
+- `MAPS[*].occlusions` are foreground strips copied from the current runtime
+  map image after characters are drawn. They must be measured against that
+  exact PNG at native resolution; do not copy a desktop rectangle into the
+  portrait runtime without a screenshot check. Keep a furniture mask to the
+  visible front edge, otherwise it can hide half of a nearby actor. The world
+  map is split into west/east images, so `MapManager.drawOcclusions()` must
+  crop a mask against each image layer instead of assuming one full-size image.
+- NPCs are sorted among themselves, then the controlled hero is drawn last so
+  the hero remains the visible focal character when sprites overlap. Furniture
+  depth is handled only by the narrow foreground strips, not by changing hero
+  priority.
 - `BATTLE.blocked` contains `[x, y]` cells that cannot be entered. Player
   movement and enemy movement both use four-direction reachability; blocked
   cells are also rendered with a crossed marker and must not be offered as

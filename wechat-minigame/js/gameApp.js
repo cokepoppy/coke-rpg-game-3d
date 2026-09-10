@@ -128,16 +128,8 @@ class GameApp {
       ctx.rect(this.ui.playRect.x, this.ui.playRect.y, this.ui.playRect.width, this.ui.playRect.height);
       ctx.clip();
       ctx.translate(this.ui.playRect.x, this.ui.playRect.y);
-      const characters = [
-        ...this.visibleNpcs().map((npc) => ({ kind: "npc", depthY: npc.y, npc })),
-        { kind: "player", depthY: this.player.y }
-      ].sort((a, b) => a.depthY - b.depthY || (a.kind === "npc" ? -1 : 1));
-      for (const character of characters) {
-        if (character.kind === "player") {
-          this.player.draw(ctx, camera);
-          continue;
-        }
-        const npc = character.npc;
+      const npcs = this.visibleNpcs().slice().sort((a, b) => a.y - b.y);
+      for (const npc of npcs) {
         drawSprite(ctx, this.images[npc.sprite], npc.x - camera.x, npc.y - camera.y, npc.direction, 0, 96, 96);
         ctx.textAlign = "center";
         ctx.font = "700 12px sans-serif";
@@ -147,6 +139,9 @@ class GameApp {
         ctx.fillStyle = "#fff6dd";
         ctx.fillText(npc.name, npc.x - camera.x, npc.y - camera.y + 14);
       }
+      // The hero is the controlled focal character: keep it above NPC sprites.
+      // Furniture depth is handled separately by the narrow foreground masks.
+      this.player.draw(ctx, camera);
       ctx.restore();
       this.mapManager.drawOcclusions(ctx, camera, this.ui.playRect);
       if (this.debugMap) this.mapManager.drawDebug(ctx, camera, this.ui.playRect);

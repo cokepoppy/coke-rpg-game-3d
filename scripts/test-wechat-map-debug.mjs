@@ -51,7 +51,8 @@ try {
         trigger: game.activeTrigger?.id || null,
         collisions: game.mapManager.map.collisions.length,
         triggers: game.mapManager.map.triggers.length,
-        occlusions: game.mapManager.map.occlusions?.length || 0
+        occlusions: game.mapManager.map.occlusions?.length || 0,
+        occlusionHeights: (game.mapManager.map.occlusions || []).map((mask) => mask.height)
       };
     }, { mapId, point });
     audit.push({ name, ...state });
@@ -60,7 +61,9 @@ try {
   }
   if (errors.length) throw new Error(`Browser errors: ${errors.join(" | ")}`);
   if (!audit.find((entry) => entry.mapId === "world" && entry.occlusions >= 4)) throw new Error("World occlusion masks are missing.");
-  if (!audit.find((entry) => entry.mapId === "room" && entry.occlusions >= 4)) throw new Error("Room occlusion masks are missing.");
+  const room = audit.find((entry) => entry.mapId === "room");
+  if (!room || room.occlusions !== 6) throw new Error("Room occlusion masks are missing.");
+  if (room.occlusionHeights.some((height) => height > 40)) throw new Error(`Room occlusion is too broad: ${JSON.stringify(room.occlusionHeights)}`);
   await writeFile(`${output}/audit.json`, `${JSON.stringify({ audit, errors }, null, 2)}\n`);
   console.log(JSON.stringify({ audit, errors }, null, 2));
   setTimeout(() => globalThis.process.exit(0), 1200);

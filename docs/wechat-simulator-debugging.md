@@ -74,3 +74,28 @@ On macOS the last file is normally mapped below:
 
 Always use `NO_PROXY='*'` for localhost CLI/test traffic. A configured proxy
 can turn local tool failures into misleading connection errors.
+
+## Map Occlusion And Battle Obstacles
+
+The portrait runtime keeps two different map contracts:
+
+- `MAPS[*].occlusions` are foreground rectangles copied from the source map
+  image after characters are drawn. This is what lets a roof, counter, bed, or
+  screen mask a character without changing the source artwork. The world map
+  is split into west/east images, so `MapManager.drawOcclusions()` must crop a
+  mask against each image layer instead of assuming one full-size image.
+- `BATTLE.blocked` contains `[x, y]` cells that cannot be entered. Player
+  movement and enemy movement both use four-direction reachability; blocked
+  cells are also rendered with a crossed marker and must not be offered as
+  movement highlights. Do not place an initial unit on a blocked cell.
+
+Run these local checks after changing either contract:
+
+```bash
+npm run wechat:map:debug
+npm run wechat:battle:actions:test
+DEMO_HEADLESS=1 npm run wechat:boss:demo
+```
+
+Keep this work in the local `wechat-debug` boundary. It does not authorize a
+VPS release or a change to any other service.

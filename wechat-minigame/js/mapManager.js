@@ -53,6 +53,51 @@ class MapManager {
     context.restore();
   }
 
+  drawOcclusions(context, camera, playRect) {
+    if (!this.map.occlusions?.length) return;
+    context.save();
+    context.beginPath();
+    context.rect(playRect.x, playRect.y, playRect.width, playRect.height);
+    context.clip();
+    context.translate(playRect.x, playRect.y);
+    for (const rect of this.map.occlusions) this.drawMapRect(context, camera, rect);
+    context.restore();
+  }
+
+  drawMapRect(context, camera, rect) {
+    if (this.map.images) {
+      for (const layer of this.map.images) {
+        const image = this.images[layer.id];
+        if (!image) continue;
+        const left = Math.max(rect.x, layer.x);
+        const top = Math.max(rect.y, layer.y);
+        const right = Math.min(rect.x + rect.width, layer.x + image.width);
+        const bottom = Math.min(rect.y + rect.height, layer.y + image.height);
+        if (right <= left || bottom <= top) continue;
+        context.drawImage(
+          image,
+          left - layer.x,
+          top - layer.y,
+          right - left,
+          bottom - top,
+          left - camera.x,
+          top - camera.y,
+          right - left,
+          bottom - top
+        );
+      }
+      return;
+    }
+    const image = this.images[this.map.image];
+    if (!image) return;
+    const left = Math.max(rect.x, 0);
+    const top = Math.max(rect.y, 0);
+    const right = Math.min(rect.x + rect.width, image.width);
+    const bottom = Math.min(rect.y + rect.height, image.height);
+    if (right <= left || bottom <= top) return;
+    context.drawImage(image, left, top, right - left, bottom - top, left - camera.x, top - camera.y, right - left, bottom - top);
+  }
+
   drawDebug(context, camera, playRect) {
     const tile = 64;
     context.save();
@@ -83,6 +128,12 @@ class MapManager {
       context.strokeStyle = "rgba(255, 78, 64, 0.92)";
       context.fillRect(wall.x, wall.y, wall.width, wall.height);
       context.strokeRect(wall.x + 0.5, wall.y + 0.5, wall.width, wall.height);
+    }
+    for (const mask of this.map.occlusions || []) {
+      context.fillStyle = "rgba(255, 220, 80, 0.18)";
+      context.strokeStyle = "rgba(255, 220, 80, 0.92)";
+      context.fillRect(mask.x, mask.y, mask.width, mask.height);
+      context.strokeRect(mask.x + 0.5, mask.y + 0.5, mask.width, mask.height);
     }
     for (const trigger of this.map.triggers || []) {
       context.fillStyle = "rgba(72, 164, 255, 0.24)";

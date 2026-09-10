@@ -9,6 +9,7 @@ class BattleScene {
     this.skillSfx = skillSfx;
     this.onFinish = onFinish;
     this.config = battleConfig;
+    this.blocked = new Set((battleConfig.blocked || []).map(([x, y]) => cellKey(x, y)));
     this.mapKey = mapKey;
     this.playerModifiers = playerModifiers;
     this.unlockedSkillIds = unlockedSkillIds;
@@ -322,16 +323,11 @@ class BattleScene {
   }
 
   moveEnemyToward(enemy, target, preferredRange = 1) {
-    const occupied = new Set(this.units.filter((unit) => unit.alive && unit.id !== enemy.id).map((unit) => `${unit.x},${unit.y}`));
     let best = { x: enemy.x, y: enemy.y, metric: distance(enemy, target) * 10 };
-    for (let y = 0; y < this.config.rows; y += 1) {
-      for (let x = 0; x < this.config.cols; x += 1) {
-        const steps = distance(enemy, { x, y });
-        if (steps < 1 || steps > enemy.move || occupied.has(`${x},${y}`)) continue;
-        const rangeDistance = Math.abs(distance({ x, y }, target) - preferredRange);
-        const metric = rangeDistance * 10 + distance({ x, y }, target);
-        if (metric < best.metric) best = { x, y, metric };
-      }
+    for (const cell of this.reachableCells(enemy)) {
+      const rangeDistance = Math.abs(distance(cell, target) - preferredRange);
+      const metric = rangeDistance * 10 + distance(cell, target);
+      if (metric < best.metric) best = { ...cell, metric };
     }
     if (best.x === enemy.x && best.y === enemy.y) return;
     enemy.direction = directionTo(enemy, best);
@@ -392,12 +388,29 @@ class BattleScene {
 
   movesFor(unit) {
     if (!unit || unit.moved) return [];
-    const occupied = new Set(this.units.filter((item) => item.alive && item.id !== unit.id).map((item) => `${item.x},${item.y}`));
+    return this.reachableCells(unit).map((cell) => ({ ...cell, kind: "move" }));
+  }
+
+  reachableCells(unit) {
+    const occupied = new Set(this.units
+      .filter((item) => item.alive && item.id !== unit.id)
+      .map((item) => cellKey(item.x, item.y)));
+    const reached = new Set([cellKey(unit.x, unit.y)]);
+    const frontier = [{ x: unit.x, y: unit.y, steps: 0 }];
     const moves = [];
-    for (let y = 0; y < this.config.rows; y += 1) {
-      for (let x = 0; x < this.config.cols; x += 1) {
-        const steps = distance(unit, { x, y });
-        if (steps > 0 && !occupied.has(`${x},${y}`) && steps <= unit.move) moves.push({ x, y, kind: "move" });
+    for (let index = 0; index < frontier.length; index += 1) {
+      const current = frontier[index];
+      if (current.steps >= unit.move) continue;
+      for (const next of neighbors(current)) {
+        const nextKey = cellKey(next.x, next.y);
+        if (
+          next.x < 0 || next.y < 0 || next.x >= this.config.cols || next.y >= this.config.rows
+          || reached.has(nextKey) || this.blocked.has(nextKey) || occupied.has(nextKey)
+        ) continue;
+        reached.add(nextKey);
+        const cell = { x: next.x, y: next.y };
+        frontier.push({ ...cell, steps: current.steps + 1 });
+        moves.push(cell);
       }
     }
     return moves;
@@ -520,6 +533,23 @@ class BattleScene {
       context.beginPath();
       context.moveTo(grid.x, grid.y + y * tile + 0.5);
       context.lineTo(grid.x + grid.width, grid.y + y * tile + 0.5);
+      context.stroke();
+    }
+    for (const cell of this.config.blocked || []) {
+      const x = grid.x + cell[0] * tile;
+      const y = grid.y + cell[1] * tile;
+      context.fillStyle = "rgba(18, 20, 17, 0.62)";
+      context.fillRect(x, y, tile, tile);
+      context.strokeStyle = "rgba(219, 186, 115, 0.76)";
+      context.lineWidth = 2;
+      context.strokeRect(x + 2, y + 2, tile - 4, tile - 4);
+      context.strokeStyle = "rgba(245, 234, 208, 0.30)";
+      context.lineWidth = 1;
+      context.beginPath();
+      context.moveTo(x + 10, y + tile - 10);
+      context.lineTo(x + tile - 10, y + 10);
+      context.moveTo(x + 10, y + 10);
+      context.lineTo(x + tile - 10, y + tile - 10);
       context.stroke();
     }
     this.drawUnits(context);
@@ -721,6 +751,19 @@ class BattleScene {
     context.font = "12px sans-serif";
     context.fillText("普通攻击不耗气；移动后可攻击、放技能或待命。", 24, panel.y + 218);
   }
+}
+
+function cellKey(x, y) {
+  return `${x},${y}`;
+}
+
+function neighbors(cell) {
+  return [
+    { x: cell.x + 1, y: cell.y },
+    { x: cell.x - 1, y: cell.y },
+    { x: cell.x, y: cell.y + 1 },
+    { x: cell.x, y: cell.y - 1 }
+  ];
 }
 
 function distance(a, b) {

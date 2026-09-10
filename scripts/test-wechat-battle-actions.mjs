@@ -107,6 +107,8 @@ try {
       renderedAttackFrames: battle.audit.renderedAttackFrames,
       hitSfx: game.hitSfx.audit,
       waitSfx: game.skillSfx.wait.audit,
+      blockedCells: battle.config.blocked || [],
+      blockedHighlights: battle.highlights.filter((cell) => (battle.config.blocked || []).some(([x, y]) => x === cell.x && y === cell.y)),
       postEnemy: {
         side: battle.side,
         phase: battle.phase,
@@ -118,6 +120,8 @@ try {
   audit.afterEnemy = afterEnemy;
   audit.errors = errors;
 
+  if (!audit.blockedCells.length) throw new Error("Battle map has no blocked cells.");
+  if (audit.blockedHighlights.length) throw new Error(`Blocked cells were offered as movement targets: ${JSON.stringify(audit.blockedHighlights)}`);
   if (audit.undo.afterUndo.x !== audit.undo.start.x || audit.undo.afterUndo.y !== audit.undo.start.y || audit.undo.afterUndo.moved) throw new Error("Undo move did not restore the selected unit.");
   if (audit.hero.qi !== 0) throw new Error(`Basic attack should not consume qi, received ${audit.hero.qi}`);
   if (!audit.attacks.some((event) => event.skillId === "basic_attack" && event.damage > 0)) throw new Error("Basic attack did not damage an adjacent enemy.");

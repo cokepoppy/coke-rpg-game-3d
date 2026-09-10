@@ -50,7 +50,8 @@ try {
         player: { x: Math.round(game.player.x), y: Math.round(game.player.y) },
         trigger: game.activeTrigger?.id || null,
         collisions: game.mapManager.map.collisions.length,
-        triggers: game.mapManager.map.triggers.length
+        triggers: game.mapManager.map.triggers.length,
+        occlusions: game.mapManager.map.occlusions?.length || 0
       };
     }, { mapId, point });
     audit.push({ name, ...state });
@@ -58,6 +59,8 @@ try {
     await page.screenshot({ path: `${output}/${name}.png` });
   }
   if (errors.length) throw new Error(`Browser errors: ${errors.join(" | ")}`);
+  if (!audit.find((entry) => entry.mapId === "world" && entry.occlusions >= 4)) throw new Error("World occlusion masks are missing.");
+  if (!audit.find((entry) => entry.mapId === "room" && entry.occlusions >= 4)) throw new Error("Room occlusion masks are missing.");
   await writeFile(`${output}/audit.json`, `${JSON.stringify({ audit, errors }, null, 2)}\n`);
   console.log(JSON.stringify({ audit, errors }, null, 2));
   setTimeout(() => globalThis.process.exit(0), 1200);

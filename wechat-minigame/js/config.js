@@ -75,6 +75,7 @@ const BATTLE = {
   title: "西岭密探",
   cols: 7,
   rows: 9,
+  blocked: [[3, 2], [3, 3], [3, 4], [3, 5], [4, 4]],
   objective: "击退伏兵",
   players: [
     { id: "hero", name: GAME.heroName, sprite: "hero", attackSprite: "heroAttack", side: "player", x: 2, y: 7, hp: 88, qi: 110, move: 3, range: 2, damage: 32, skillIds: ["guiyuan_sword", "daze", "whirlwind"] },
@@ -115,6 +116,7 @@ const BOSS_BATTLES = {
     title: "灯亭 · 引灯魇客",
     cols: BATTLE.cols,
     rows: BATTLE.rows,
+    blocked: [[2, 2], [2, 3], [2, 4], [4, 1], [4, 2]],
     objective: "击破引灯魇客并熄灭残灯",
     players: BATTLE.players.map((unit) => ({ ...unit })),
     enemies: [
@@ -132,6 +134,7 @@ const BOSS_BATTLES = {
     title: "月华药庐 · 照骨婆",
     cols: BATTLE.cols,
     rows: BATTLE.rows,
+    blocked: [[2, 2], [2, 3], [2, 4], [4, 1], [4, 2]],
     objective: "击破照骨婆并夺回药账残页",
     players: BATTLE.players.map((unit) => ({ ...unit })),
     enemies: [
@@ -155,6 +158,20 @@ const WORLD_NODES = [
   { id: "yuehua", name: "月华谷", x: 242, y: 486, status: "locked" },
   { id: "erhai", name: "洱海渡口", x: 292, y: 430, status: "locked" },
   { id: "jianhu", name: "剑湖宫道", x: 122, y: 176, status: "locked" }
+];
+
+const WORLD_OCCLUSIONS = [
+  { x: 2140, y: 520, width: 860, height: 350 },
+  { x: 2650, y: 1960, width: 690, height: 285 },
+  { x: 3008, y: 2368, width: 256, height: 82 },
+  { x: 3072, y: 2460, width: 192, height: 64 }
+];
+
+const ROOM_OCCLUSIONS = [
+  { x: 100, y: 250, width: 338, height: 100 },
+  { x: 488, y: 420, width: 313, height: 70 },
+  { x: 900, y: 300, width: 300, height: 210 },
+  { x: 200, y: 430, width: 263, height: 180 }
 ];
 
 const ROOM_COLLISIONS = [
@@ -262,6 +279,7 @@ const MAPS = {
     width: 4480,
     height: 3584,
     spawn: { x: 2700, y: 2520 },
+    occlusions: WORLD_OCCLUSIONS,
     collisions: [
       { x: 0, y: 0, width: 4480, height: 72 },
       { x: 0, y: 3512, width: 4480, height: 72 },
@@ -371,6 +389,7 @@ const MAPS = {
     height: 768,
     spawn: { x: 610, y: 650 },
     exitTo: { mapId: "world", spawn: { x: 2700, y: 2520 }, label: "离开客房" },
+    occlusions: ROOM_OCCLUSIONS,
     collisions: ROOM_COLLISIONS,
     triggers: ROOM_TRIGGERS,
     npcs: [{ id: "companion", name: "苏萝", sprite: "companion", x: 540, y: 260, direction: "down" }]

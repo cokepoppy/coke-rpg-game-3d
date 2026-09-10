@@ -5,7 +5,7 @@ const CUTSCENES = {
     source: "video-pack/fuyao-teaching.mp4",
     poster: "daoistCutscenePoster",
     playbackDurationMs: 5100,
-    fallbackDelayMs: 3000,
+    fallbackDelayMs: 6000,
     fallbackDurationMs: 4200,
     rewardSkillId: "fuyou_step",
     rewardSkillName: "扶摇诀"

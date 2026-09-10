@@ -90,16 +90,16 @@ NODE_PATH=/Users/shangguanchenhuan/.cache/codex-runtimes/codex-primary-runtime/d
 - `auto-sprite-studio`：人物行走帧生成、切分、锚点漂移检测和重组。
 - `rpg-game-studio`：浏览器 RPG 代码架构、地图管理、角色、对话和剧情脚本系统脚手架。
 
-## 微信小游戏竖屏版
+## 移动浏览器竖屏版与微信小游戏
 
-微信小游戏工程位于 `wechat-minigame/`，使用单 Canvas、竖屏触控方向键和微信本地存储。Chrome 调试壳位于 `wechat-debug/`。
+移动浏览器版和微信小游戏共用 `wechat-minigame/` 的单 Canvas 运行时、竖屏触控方向键和资源分包。浏览器入口位于 `wechat-debug/`，微信开发者工具入口仍是 `wechat-minigame/`。
 
 ```bash
 npm install
 npm run wechat:debug
 ```
 
-浏览器访问 `http://127.0.0.1:4174/wechat-debug/`。完成快速调试后执行：
+手机浏览器访问 `http://127.0.0.1:4174/wechat-debug/`。完成浏览器回归后，再执行：
 
 ```bash
 npm run wechat:open

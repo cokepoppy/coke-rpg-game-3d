@@ -80,13 +80,18 @@ window.wx = {
 
 function createBrowserVideo(options) {
   const video = document.createElement("video");
+  const errorHandlers = [];
   video.dataset.wechatVideo = "true";
   video.src = options.src;
+  video.preload = "auto";
   video.autoplay = Boolean(options.autoplay);
   video.loop = Boolean(options.loop);
   video.muted = Boolean(options.muted);
   video.controls = Boolean(options.controls);
   video.playsInline = true;
+  video.setAttribute("playsinline", "");
+  video.setAttribute("webkit-playsinline", "");
+  if (video.muted) video.setAttribute("muted", "");
   video.style.position = "fixed";
   video.style.zIndex = "10";
   video.style.objectFit = options.objectFit || "contain";
@@ -103,9 +108,17 @@ function createBrowserVideo(options) {
   };
   place();
   window.addEventListener("resize", place);
+  video.addEventListener("error", () => {
+    const error = { errMsg: video.error?.message || "browser video error" };
+    errorHandlers.forEach((handler) => handler(error));
+  });
   document.body.appendChild(video);
   return {
-    play: () => video.play().catch(() => {}),
+    play: () => video.play().catch((error) => {
+      const normalized = { errMsg: error?.message || "browser video play rejected" };
+      errorHandlers.forEach((handler) => handler(normalized));
+      return false;
+    }),
     pause: () => video.pause(),
     stop: () => { video.pause(); video.currentTime = 0; },
     show: () => { video.style.display = "block"; },
@@ -115,6 +128,8 @@ function createBrowserVideo(options) {
     onPlay: (handler) => video.addEventListener("play", handler),
     onTimeUpdate: (handler) => video.addEventListener("timeupdate", handler),
     onWaiting: (handler) => video.addEventListener("waiting", handler),
-    onError: (handler) => video.addEventListener("error", () => handler({ errMsg: "browser video error" }), { once: true })
+    onError: (handler) => errorHandlers.push(handler),
+    get currentTime() { return video.currentTime; },
+    get duration() { return video.duration; }
   };
 }

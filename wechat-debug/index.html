@@ -2,14 +2,22 @@
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#10100e" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="苍山侠影" />
     <link rel="icon" href="data:," />
-    <title>苍山侠影 · 微信小游戏调试</title>
+    <title>苍山侠影 · 手机浏览器版</title>
     <style>
       * { box-sizing: border-box; }
       html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #10100e; overscroll-behavior: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
       body { display: grid; place-items: center; }
       canvas { width: min(100vw, 390px); height: min(100vh, 844px); image-rendering: pixelated; background: #171510; touch-action: none; box-shadow: 0 0 0 1px #413827; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+      @supports (height: 100dvh) {
+        canvas { height: min(100dvh, 844px); }
+      }
       .loading {
         position: fixed;
         inset: 0;
@@ -33,6 +41,9 @@
       .loading__detail { margin-top: 12px; min-height: 38px; color: rgba(255, 243, 208, 0.72); font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
       .loading__error { color: #ffb1a6; }
       @media (max-width: 390px) { canvas { width: 100vw; height: 100vh; } }
+      @supports (height: 100dvh) {
+        @media (max-width: 390px) { canvas { height: 100dvh; } }
+      }
     </style>
   </head>
   <body>

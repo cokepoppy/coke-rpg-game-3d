@@ -14,10 +14,14 @@ await writeFile(path.join(dist, "index.html"), `<!doctype html>
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#10100e" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="苍山侠影" />
     <meta http-equiv="refresh" content="0; url=./wechat-debug/" />
     <link rel="icon" href="data:," />
-    <title>苍山侠影</title>
+    <title>苍山侠影 · 手机浏览器版</title>
     <style>html,body{margin:0;height:100%;display:grid;place-items:center;background:#10100e;color:#fff3d0;font-family:sans-serif}</style>
   </head>
   <body>

@@ -11,6 +11,9 @@ const baseUrl = process.env.BASE_URL || "http://127.0.0.1:4174/wechat-debug/";
 const output = path.join(root, "screenshots/wechat-boss-demo");
 const headless = process.env.DEMO_HEADLESS === "1";
 const autoBattleEnabled = process.env.DEMO_AUTO_BATTLE !== "0";
+const recordVideo = process.env.DEMO_RECORD === "1";
+const viewport = { width: 390, height: 844 };
+const videoOutput = path.join(output, "coke-rpg-boss-demo-390x844.webm");
 
 await fs.rm(output, { recursive: true, force: true });
 await fs.mkdir(output, { recursive: true });
@@ -20,7 +23,13 @@ const browser = await chromium.launch({
   executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
   args: ["--autoplay-policy=no-user-gesture-required", "--window-size=420,900"]
 });
-const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
+const context = await browser.newContext({
+  viewport,
+  deviceScaleFactor: 1,
+  ...(recordVideo ? { recordVideo: { dir: output, size: viewport } } : {})
+});
+const page = await context.newPage();
+const video = recordVideo ? page.video() : null;
 const errors = [];
 const responses = [];
 const progress = [];
@@ -139,12 +148,20 @@ try {
     if (!result.battleStarted || result.battleTitle !== "灯亭 · 引灯魇客") throw new Error("Boss battle screen was not reached.");
   }
 
-  const audit = { baseUrl, headless, autoBattleEnabled, output, progress, result, errors, responses };
+  const audit = { baseUrl, headless, autoBattleEnabled, recordVideo, viewport, output, progress, result, errors, responses };
   await fs.writeFile(path.join(output, "audit.json"), `${JSON.stringify(audit, null, 2)}\n`);
   console.log(JSON.stringify(audit, null, 2));
   if (errors.length || responses.length) process.exitCode = 1;
 } finally {
   await page.close().catch(() => {});
+  await context.close().catch(() => {});
+  if (video) {
+    const recordedVideo = await video.path().catch(() => null);
+    if (recordedVideo) {
+      await fs.rename(recordedVideo, videoOutput);
+      console.log(`[wechat-boss-demo] 视频已保存：${videoOutput}`);
+    }
+  }
   await browser.close().catch(() => {});
 }
 

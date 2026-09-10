@@ -2,13 +2,13 @@ const { BATTLE, GAME } = require("./config");
 const { drawSprite } = require("./player");
 
 class BattleScene {
-  constructor({ images, viewport, hitSfx, skillSfx = {}, mapKey = "battleTemple", playerModifiers = {}, unlockedSkillIds = [], onFinish }) {
+  constructor({ images, viewport, hitSfx, skillSfx = {}, mapKey = "battleTemple", battleConfig = BATTLE, playerModifiers = {}, unlockedSkillIds = [], onFinish }) {
     this.images = images;
     this.viewport = viewport;
     this.hitSfx = hitSfx;
     this.skillSfx = skillSfx;
     this.onFinish = onFinish;
-    this.config = BATTLE;
+    this.config = battleConfig;
     this.mapKey = mapKey;
     this.playerModifiers = playerModifiers;
     this.unlockedSkillIds = unlockedSkillIds;
@@ -20,7 +20,7 @@ class BattleScene {
   }
 
   start() {
-    this.units = [...BATTLE.players, ...BATTLE.enemies].map((unit) => {
+    this.units = [...this.config.players, ...this.config.enemies].map((unit) => {
       const equipment = unit.side === "player" ? this.playerModifiers : {};
       const skillIds = unit.id === "hero" && this.unlockedSkillIds.length
         ? [...(unit.skillIds || []).slice(0, 2), ...this.unlockedSkillIds].slice(0, 3)
@@ -32,7 +32,7 @@ class BattleScene {
         move: unit.move + (equipment.move || 0),
         damage: unit.damage + (equipment.attack || 0),
         bonusAttack: equipment.attack || 0,
-        defense: equipment.defense || 0,
+        defense: (unit.defense || 0) + (equipment.defense || 0),
         displayHp: unit.hp,
         status: {},
         moved: false,
@@ -297,7 +297,7 @@ class BattleScene {
         this.audit.enemyActions.push({ id: enemy.id, action: "stunned" });
         continue;
       }
-      const skill = this.skillsFor(enemy)[0] || this.skillById("basic_attack");
+      const skill = this.enemySkillFor(enemy) || this.skillById("basic_attack");
       if (distance(enemy, target) > skill.range) this.moveEnemyToward(enemy, target, skill.range);
       if (distance(enemy, target) <= skill.range) this.enemyCastSkill(enemy, target, skill);
       else {
@@ -324,8 +324,8 @@ class BattleScene {
   moveEnemyToward(enemy, target, preferredRange = 1) {
     const occupied = new Set(this.units.filter((unit) => unit.alive && unit.id !== enemy.id).map((unit) => `${unit.x},${unit.y}`));
     let best = { x: enemy.x, y: enemy.y, metric: distance(enemy, target) * 10 };
-    for (let y = 0; y < BATTLE.rows; y += 1) {
-      for (let x = 0; x < BATTLE.cols; x += 1) {
+    for (let y = 0; y < this.config.rows; y += 1) {
+      for (let x = 0; x < this.config.cols; x += 1) {
         const steps = distance(enemy, { x, y });
         if (steps < 1 || steps > enemy.move || occupied.has(`${x},${y}`)) continue;
         const rangeDistance = Math.abs(distance({ x, y }, target) - preferredRange);
@@ -394,8 +394,8 @@ class BattleScene {
     if (!unit || unit.moved) return [];
     const occupied = new Set(this.units.filter((item) => item.alive && item.id !== unit.id).map((item) => `${item.x},${item.y}`));
     const moves = [];
-    for (let y = 0; y < BATTLE.rows; y += 1) {
-      for (let x = 0; x < BATTLE.cols; x += 1) {
+    for (let y = 0; y < this.config.rows; y += 1) {
+      for (let x = 0; x < this.config.cols; x += 1) {
         const steps = distance(unit, { x, y });
         if (steps > 0 && !occupied.has(`${x},${y}`) && steps <= unit.move) moves.push({ x, y, kind: "move" });
       }
@@ -412,8 +412,13 @@ class BattleScene {
     return (unit.skillIds || ["quick_slash"]).map((id) => this.skillById(id)).filter(Boolean).slice(0, 3);
   }
 
+  enemySkillFor(unit) {
+    const enraged = unit.enrageSkillId && unit.maxHp > 0 && unit.hp / unit.maxHp <= (unit.enrageAt || 0);
+    return this.skillById(enraged ? unit.enrageSkillId : unit.skillIds?.[0]) || this.skillsFor(unit)[0];
+  }
+
   skillById(id) {
-    return BATTLE.skills[id] || null;
+    return this.config.skills[id] || BATTLE.skills[id] || null;
   }
 
   tickStatus(unit) {
@@ -434,9 +439,9 @@ class BattleScene {
     const top = Math.max(112, (this.viewport.menuButton?.bottom || 44) + 76);
     const panelHeight = 236;
     const field = { x: 0, y: top, width: this.viewport.width, height: this.viewport.height - top - panelHeight };
-    const tile = Math.floor(Math.min(field.width / BATTLE.cols, field.height / BATTLE.rows));
-    const gridWidth = tile * BATTLE.cols;
-    const gridHeight = tile * BATTLE.rows;
+    const tile = Math.floor(Math.min(field.width / this.config.cols, field.height / this.config.rows));
+    const gridWidth = tile * this.config.cols;
+    const gridHeight = tile * this.config.rows;
     return {
       field,
       tile,
@@ -469,10 +474,10 @@ class BattleScene {
     context.textAlign = "left";
     context.fillStyle = "#f2e5c8";
     context.font = "700 20px serif";
-    context.fillText(BATTLE.title, 18, titleY);
+    context.fillText(this.config.title, 18, titleY);
     context.font = "14px sans-serif";
     context.fillStyle = "#d8bd82";
-    context.fillText(`${this.side === "player" ? "我方回合" : "敌方回合"}  ·  ${BATTLE.objective}`, 18, titleY + 30);
+    context.fillText(`${this.side === "player" ? "我方回合" : "敌方回合"}  ·  ${this.config.objective}`, 18, titleY + 30);
     const buttonTop = Math.max(70, top - 54);
     ui.button(context, "battle:end", this.viewport.width - 112, buttonTop, 90, 42, "结束回合", this.side === "player" ? "normal" : "disabled");
   }
@@ -505,13 +510,13 @@ class BattleScene {
     }
     context.strokeStyle = "rgba(245, 234, 208, 0.20)";
     context.lineWidth = 1;
-    for (let x = 0; x <= BATTLE.cols; x += 1) {
+    for (let x = 0; x <= this.config.cols; x += 1) {
       context.beginPath();
       context.moveTo(grid.x + x * tile + 0.5, grid.y);
       context.lineTo(grid.x + x * tile + 0.5, grid.y + grid.height);
       context.stroke();
     }
-    for (let y = 0; y <= BATTLE.rows; y += 1) {
+    for (let y = 0; y <= this.config.rows; y += 1) {
       context.beginPath();
       context.moveTo(grid.x, grid.y + y * tile + 0.5);
       context.lineTo(grid.x + grid.width, grid.y + y * tile + 0.5);
@@ -537,7 +542,7 @@ class BattleScene {
         this.audit.renderedAttackFrames.push({ id: unit.id, sprite: spriteKey, direction: unit.direction, frame });
       }
       context.globalAlpha = alpha;
-      drawSprite(context, this.images[spriteKey], center.x + hit.x + lunge.x, center.y + 22 + hit.y + lunge.y, unit.direction, frame, 70, 70);
+      drawSprite(context, this.images[spriteKey], center.x + hit.x + lunge.x, center.y + 22 + hit.y + lunge.y, unit.direction, frame, unit.drawWidth || 70, unit.drawHeight || 70);
       context.globalAlpha = 1;
       if (unit.animation?.type === "hit") {
         const flashProgress = 1 - Math.max(0, unit.animation.time) / (unit.animation.duration || 0.56);

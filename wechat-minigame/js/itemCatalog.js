@@ -74,6 +74,46 @@ const ITEM_CATALOG = {
     rarity: "常见",
     effect: "剧情线索",
     description: "没有署名的短笺，提到了灯亭和铜匣。"
+  },
+  copper_lantern_shard: {
+    id: "copper_lantern_shard",
+    name: "铜灯残片",
+    type: "剧情",
+    rarity: "精良",
+    effect: "拼合灯亭暗号",
+    description: "从客房旧布囊夹层里找到的铜片，边缘刻着半个灯纹。"
+  },
+  lantern_order_clue: {
+    id: "lantern_order_clue",
+    name: "灯亭暗号",
+    type: "剧情",
+    rarity: "精良",
+    effect: "解读茶肆告示",
+    description: "账册页脚的四个落款，按钟声顺序排列后才有意义。"
+  },
+  tea_house_cipher: {
+    id: "tea_house_cipher",
+    name: "茶肆密语",
+    type: "剧情",
+    rarity: "精良",
+    effect: "开启残灯禁地",
+    description: "告示上被删掉的三行字，指向苍山北坡的残灯禁地。"
+  },
+  broken_sword_guard: {
+    id: "broken_sword_guard",
+    name: "断剑护手",
+    type: "剧情",
+    rarity: "稀有",
+    effect: "证明佩剑被人为取走",
+    description: "引灯魇客身上找到的旧护手，刻着与沈临川佩剑相同的云纹。"
+  },
+  moon_record_fragment: {
+    id: "moon_record_fragment",
+    name: "月华药账残页",
+    type: "剧情",
+    rarity: "稀有",
+    effect: "推进王府旧案",
+    description: "药账残页记录了不止一个被调包的孩子，以及一笔没有收货人的药材。"
   }
 };
 

@@ -1,4 +1,4 @@
-const { GAME, ASSETS, BATTLE, SCOUT_IDS, WORLD_NODES } = require("./config");
+const { GAME, ASSETS, BATTLE, BOSS_BATTLES, SCOUT_IDS, WORLD_NODES } = require("./config");
 const { createSurface, loadImage, createAudio, createSfx, loadAssetPacks, readSave, writeSave } = require("./platform");
 const { Player, drawSprite } = require("./player");
 const { MapManager } = require("./mapManager");
@@ -27,6 +27,7 @@ class GameApp {
     this.money = 120;
     this.items = {};
     this.defeatedScouts = new Set();
+    this.defeatedBosses = new Set();
     this.learnedSkills = new Set();
     this.seenCutscenes = new Set();
     this.storyFlags = new Set();
@@ -233,6 +234,7 @@ class GameApp {
     this.money = 120;
     this.items = { hemostatic_powder: 2, qingxin_pill: 1 };
     this.defeatedScouts = new Set();
+    this.defeatedBosses = new Set();
     this.learnedSkills = new Set();
     this.seenCutscenes = new Set();
     this.storyFlags = new Set();
@@ -248,7 +250,7 @@ class GameApp {
     this.dialog.show([
       { speaker: GAME.companionName, text: "你终于醒了。昨夜苍山钟声忽断，客栈外又多了几名陌生人。" },
       { speaker: GAME.heroName, text: "我的佩剑不见了，只记得昏迷前听见一阵短笛。" },
-      { speaker: GAME.companionName, text: "先去客栈内室查找账册。靠近木门后，点右下角的“交互”。" }
+      { speaker: GAME.companionName, text: "先去客栈内室查找账册。靠近木门后，点右下角的“交互”。如果钟声真的在第七响前断了，那就不是普通失窃。" }
     ]);
   }
 
@@ -269,7 +271,9 @@ class GameApp {
   interact() {
     const trigger = this.activeTrigger;
     if (!trigger) return;
-    if (trigger.id === "inn") {
+    if (trigger.id.startsWith("boss_")) {
+      this.interactWithBoss(trigger.id);
+    } else if (trigger.id === "inn") {
       this.dialog.show({ speaker: "云来客栈", text: "木门虚掩，屋里传来淡淡药香。", choices: [
         { label: "进入客房", action: () => this.enterRoom("room") },
         { label: "暂时离开" }
@@ -310,13 +314,8 @@ class GameApp {
         { label: exit.label, action: () => this.enterMap(exit.mapId, exit.spawn) },
         { label: "继续搜索" }
       ] });
-    } else if (trigger.id === "wardrobe") {
-      this.addItem("silver_piece", 1);
-      this.addItem("unsigned_letter", 1);
-      this.money += 12;
-      this.dialog.show({ speaker: "木柜", text: "柜门吱呀打开。旧布囊里有碎银和一封未署名的信。已放入背包。", choices: [{ label: "收下线索" }] });
-    } else if (trigger.id === "desk") {
-      this.dialog.show({ speaker: "账册", text: "夹页反复写着“灯亭、铜匣、寺后”，三处似乎指向同一条密道。" });
+    } else if (trigger.id === "wardrobe" || trigger.id === "desk") {
+      this.inspectClueSpot(trigger.id);
     } else if (trigger.id === "vendor") {
       this.dialog.show({ speaker: "药摊老人", text: "少侠气息不稳。若要补药或兵刃，我这摊上还有几样可用。", choices: [
         { label: "查看货物", action: () => this.openShop("apothecary") },
@@ -368,31 +367,134 @@ class GameApp {
     }
   }
 
+  inspectClueSpot(kind) {
+    const mapId = this.mapManager.id;
+    if (mapId === "room") {
+      if (kind === "wardrobe") {
+        if (this.storyFlags.has("inn_letter_found")) {
+          this.dialog.show({ speaker: "木柜", text: "旧布囊已经空了，只剩下铜灯残片压出的浅痕。", choices: [{ label: "回想线索" }] });
+          return;
+        }
+        this.addItem("silver_piece", 1);
+        this.addItem("unsigned_letter", 1);
+        this.addItem("copper_lantern_shard", 1);
+        this.money += 12;
+        this.storyFlags.add("inn_letter_found");
+        this.rememberStory("客房木柜找到无名信和铜灯残片，信上写着灯亭、铜匣、寺后。");
+        this.dialog.show({ speaker: "木柜", text: "柜门吱呀打开。旧布囊里有碎银、一封无名信，还有一枚刻着半个灯纹的铜片。信上写着：灯亭、铜匣、寺后。", choices: [{ label: "收下线索" }] });
+        return;
+      }
+      if (!this.storyFlags.has("inn_letter_found")) {
+        this.dialog.show({ speaker: "账册", text: "夹页被人用蜡封住了。也许客房里还有东西能对上这道封记。", choices: [{ label: "先搜索木柜" }] });
+        return;
+      }
+      if (!this.storyFlags.has("lantern_order_clue")) {
+        this.addItem("lantern_order_clue", 1);
+        this.storyFlags.add("lantern_order_clue");
+        this.rememberStory("客房账册用无名信和铜灯残片解出四个钟声落款，得到灯亭暗号。");
+        this.dialog.show({ speaker: "账册", text: "铜片嵌入账册缺口。四个落款按钟声顺序读成一句话：先灭北灯，再问无名。茶肆的告示也许是下一把锁。", choices: [{ label: "记下暗号" }] });
+      } else {
+        this.dialog.show({ speaker: "账册", text: "暗号已经记下：先灭北灯，再问无名。", choices: [{ label: "继续追查" }] });
+      }
+      return;
+    }
+
+    if (mapId === "teahouseRoom") {
+      if (kind === "desk" && !this.storyFlags.has("tea_house_cipher")) {
+        if (!this.storyFlags.has("lantern_order_clue")) {
+          this.dialog.show({ speaker: "告示", text: "告示被茶渍盖住了三行字。没有正确的钟声顺序，读出来只是一堆断句。", choices: [{ label: "先回客房" }] });
+          return;
+        }
+        this.addItem("tea_house_cipher", 1);
+        this.storyFlags.add("tea_house_cipher");
+        this.rememberStory("松风茶肆告示补全三行密语，指向苍山北坡的残灯禁地。");
+        this.dialog.show({ speaker: "告示", text: "按灯亭暗号重新排列后，三行被刮去的字显出来：北坡残灯、三步一停、勿看灯芯。", choices: [{ label: "记下密语" }] });
+      } else if (kind === "desk") {
+        this.dialog.show({ speaker: "告示", text: "北坡残灯，三步一停，勿看灯芯。那处禁地已经被人提前清过。", choices: [{ label: "继续追查" }] });
+      } else {
+        this.dialog.show({ speaker: "茶箱", text: "茶箱底部有被撬过的痕迹，箱盖内侧刻着一个向北的灯形缺口。", choices: [{ label: "记下方向" }] });
+      }
+      return;
+    }
+
+    if (mapId === "moonStudy" && kind === "desk") {
+      if (!this.storyFlags.has("tea_house_cipher")) {
+        this.dialog.show({ speaker: "月华案卷", text: "药账的页码被人为打乱了。茶肆密语或许能告诉你该从哪一页读起。", choices: [{ label: "先找密语" }] });
+        return;
+      }
+      if (!this.storyFlags.has("moon_cipher_ready")) {
+        this.storyFlags.add("moon_cipher_ready");
+        this.rememberStory("月华书房按茶肆密语复原药账页码，裂镜药圃的入口显现。");
+        this.dialog.show({ speaker: "月华案卷", text: "药账按密语重排后，收货人一栏只剩一个字：照。页脚画着裂镜，入口就在药庐北侧。", choices: [{ label: "记下入口" }] });
+      } else {
+        this.dialog.show({ speaker: "月华案卷", text: "裂镜药圃的入口在药庐北侧。先确认苍山那盏残灯已经熄灭。", choices: [{ label: "继续探索" }] });
+      }
+      return;
+    }
+
+    this.dialog.show({ speaker: kind === "desk" ? "案卷" : "药柜", text: "这里留下了有人匆忙翻找过的痕迹，但暂时没有新的线索。", choices: [{ label: "离开" }] });
+  }
+
+  interactWithBoss(triggerId) {
+    if (this.defeatedBosses.has(triggerId)) {
+      this.dialog.show({ speaker: "遗迹", text: "残灯已经熄灭，裂镜也不再映出人影。这里的证据已经被你收好。", choices: [{ label: "继续前进" }] });
+      return;
+    }
+    const ready = triggerId === "boss_lantern_wraith"
+      ? this.storyFlags.has("lantern_order_clue") && this.storyFlags.has("tea_house_cipher")
+      : this.defeatedBosses.has("boss_lantern_wraith") && this.storyFlags.has("moon_cipher_ready");
+    if (!ready) {
+      const text = triggerId === "boss_lantern_wraith"
+        ? "残灯禁地的石门没有回应。无名信、账册和茶肆告示还没有拼成完整暗号。"
+        : "裂镜药圃被一层毒雾封住。先熄灭苍山残灯，再按月华案卷复原入口。";
+      this.dialog.show({ speaker: "封锁的入口", text, choices: [{ label: "先寻找线索" }] });
+      return;
+    }
+    const boss = triggerId === "boss_lantern_wraith" ? "引灯魇客" : "照骨婆";
+    this.dialog.show({ speaker: boss, text: triggerId === "boss_lantern_wraith"
+      ? "第七响没有落下，你却循着灯火来了。护手留下，旧案就还能继续沉睡。"
+      : "你把灯熄了，便以为能看清药账？镜里照出的，未必是你自己的脸。", choices: [
+      { label: "进入 Boss 战", action: () => this.startBattle(triggerId) },
+      { label: "先补给" }
+    ] });
+  }
+
   startBattle(triggerId) {
     this.axis = { x: 0, y: 0 };
     this.touchBindings.clear();
     this.currentBattleTriggerId = triggerId;
+    const battleConfig = BOSS_BATTLES[triggerId] || BATTLE;
+    const bossBattle = Boolean(BOSS_BATTLES[triggerId]);
     this.battle = new BattleScene({
       images: this.images,
       viewport: this.viewport,
       hitSfx: this.hitSfx,
       skillSfx: this.skillSfx,
       mapKey: this.battleMapFor(triggerId),
+      battleConfig,
       playerModifiers: equipmentModifiers(this.items),
       unlockedSkillIds: [...this.learnedSkills],
       onFinish: (result, audit) => {
-        const rewards = result === "victory" ? this.grantBattleRewards() : { money: 0, items: [] };
-        if (result === "victory" && this.currentBattleTriggerId) this.defeatedScouts.add(this.currentBattleTriggerId);
+        const rewards = result === "victory" ? this.grantBattleRewards(battleConfig) : { money: 0, items: [] };
+        if (result === "victory" && this.currentBattleTriggerId) {
+          if (bossBattle) this.defeatedBosses.add(this.currentBattleTriggerId);
+          else this.defeatedScouts.add(this.currentBattleTriggerId);
+          this.rememberBossVictory(this.currentBattleTriggerId, rewards);
+        }
         this.worldMapUnlocked = this.requiredScoutDefeatCount() >= SCOUT_IDS.length;
         this.lastBattleAudit = { ...audit, rewards };
         this.mode = "game";
         this.playMusic();
         this.activeTrigger = this.resolveActiveTrigger();
         const remaining = Math.max(0, SCOUT_IDS.length - this.requiredScoutDefeatCount());
-        const clearText = this.worldMapUnlocked ? "沿路密探已清剿，舆图上出现了新的路线。" : `还剩 ${remaining} 处密探据点。`;
+        const clearText = bossBattle
+          ? (result === "victory" ? this.bossVictoryText(triggerId) : "")
+          : (this.worldMapUnlocked ? "沿路密探已清剿，舆图上出现了新的路线。" : `还剩 ${remaining} 处密探据点。`);
         this.dialog.show({
           speaker: "战斗",
-          text: result === "victory" ? `伏兵败退。你获得 ${rewards.money} 两银子${rewards.items.length ? `，${rewards.items.map((item) => `${item.name}×${item.amount}`).join("、")}` : ""}。${clearText}` : "我方败退，江湖路止于此处。",
+          text: result === "victory"
+            ? `${bossBattle ? "Boss 倒下。" : "伏兵败退。"}你获得 ${rewards.money} 两银子${rewards.items.length ? `，${rewards.items.map((item) => `${item.name}×${item.amount}`).join("、")}` : ""}。${clearText}`
+            : "我方败退，线索没有丢失；补给后可以再次挑战。",
           choices: [{ label: result === "victory" ? "回到大地图" : "游戏结束" }]
         });
       }
@@ -402,8 +504,8 @@ class GameApp {
     this.playBattleMusic();
   }
 
-  grantBattleRewards() {
-    const reward = BATTLE.rewards || {};
+  grantBattleRewards(battleConfig = BATTLE) {
+    const reward = battleConfig.rewards || {};
     const money = randomInt(reward.money?.min || 0, reward.money?.max || 0);
     this.money += money;
     const items = [];
@@ -414,6 +516,23 @@ class GameApp {
       items.push({ itemId: drop.itemId, name: drop.name, amount });
     }
     return { money, items };
+  }
+
+  rememberBossVictory(triggerId, rewards) {
+    if (triggerId === "boss_lantern_wraith") {
+      this.storyFlags.add("lantern_boss_defeated");
+      this.rememberStory("引灯魇客倒下，沈临川从残灯骨架中找到与佩剑相同云纹的断剑护手。");
+    }
+    if (triggerId === "boss_bone_mirror_hag") {
+      this.storyFlags.add("moon_boss_defeated");
+      this.rememberStory("照骨婆败退，药账残页证明被调包的孩子不止一个，且有人在王府之外收货。");
+    }
+    if (rewards.items.some((item) => item.itemId === "moon_record_fragment")) this.storyFlags.add("moon_record_found");
+  }
+
+  bossVictoryText(triggerId) {
+    if (triggerId === "boss_lantern_wraith") return "断剑护手与佩剑云纹一致，月华谷书房或许能解释这件事。";
+    return "药账残页记录了第二个孩子的名字，王府线索不再只是传闻。";
   }
 
   playCutscene(id) {
@@ -539,6 +658,7 @@ class GameApp {
       money: this.money,
       items: this.items,
       defeatedScouts: [...this.defeatedScouts],
+      defeatedBosses: [...this.defeatedBosses],
       worldMapUnlocked: this.worldMapUnlocked,
       learnedSkills: [...this.learnedSkills],
       seenCutscenes: [...this.seenCutscenes],
@@ -560,6 +680,7 @@ class GameApp {
     this.money = save.money ?? 120;
     this.items = save.items || {};
     this.defeatedScouts = new Set(save.defeatedScouts || []);
+    this.defeatedBosses = new Set(save.defeatedBosses || []);
     this.worldMapUnlocked = Boolean(save.worldMapUnlocked) || this.defeatedScouts.size >= SCOUT_IDS.length;
     this.learnedSkills = new Set(save.learnedSkills || []);
     this.seenCutscenes = new Set(save.seenCutscenes || []);
@@ -656,7 +777,8 @@ class GameApp {
   }
 
   battleMapFor(triggerId) {
-    if (triggerId === "scout_moon") return "battleBamboo";
+    if (triggerId === "boss_bone_mirror_hag" || triggerId === "scout_moon") return "battleBamboo";
+    if (triggerId === "boss_lantern_wraith") return "battleTemple";
     if (triggerId === "scout_archer" || triggerId === "scout_bridge") return "battleBamboo";
     if (triggerId === "scout_gate") return "battleFerry";
     return "battleTemple";
@@ -666,6 +788,7 @@ class GameApp {
     const trigger = this.mapManager.nearby(this.player.boundsAt(this.player.x, this.player.y));
     if (!trigger) return null;
     if (this.defeatedScouts.has(trigger.id)) return null;
+    if (this.defeatedBosses.has(trigger.id)) return null;
     return trigger;
   }
 
@@ -682,7 +805,7 @@ class GameApp {
   }
 
   visibleNpcs() {
-    return (this.mapManager.map.npcs || []).filter((npc) => !this.defeatedScouts.has(npc.id));
+    return (this.mapManager.map.npcs || []).filter((npc) => !this.defeatedScouts.has(npc.id) && !this.defeatedBosses.has(npc.id));
   }
 
   worldNodes() {

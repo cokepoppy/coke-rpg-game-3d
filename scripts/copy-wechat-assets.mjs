@@ -23,6 +23,8 @@ const files = [
   ["assets/characters/mu_zhiyan/mu_zhiyan-walk-anchored.png", "wechat-minigame/character-pack/mu-zhiyan.png"],
   ["assets/characters/moon_valley_disciple/moon_valley_disciple-walk-anchored.png", "wechat-minigame/character-pack/moon-valley-disciple.png"],
   ["assets/characters/moon_valley_traitor/moon_valley_traitor-walk-anchored.png", "wechat-minigame/character-pack/moon-valley-traitor.png"],
+  ["assets/characters/lantern_wraith/lantern_wraith-walk-anchored-v2.png", "wechat-minigame/character-pack/lantern-wraith.png"],
+  ["assets/characters/bone_mirror_hag/bone_mirror_hag-walk-anchored.png", "wechat-minigame/character-pack/bone-mirror-hag.png"],
   ["assets/characters/xiao_beichen/xiao_beichen-walk-anchored.png", "wechat-minigame/character-pack/xiao-beichen.png"],
   ["assets/characters/xu_yunsheng/xu_yunsheng-walk-anchored.png", "wechat-minigame/character-pack/xu-yunsheng.png"],
   ["assets/characters/lian_zhao/lian_zhao-walk-anchored.png", "wechat-minigame/character-pack/lian-zhao.png"],

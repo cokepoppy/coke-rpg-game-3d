@@ -9,6 +9,7 @@
     "wechat:test": "node scripts/test-wechat-debug.mjs",
     "wechat:menu:test": "node scripts/test-wechat-menu.mjs",
     "wechat:battle:test": "node scripts/test-wechat-battle.mjs",
+    "wechat:boss:test": "node scripts/test-wechat-bosses.mjs",
     "wechat:battle:skills:test": "node scripts/test-wechat-battle-skills.mjs",
     "wechat:battle:actions:test": "node scripts/test-wechat-battle-actions.mjs",
     "wechat:map:debug": "node scripts/test-wechat-map-debug.mjs",

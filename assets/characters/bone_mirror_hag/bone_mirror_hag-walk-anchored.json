@@ -1,0 +1,684 @@
+{
+  "input": "/Users/shangguan/Documents/home2026/coke-rpg-game/assets/characters/bone_mirror_hag/bone_mirror_hag-walk-raw-imagegen.png",
+  "output": "/Users/shangguan/Documents/home2026/coke-rpg-game/assets/characters/bone_mirror_hag/bone_mirror_hag-walk-anchored.png",
+  "rows": 4,
+  "cols": 4,
+  "cell": {
+    "width": 310,
+    "height": 316
+  },
+  "targetAnchor": {
+    "x": 155,
+    "y": 305
+  },
+  "thresholds": {
+    "alphaThreshold": 24,
+    "minComponentArea": 40,
+    "footBand": 14,
+    "maxAnchorDrift": 2,
+    "minTopMargin": 8,
+    "minSideMargin": 10,
+    "minVerticalStride": 3
+  },
+  "before": {
+    "global": {
+      "anchorXDrift": 99,
+      "anchorYDrift": 31,
+      "centroidXDrift": 23,
+      "maxResiduePixels": 1224
+    },
+    "byDirection": [
+      {
+        "row": 0,
+        "direction": "down",
+        "anchorXDrift": 19,
+        "anchorYDrift": 1,
+        "centroidXDrift": 19,
+        "residuePixels": 351
+      },
+      {
+        "row": 1,
+        "direction": "left",
+        "anchorXDrift": 44,
+        "anchorYDrift": 0,
+        "centroidXDrift": 13,
+        "residuePixels": 1474
+      },
+      {
+        "row": 2,
+        "direction": "right",
+        "anchorXDrift": 21,
+        "anchorYDrift": 0,
+        "centroidXDrift": 8,
+        "residuePixels": 4673
+      },
+      {
+        "row": 3,
+        "direction": "up",
+        "anchorXDrift": 6,
+        "anchorYDrift": 5,
+        "centroidXDrift": 9,
+        "residuePixels": 0
+      }
+    ]
+  },
+  "after": {
+    "global": {
+      "anchorXDrift": 0,
+      "anchorYDrift": 0,
+      "centroidXDrift": 78,
+      "maxResiduePixels": 1165
+    },
+    "byDirection": [
+      {
+        "row": 0,
+        "direction": "down",
+        "anchorXDrift": 0,
+        "anchorYDrift": 0,
+        "centroidXDrift": 3,
+        "residuePixels": 338
+      },
+      {
+        "row": 1,
+        "direction": "left",
+        "anchorXDrift": 0,
+        "anchorYDrift": 0,
+        "centroidXDrift": 31,
+        "residuePixels": 279
+      },
+      {
+        "row": 2,
+        "direction": "right",
+        "anchorXDrift": 0,
+        "anchorYDrift": 0,
+        "centroidXDrift": 15,
+        "residuePixels": 2839
+      },
+      {
+        "row": 3,
+        "direction": "up",
+        "anchorXDrift": 0,
+        "anchorYDrift": 0,
+        "centroidXDrift": 5,
+        "residuePixels": 0
+      }
+    ]
+  },
+  "contract": {
+    "pass": false,
+    "failures": [
+      "top margin 0px is below 8px; head, hair, or weapon may be cropped",
+      "side margins 0/0px are below 10px",
+      "down walk does not alternate feet: frame1 -11px, frame3 -17px"
+    ],
+    "margins": {
+      "top": 0,
+      "left": 0,
+      "right": 0
+    },
+    "verticalGait": [
+      {
+        "direction": "down",
+        "frame1Offset": -11,
+        "frame3Offset": -17,
+        "pass": false
+      },
+      {
+        "direction": "up",
+        "frame1Offset": 5,
+        "frame3Offset": -5,
+        "pass": true
+      }
+    ]
+  },
+  "regenerate": true,
+  "regenerationPrompt": "Regenerate this character as a strict 4x4 top-down pixel-art RPG walk sprite sheet.\nCanvas contract: 4 columns x 4 rows; the final asset must normalize cleanly to 128x128 px per frame.\nRuntime contract: character body fits a 64x96 px in-game display on a 64x64 map tile; feet anchor is bottom-center and stable.\nRows: down, left, right, up. Columns: idle, left-foot step, idle, right-foot step.\nDown and up rows must clearly alternate opposite feet in columns 2 and 4.\nKeep at least 8 px top padding and 10 px side padding in every frame after normalization; do not crop head, hair, robe, weapon, hands, or feet.\nEvery frame uses identical scale, consistent identity, and the same foot-contact map anchor.\nPerfectly flat #FF00FF chroma-key background; no shadows, text, labels, grid, UI, or watermark.\nPrevious QA failures: top margin 0px is below 8px; head, hair, or weapon may be cropped; side margins 0/0px are below 10px; down walk does not alternate feet: frame1 -11px, frame3 -17px.",
+  "pass": false,
+  "frames": [
+    {
+      "row": 0,
+      "col": 0,
+      "direction": "down",
+      "body": {
+        "count": 47032,
+        "left": 41,
+        "top": 1,
+        "right": 305,
+        "bottom": 305,
+        "width": 265,
+        "height": 305,
+        "centerX": 173
+      },
+      "anchor": {
+        "x": 160,
+        "y": 305,
+        "rawX": 160
+      },
+      "centroid": {
+        "x": 168,
+        "y": 168
+      },
+      "residuePixels": 120,
+      "anchorOffset": {
+        "x": -5,
+        "y": 0
+      },
+      "afterAnchor": {
+        "x": 155,
+        "y": 305,
+        "rawX": 155
+      }
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "direction": "down",
+      "body": {
+        "count": 46069,
+        "left": 24,
+        "top": 2,
+        "right": 289,
+        "bottom": 305,
+        "width": 266,
+        "height": 304,
+        "centerX": 157
+      },
+      "anchor": {
+        "x": 146,
+        "y": 305,
+        "rawX": 146
+      },
+      "centroid": {
+        "x": 157,
+        "y": 168
+      },
+      "residuePixels": 90,
+      "anchorOffset": {
+        "x": 9,
+        "y": 0
+      },
+      "afterAnchor": {
+        "x": 155,
+        "y": 305,
+        "rawX": 155
+      }
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "direction": "down",
+      "body": {
+        "count": 46486,
+        "left": 27,
+        "top": 2,
+        "right": 286,
+        "bottom": 305,
+        "width": 260,
+        "height": 304,
+        "centerX": 157
+      },
+      "anchor": {
+        "x": 141,
+        "y": 305,
+        "rawX": 141
+      },
+      "centroid": {
+        "x": 151,
+        "y": 167
+      },
+      "residuePixels": 63,
+      "anchorOffset": {
+        "x": 14,
+        "y": 0
+      },
+      "afterAnchor": {
+        "x": 155,
+        "y": 305,
+        "rawX": 155
+      }
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "direction": "down",
+      "body": {
+        "count": 47297,
+        "left": 24,
+        "top": 1,
+        "right": 292,
+        "bottom": 304,
+        "width": 269,
+        "height": 304,
+        "centerX": 158
+      },
+      "anchor": {
+        "x": 141,
+        "y": 304,
+        "rawX": 141
+      },
+      "centroid": {
+        "x": 149,
+        "y": 167
+      },
+      "residuePixels": 78,
+      "anchorOffset": {
+        "x": 14,
+        "y": 1
+      },
+      "afterAnchor": {
+        "x": 155,
+        "y": 305,
+        "rawX": 155
+      }
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "direction": "left",
+      "body": {
+        "count": 47208,
+        "left": 36,
+        "top": 0,
+        "right": 295,
+        "bottom": 287,
+        "width": 260,
+        "height": 288,
+        "centerX": 166
+      },
+      "anchor": {
+        "x": 149,
+        "y": 287,
+        "rawX": 149
+      },
+      "centroid": {
+        "x": 157,
+        "y": 154
+      },
+      "residuePixels": 375,
+      "anchorOffset": {
+        "x": 6,
+        "y": 18
+      },
+      "afterAnchor": {
+        "x": 155,
+        "y": 305,
+        "rawX": 155
+      }
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "direction": "left",
+      "body": {
+        "count": 44509,
+        "left": 36,
+        "top": 0,
+        "right": 303,
+        "bottom": 287,
+        "width": 268,
+        "height": 288,
+        "centerX": 170
+      },
+      "anchor": {
+        "x": 132,
+        "y": 287,
+        "rawX": 132
+      },
+      "centroid": {
+        "x": 158,
+        "y": 152
+      },
+      "residuePixels": 407,
+      "anchorOffset": {
+        "x": 23,
+        "y": 18
+      },
+      "afterAnchor": {
+        "x": 155,
+        "y": 305,
+        "rawX": 155
+      }
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "direction": "left",
+      "body": {
+        "count": 45507,
+        "left": 27,
+        "top": 0,
+        "right": 290,
+        "bottom": 287,
+        "width": 264,
+        "height": 288,
+        "centerX": 159
+      },
+      "anchor": {
+        "x": 132,
+        "y": 287,
+        "rawX": 132
+      },
+      "centroid": {
+        "x": 150,
+        "y": 153
+      },
+      "residuePixels": 349,
+      "anchorOffset": {
+        "x": 23,
+        "y": 18
+      },
+      "afterAnchor": {
+        "x": 155,
+        "y": 305,
+        "rawX": 155
+      }
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "direction": "left",
+      "body": {
+        "count": 45559,
+        "left": 15,
+        "top": 0,
+        "right": 292,
+        "bottom": 287,
+        "width": 278,
+        "height": 288,
+        "centerX": 154
+      },
+      "anchor": {
+        "x": 105,
+        "y": 287,
+        "rawX": 105
+      },
+      "centroid": {
+        "x": 145,
+        "y": 152
+      },
+      "residuePixels": 343,
+      "anchorOffset": {
+        "x": 50,
+        "y": 18
+      },
+      "afterAnchor": {
+        "x": 155,
+        "y": 305,
+        "rawX": 155
+      }
+    },
+    {
+      "row": 2,
+      "col": 0,
+      "direction": "right",
+      "body": {
+        "count": 46272,
+        "left": 16,
+        "top": 0,
+        "right": 288,
+        "bottom": 274,
+        "width": 273,
+        "height": 275,
+        "centerX": 152
+      },
+      "anchor": {
+        "x": 183,
+        "y": 274,
+        "rawX": 183
+      },
+      "centroid": {
+        "x": 158,
+        "y": 142
+      },
+      "residuePixels": 1125,
+      "anchorOffset": {
+        "x": -28,
+        "y": 31
+      },
+      "afterAnchor": {
+        "x": 155,
+        "y": 305,
+        "rawX": 155
+      }
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "direction": "right",
+      "body": {
+        "count": 46304,
+        "left": 15,
+        "top": 0,
+        "right": 281,
+        "bottom": 274,
+        "width": 267,
+        "height": 275,
+        "centerX": 148
+      },
+      "anchor": {
+        "x": 184,
+        "y": 274,
+        "rawX": 184
+      },
+      "centroid": {
+        "x": 155,
+        "y": 143
+      },
+      "residuePixels": 1173,
+      "anchorOffset": {
+        "x": -29,
+        "y": 31
+      },
+      "afterAnchor": {
+        "x": 155,
+        "y": 305,
+        "rawX": 155
+      }
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "direction": "right",
+      "body": {
+        "count": 45342,
+        "left": 21,
+        "top": 0,
+        "right": 292,
+        "bottom": 274,
+        "width": 272,
+        "height": 275,
+        "centerX": 157
+      },
+      "anchor": {
+        "x": 189,
+        "y": 274,
+        "rawX": 189
+      },
+      "centroid": {
+        "x": 163,
+        "y": 140
+      },
+      "residuePixels": 1224,
+      "anchorOffset": {
+        "x": -34,
+        "y": 31
+      },
+      "afterAnchor": {
+        "x": 155,
+        "y": 305,
+        "rawX": 155
+      }
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "direction": "right",
+      "body": {
+        "count": 46366,
+        "left": 23,
+        "top": 0,
+        "right": 288,
+        "bottom": 274,
+        "width": 266,
+        "height": 275,
+        "centerX": 156
+      },
+      "anchor": {
+        "x": 204,
+        "y": 274,
+        "rawX": 204
+      },
+      "centroid": {
+        "x": 162,
+        "y": 145
+      },
+      "residuePixels": 1151,
+      "anchorOffset": {
+        "x": -49,
+        "y": 31
+      },
+      "afterAnchor": {
+        "x": 155,
+        "y": 305,
+        "rawX": 155
+      }
+    },
+    {
+      "row": 3,
+      "col": 0,
+      "direction": "up",
+      "body": {
+        "count": 48843,
+        "left": 11,
+        "top": 0,
+        "right": 287,
+        "bottom": 283,
+        "width": 277,
+        "height": 284,
+        "centerX": 149
+      },
+      "anchor": {
+        "x": 156,
+        "y": 283,
+        "rawX": 156
+      },
+      "centroid": {
+        "x": 155,
+        "y": 146
+      },
+      "residuePixels": 0,
+      "anchorOffset": {
+        "x": -1,
+        "y": 22
+      },
+      "afterAnchor": {
+        "x": 155,
+        "y": 305,
+        "rawX": 155
+      }
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "direction": "up",
+      "body": {
+        "count": 49387,
+        "left": 10,
+        "top": 0,
+        "right": 284,
+        "bottom": 288,
+        "width": 275,
+        "height": 289,
+        "centerX": 147
+      },
+      "anchor": {
+        "x": 152,
+        "y": 288,
+        "rawX": 152
+      },
+      "centroid": {
+        "x": 153,
+        "y": 150
+      },
+      "residuePixels": 0,
+      "anchorOffset": {
+        "x": 3,
+        "y": 17
+      },
+      "afterAnchor": {
+        "x": 155,
+        "y": 305,
+        "rawX": 155
+      }
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "direction": "up",
+      "body": {
+        "count": 48426,
+        "left": 23,
+        "top": 0,
+        "right": 289,
+        "bottom": 288,
+        "width": 267,
+        "height": 289,
+        "centerX": 156
+      },
+      "anchor": {
+        "x": 154,
+        "y": 288,
+        "rawX": 154
+      },
+      "centroid": {
+        "x": 154,
+        "y": 148
+      },
+      "residuePixels": 0,
+      "anchorOffset": {
+        "x": 1,
+        "y": 17
+      },
+      "afterAnchor": {
+        "x": 155,
+        "y": 305,
+        "rawX": 155
+      }
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "direction": "up",
+      "body": {
+        "count": 48770,
+        "left": 25,
+        "top": 0,
+        "right": 301,
+        "bottom": 288,
+        "width": 277,
+        "height": 289,
+        "centerX": 163
+      },
+      "anchor": {
+        "x": 158,
+        "y": 288,
+        "rawX": 158
+      },
+      "centroid": {
+        "x": 162,
+        "y": 147
+      },
+      "residuePixels": 0,
+      "anchorOffset": {
+        "x": -3,
+        "y": 17
+      },
+      "afterAnchor": {
+        "x": 155,
+        "y": 305,
+        "rawX": 155
+      }
+    }
+  ],
+  "generatedAt": "2026-09-10T06:41:11.590Z"
+}

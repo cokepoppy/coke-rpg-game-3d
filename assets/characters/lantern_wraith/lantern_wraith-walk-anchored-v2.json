@@ -1,0 +1,684 @@
+{
+  "input": "/Users/shangguan/Documents/home2026/coke-rpg-game/assets/characters/lantern_wraith/lantern_wraith-walk-raw-imagegen-v2.png",
+  "output": "/Users/shangguan/Documents/home2026/coke-rpg-game/assets/characters/lantern_wraith/lantern_wraith-walk-anchored-v2.png",
+  "rows": 4,
+  "cols": 4,
+  "cell": {
+    "width": 311,
+    "height": 315
+  },
+  "targetAnchor": {
+    "x": 156,
+    "y": 294
+  },
+  "thresholds": {
+    "alphaThreshold": 24,
+    "minComponentArea": 40,
+    "footBand": 14,
+    "maxAnchorDrift": 2,
+    "minTopMargin": 8,
+    "minSideMargin": 10,
+    "minVerticalStride": 3
+  },
+  "before": {
+    "global": {
+      "anchorXDrift": 111,
+      "anchorYDrift": 22,
+      "centroidXDrift": 45,
+      "maxResiduePixels": 151
+    },
+    "byDirection": [
+      {
+        "row": 0,
+        "direction": "down",
+        "anchorXDrift": 36,
+        "anchorYDrift": 2,
+        "centroidXDrift": 21,
+        "residuePixels": 0
+      },
+      {
+        "row": 1,
+        "direction": "left",
+        "anchorXDrift": 39,
+        "anchorYDrift": 2,
+        "centroidXDrift": 19,
+        "residuePixels": 0
+      },
+      {
+        "row": 2,
+        "direction": "right",
+        "anchorXDrift": 50,
+        "anchorYDrift": 1,
+        "centroidXDrift": 16,
+        "residuePixels": 407
+      },
+      {
+        "row": 3,
+        "direction": "up",
+        "anchorXDrift": 18,
+        "anchorYDrift": 0,
+        "centroidXDrift": 19,
+        "residuePixels": 0
+      }
+    ]
+  },
+  "after": {
+    "global": {
+      "anchorXDrift": 0,
+      "anchorYDrift": 0,
+      "centroidXDrift": 115,
+      "maxResiduePixels": 1260
+    },
+    "byDirection": [
+      {
+        "row": 0,
+        "direction": "down",
+        "anchorXDrift": 0,
+        "anchorYDrift": 0,
+        "centroidXDrift": 15,
+        "residuePixels": 0
+      },
+      {
+        "row": 1,
+        "direction": "left",
+        "anchorXDrift": 0,
+        "anchorYDrift": 0,
+        "centroidXDrift": 20,
+        "residuePixels": 394
+      },
+      {
+        "row": 2,
+        "direction": "right",
+        "anchorXDrift": 0,
+        "anchorYDrift": 0,
+        "centroidXDrift": 35,
+        "residuePixels": 2239
+      },
+      {
+        "row": 3,
+        "direction": "up",
+        "anchorXDrift": 0,
+        "anchorYDrift": 0,
+        "centroidXDrift": 3,
+        "residuePixels": 407
+      }
+    ]
+  },
+  "contract": {
+    "pass": false,
+    "failures": [
+      "side margins 0/0px are below 10px",
+      "down walk does not alternate feet: frame1 -4px, frame3 -12px",
+      "up walk does not alternate feet: frame1 -2px, frame3 0px"
+    ],
+    "margins": {
+      "top": 13,
+      "left": 0,
+      "right": 0
+    },
+    "verticalGait": [
+      {
+        "direction": "down",
+        "frame1Offset": -4,
+        "frame3Offset": -12,
+        "pass": false
+      },
+      {
+        "direction": "up",
+        "frame1Offset": -2,
+        "frame3Offset": 0,
+        "pass": false
+      }
+    ]
+  },
+  "regenerate": true,
+  "regenerationPrompt": "Regenerate this character as a strict 4x4 top-down pixel-art RPG walk sprite sheet.\nCanvas contract: 4 columns x 4 rows; the final asset must normalize cleanly to 128x128 px per frame.\nRuntime contract: character body fits a 64x96 px in-game display on a 64x64 map tile; feet anchor is bottom-center and stable.\nRows: down, left, right, up. Columns: idle, left-foot step, idle, right-foot step.\nDown and up rows must clearly alternate opposite feet in columns 2 and 4.\nKeep at least 8 px top padding and 10 px side padding in every frame after normalization; do not crop head, hair, robe, weapon, hands, or feet.\nEvery frame uses identical scale, consistent identity, and the same foot-contact map anchor.\nPerfectly flat #FF00FF chroma-key background; no shadows, text, labels, grid, UI, or watermark.\nPrevious QA failures: side margins 0/0px are below 10px; down walk does not alternate feet: frame1 -4px, frame3 -12px; up walk does not alternate feet: frame1 -2px, frame3 0px.",
+  "pass": false,
+  "frames": [
+    {
+      "row": 0,
+      "col": 0,
+      "direction": "down",
+      "body": {
+        "count": 35290,
+        "left": 61,
+        "top": 18,
+        "right": 286,
+        "bottom": 294,
+        "width": 226,
+        "height": 277,
+        "centerX": 174
+      },
+      "anchor": {
+        "x": 177,
+        "y": 294,
+        "rawX": 177
+      },
+      "centroid": {
+        "x": 171,
+        "y": 166
+      },
+      "residuePixels": 0,
+      "anchorOffset": {
+        "x": -21,
+        "y": 0
+      },
+      "afterAnchor": {
+        "x": 156,
+        "y": 294,
+        "rawX": 156
+      }
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "direction": "down",
+      "body": {
+        "count": 33785,
+        "left": 59,
+        "top": 18,
+        "right": 272,
+        "bottom": 292,
+        "width": 214,
+        "height": 275,
+        "centerX": 166
+      },
+      "anchor": {
+        "x": 162,
+        "y": 292,
+        "rawX": 162
+      },
+      "centroid": {
+        "x": 164,
+        "y": 166
+      },
+      "residuePixels": 0,
+      "anchorOffset": {
+        "x": -6,
+        "y": 2
+      },
+      "afterAnchor": {
+        "x": 156,
+        "y": 294,
+        "rawX": 156
+      }
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "direction": "down",
+      "body": {
+        "count": 34410,
+        "left": 49,
+        "top": 18,
+        "right": 266,
+        "bottom": 294,
+        "width": 218,
+        "height": 277,
+        "centerX": 158
+      },
+      "anchor": {
+        "x": 157,
+        "y": 294,
+        "rawX": 157
+      },
+      "centroid": {
+        "x": 154,
+        "y": 167
+      },
+      "residuePixels": 0,
+      "anchorOffset": {
+        "x": -1,
+        "y": 0
+      },
+      "afterAnchor": {
+        "x": 156,
+        "y": 294,
+        "rawX": 156
+      }
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "direction": "down",
+      "body": {
+        "count": 34556,
+        "left": 40,
+        "top": 19,
+        "right": 266,
+        "bottom": 292,
+        "width": 227,
+        "height": 274,
+        "centerX": 153
+      },
+      "anchor": {
+        "x": 141,
+        "y": 292,
+        "rawX": 141
+      },
+      "centroid": {
+        "x": 150,
+        "y": 167
+      },
+      "residuePixels": 0,
+      "anchorOffset": {
+        "x": 15,
+        "y": 2
+      },
+      "afterAnchor": {
+        "x": 156,
+        "y": 294,
+        "rawX": 156
+      }
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "direction": "left",
+      "body": {
+        "count": 33418,
+        "left": 98,
+        "top": 4,
+        "right": 293,
+        "bottom": 283,
+        "width": 196,
+        "height": 280,
+        "centerX": 196
+      },
+      "anchor": {
+        "x": 142,
+        "y": 283,
+        "rawX": 142
+      },
+      "centroid": {
+        "x": 179,
+        "y": 152
+      },
+      "residuePixels": 0,
+      "anchorOffset": {
+        "x": 14,
+        "y": 11
+      },
+      "afterAnchor": {
+        "x": 156,
+        "y": 294,
+        "rawX": 156
+      }
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "direction": "left",
+      "body": {
+        "count": 35116,
+        "left": 76,
+        "top": 4,
+        "right": 285,
+        "bottom": 285,
+        "width": 210,
+        "height": 282,
+        "centerX": 181
+      },
+      "anchor": {
+        "x": 118,
+        "y": 285,
+        "rawX": 118
+      },
+      "centroid": {
+        "x": 173,
+        "y": 158
+      },
+      "residuePixels": 0,
+      "anchorOffset": {
+        "x": 38,
+        "y": 9
+      },
+      "afterAnchor": {
+        "x": 156,
+        "y": 294,
+        "rawX": 156
+      }
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "direction": "left",
+      "body": {
+        "count": 33451,
+        "left": 80,
+        "top": 4,
+        "right": 276,
+        "bottom": 283,
+        "width": 197,
+        "height": 280,
+        "centerX": 178
+      },
+      "anchor": {
+        "x": 129,
+        "y": 283,
+        "rawX": 129
+      },
+      "centroid": {
+        "x": 163,
+        "y": 153
+      },
+      "residuePixels": 0,
+      "anchorOffset": {
+        "x": 27,
+        "y": 11
+      },
+      "afterAnchor": {
+        "x": 156,
+        "y": 294,
+        "rawX": 156
+      }
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "direction": "left",
+      "body": {
+        "count": 34092,
+        "left": 70,
+        "top": 4,
+        "right": 275,
+        "bottom": 284,
+        "width": 206,
+        "height": 281,
+        "centerX": 173
+      },
+      "anchor": {
+        "x": 103,
+        "y": 284,
+        "rawX": 103
+      },
+      "centroid": {
+        "x": 160,
+        "y": 155
+      },
+      "residuePixels": 0,
+      "anchorOffset": {
+        "x": 53,
+        "y": 10
+      },
+      "afterAnchor": {
+        "x": 156,
+        "y": 294,
+        "rawX": 156
+      }
+    },
+    {
+      "row": 2,
+      "col": 0,
+      "direction": "right",
+      "body": {
+        "count": 31785,
+        "left": 44,
+        "top": 0,
+        "right": 222,
+        "bottom": 279,
+        "width": 179,
+        "height": 280,
+        "centerX": 133
+      },
+      "anchor": {
+        "x": 175,
+        "y": 279,
+        "rawX": 175
+      },
+      "centroid": {
+        "x": 149,
+        "y": 148
+      },
+      "residuePixels": 64,
+      "anchorOffset": {
+        "x": -19,
+        "y": 15
+      },
+      "afterAnchor": {
+        "x": 156,
+        "y": 294,
+        "rawX": 156
+      }
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "direction": "right",
+      "body": {
+        "count": 33945,
+        "left": 30,
+        "top": 0,
+        "right": 247,
+        "bottom": 279,
+        "width": 218,
+        "height": 280,
+        "centerX": 139
+      },
+      "anchor": {
+        "x": 214,
+        "y": 279,
+        "rawX": 214
+      },
+      "centroid": {
+        "x": 150,
+        "y": 153
+      },
+      "residuePixels": 95,
+      "anchorOffset": {
+        "x": -58,
+        "y": 15
+      },
+      "afterAnchor": {
+        "x": 156,
+        "y": 294,
+        "rawX": 156
+      }
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "direction": "right",
+      "body": {
+        "count": 32199,
+        "left": 19,
+        "top": 0,
+        "right": 212,
+        "bottom": 279,
+        "width": 194,
+        "height": 280,
+        "centerX": 116
+      },
+      "anchor": {
+        "x": 164,
+        "y": 279,
+        "rawX": 164
+      },
+      "centroid": {
+        "x": 134,
+        "y": 150
+      },
+      "residuePixels": 97,
+      "anchorOffset": {
+        "x": -8,
+        "y": 15
+      },
+      "afterAnchor": {
+        "x": 156,
+        "y": 294,
+        "rawX": 156
+      }
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "direction": "right",
+      "body": {
+        "count": 34005,
+        "left": 15,
+        "top": 1,
+        "right": 232,
+        "bottom": 278,
+        "width": 218,
+        "height": 278,
+        "centerX": 124
+      },
+      "anchor": {
+        "x": 198,
+        "y": 278,
+        "rawX": 198
+      },
+      "centroid": {
+        "x": 134,
+        "y": 153
+      },
+      "residuePixels": 151,
+      "anchorOffset": {
+        "x": -42,
+        "y": 16
+      },
+      "afterAnchor": {
+        "x": 156,
+        "y": 294,
+        "rawX": 156
+      }
+    },
+    {
+      "row": 3,
+      "col": 0,
+      "direction": "up",
+      "body": {
+        "count": 35145,
+        "left": 51,
+        "top": 0,
+        "right": 286,
+        "bottom": 272,
+        "width": 236,
+        "height": 273,
+        "centerX": 169
+      },
+      "anchor": {
+        "x": 166,
+        "y": 272,
+        "rawX": 166
+      },
+      "centroid": {
+        "x": 164,
+        "y": 144
+      },
+      "residuePixels": 0,
+      "anchorOffset": {
+        "x": -10,
+        "y": 22
+      },
+      "afterAnchor": {
+        "x": 156,
+        "y": 294,
+        "rawX": 156
+      }
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "direction": "up",
+      "body": {
+        "count": 34072,
+        "left": 46,
+        "top": 0,
+        "right": 271,
+        "bottom": 272,
+        "width": 226,
+        "height": 273,
+        "centerX": 159
+      },
+      "anchor": {
+        "x": 157,
+        "y": 272,
+        "rawX": 157
+      },
+      "centroid": {
+        "x": 157,
+        "y": 143
+      },
+      "residuePixels": 0,
+      "anchorOffset": {
+        "x": -1,
+        "y": 22
+      },
+      "afterAnchor": {
+        "x": 156,
+        "y": 294,
+        "rawX": 156
+      }
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "direction": "up",
+      "body": {
+        "count": 35116,
+        "left": 38,
+        "top": 0,
+        "right": 267,
+        "bottom": 272,
+        "width": 230,
+        "height": 273,
+        "centerX": 153
+      },
+      "anchor": {
+        "x": 152,
+        "y": 272,
+        "rawX": 152
+      },
+      "centroid": {
+        "x": 149,
+        "y": 143
+      },
+      "residuePixels": 0,
+      "anchorOffset": {
+        "x": 4,
+        "y": 22
+      },
+      "afterAnchor": {
+        "x": 156,
+        "y": 294,
+        "rawX": 156
+      }
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "direction": "up",
+      "body": {
+        "count": 33792,
+        "left": 35,
+        "top": 0,
+        "right": 261,
+        "bottom": 272,
+        "width": 227,
+        "height": 273,
+        "centerX": 148
+      },
+      "anchor": {
+        "x": 148,
+        "y": 272,
+        "rawX": 148
+      },
+      "centroid": {
+        "x": 145,
+        "y": 142
+      },
+      "residuePixels": 0,
+      "anchorOffset": {
+        "x": 8,
+        "y": 22
+      },
+      "afterAnchor": {
+        "x": 156,
+        "y": 294,
+        "rawX": 156
+      }
+    }
+  ],
+  "generatedAt": "2026-09-10T06:37:10.602Z"
+}

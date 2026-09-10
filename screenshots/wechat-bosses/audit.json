@@ -1,0 +1,131 @@
+{
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "clueAudit": {
+    "mapId": "room",
+    "items": {
+      "hemostatic_powder": 2,
+      "qingxin_pill": 1,
+      "silver_piece": 1,
+      "unsigned_letter": 1,
+      "copper_lantern_shard": 1
+    },
+    "flags": [
+      "inn_letter_found"
+    ]
+  },
+  "deskAudit": {
+    "items": {
+      "hemostatic_powder": 2,
+      "qingxin_pill": 1,
+      "silver_piece": 1,
+      "unsigned_letter": 1,
+      "copper_lantern_shard": 1,
+      "lantern_order_clue": 1
+    },
+    "flags": [
+      "inn_letter_found",
+      "lantern_order_clue"
+    ]
+  },
+  "teaAudit": {
+    "items": {
+      "hemostatic_powder": 2,
+      "qingxin_pill": 1,
+      "silver_piece": 1,
+      "unsigned_letter": 1,
+      "copper_lantern_shard": 1,
+      "lantern_order_clue": 1,
+      "tea_house_cipher": 1
+    },
+    "flags": [
+      "inn_letter_found",
+      "lantern_order_clue",
+      "tea_house_cipher"
+    ]
+  },
+  "moonAudit": {
+    "items": {
+      "hemostatic_powder": 2,
+      "qingxin_pill": 1,
+      "silver_piece": 1,
+      "unsigned_letter": 1,
+      "copper_lantern_shard": 1,
+      "lantern_order_clue": 1,
+      "tea_house_cipher": 1
+    },
+    "flags": [
+      "inn_letter_found",
+      "lantern_order_clue",
+      "tea_house_cipher",
+      "moon_cipher_ready"
+    ]
+  },
+  "bossAudits": [
+    {
+      "before": {
+        "triggerId": "boss_lantern_wraith",
+        "dialogSpeaker": "引灯魇客",
+        "dialogText": "第七响没有落下，你却循着灯火来了。护手留下，旧案就还能继续沉睡。"
+      },
+      "audit": {
+        "title": "灯亭 · 引灯魇客",
+        "boss": {
+          "id": "lanternWraith",
+          "hp": 168,
+          "drawWidth": 118,
+          "drawHeight": 138
+        },
+        "enragedSkill": "lantern_ring",
+        "enemies": [
+          {
+            "id": "lanternWraith",
+            "hp": 168
+          },
+          {
+            "id": "lanternShadeA",
+            "hp": 58
+          },
+          {
+            "id": "lanternShadeB",
+            "hp": 58
+          }
+        ]
+      }
+    },
+    {
+      "before": {
+        "triggerId": "boss_bone_mirror_hag",
+        "dialogSpeaker": "照骨婆",
+        "dialogText": "你把灯熄了，便以为能看清药账？镜里照出的，未必是你自己的脸。"
+      },
+      "audit": {
+        "title": "月华药庐 · 照骨婆",
+        "boss": {
+          "id": "boneMirrorHag",
+          "hp": 188,
+          "drawWidth": 122,
+          "drawHeight": 140
+        },
+        "enragedSkill": "mirror_shatter",
+        "enemies": [
+          {
+            "id": "boneMirrorHag",
+            "hp": 188
+          },
+          {
+            "id": "mirrorServant",
+            "hp": 68
+          },
+          {
+            "id": "poisonLantern",
+            "hp": 62
+          }
+        ]
+      }
+    }
+  ],
+  "errors": []
+}

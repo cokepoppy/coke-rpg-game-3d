@@ -44,6 +44,8 @@ const ASSETS = {
   muZhiyan: "character-pack/mu-zhiyan.png",
   moonValleyDisciple: "character-pack/moon-valley-disciple.png",
   moonValleyTraitor: "character-pack/moon-valley-traitor.png",
+  lanternWraith: "character-pack/lantern-wraith.png",
+  boneMirrorHag: "character-pack/bone-mirror-hag.png",
   xiaoBeichen: "character-pack/xiao-beichen.png",
   xuYunsheng: "character-pack/xu-yunsheng.png",
   lianZhao: "character-pack/lian-zhao.png",
@@ -92,7 +94,10 @@ const BATTLE = {
     guard_break: { id: "guard_break", name: "破甲刺", cost: 35, range: 1, damage: 22, kind: "single", status: "exposed", statusTurns: 2, effect: "破防两回合" },
     arrow_shot: { id: "arrow_shot", name: "袖弩", cost: 0, range: 2, damage: 16, kind: "single", effect: "远程射击" },
     rally: { id: "rally", name: "振奋", cost: 25, range: 0, qiRestore: 18, kind: "ally_all", effect: "我方回复真气" },
-    fuyou_step: { id: "fuyou_step", name: "扶摇诀", cost: 50, range: 3, damage: 30, kind: "aoe", radius: 1, status: "stunned", statusTurns: 1, effect: "御风群攻并使敌人晕眩" }
+    fuyou_step: { id: "fuyou_step", name: "扶摇诀", cost: 50, range: 3, damage: 30, kind: "aoe", radius: 1, status: "stunned", statusTurns: 1, effect: "御风群攻并使敌人晕眩" },
+    lantern_ring: { id: "lantern_ring", name: "灯影回环", cost: 28, range: 3, damage: 27, kind: "aoe", radius: 1, status: "exposed", statusTurns: 2, effect: "灯火回环并使目标破防" },
+    mirror_needle: { id: "mirror_needle", name: "照骨针", cost: 22, range: 3, damage: 25, kind: "single", status: "stunned", statusTurns: 1, effect: "远距毒针并短暂封穴" },
+    mirror_shatter: { id: "mirror_shatter", name: "裂镜回生", cost: 34, range: 3, damage: 30, kind: "aoe", radius: 1, status: "exposed", statusTurns: 2, effect: "裂镜震荡并使目标破防" }
   },
   rewards: {
     money: { min: 18, max: 35 },
@@ -105,7 +110,45 @@ const BATTLE = {
   }
 };
 
+const BOSS_BATTLES = {
+  boss_lantern_wraith: {
+    title: "灯亭 · 引灯魇客",
+    cols: BATTLE.cols,
+    rows: BATTLE.rows,
+    objective: "击破引灯魇客并熄灭残灯",
+    players: BATTLE.players.map((unit) => ({ ...unit })),
+    enemies: [
+      { id: "lanternWraith", name: "引灯魇客", sprite: "lanternWraith", side: "enemy", x: 5, y: 4, hp: 168, qi: 110, move: 2, range: 3, damage: 30, defense: 5, skillIds: ["lantern_ring"], enrageAt: 0.5, enrageSkillId: "lantern_ring", drawWidth: 118, drawHeight: 138 },
+      { id: "lanternShadeA", name: "残灯影卫", sprite: "scout", attackSprite: "scoutAttack", side: "enemy", x: 4, y: 6, hp: 58, qi: 35, move: 2, range: 1, damage: 20, skillIds: ["quick_slash"] },
+      { id: "lanternShadeB", name: "残灯影卫", sprite: "scout", attackSprite: "scoutAttack", side: "enemy", x: 6, y: 2, hp: 58, qi: 35, move: 2, range: 1, damage: 20, skillIds: ["quick_slash"] }
+    ],
+    skills: BATTLE.skills,
+    rewards: {
+      money: { min: 48, max: 68 },
+      drops: [{ itemId: "broken_sword_guard", name: "断剑护手", chance: 1, min: 1, max: 1 }]
+    }
+  },
+  boss_bone_mirror_hag: {
+    title: "月华药庐 · 照骨婆",
+    cols: BATTLE.cols,
+    rows: BATTLE.rows,
+    objective: "击破照骨婆并夺回药账残页",
+    players: BATTLE.players.map((unit) => ({ ...unit })),
+    enemies: [
+      { id: "boneMirrorHag", name: "照骨婆", sprite: "boneMirrorHag", side: "enemy", x: 5, y: 4, hp: 188, qi: 120, move: 2, range: 3, damage: 32, defense: 6, skillIds: ["mirror_needle"], enrageAt: 0.5, enrageSkillId: "mirror_shatter", drawWidth: 122, drawHeight: 140 },
+      { id: "mirrorServant", name: "镜中侍", sprite: "moonValleyTraitor", side: "enemy", x: 4, y: 6, hp: 68, qi: 42, move: 2, range: 2, damage: 22, skillIds: ["arrow_shot"] },
+      { id: "poisonLantern", name: "毒灯影", sprite: "moonValleyTraitor", side: "enemy", x: 6, y: 2, hp: 62, qi: 42, move: 2, range: 2, damage: 20, skillIds: ["arrow_shot"] }
+    ],
+    skills: BATTLE.skills,
+    rewards: {
+      money: { min: 62, max: 86 },
+      drops: [{ itemId: "moon_record_fragment", name: "月华药账残页", chance: 1, min: 1, max: 1 }]
+    }
+  }
+};
+
 const SCOUT_IDS = ["scout", "scout_bridge", "scout_archer", "scout_road", "scout_monk", "scout_gate"];
+const BOSS_IDS = Object.keys(BOSS_BATTLES);
 
 const WORLD_NODES = [
   { id: "cangshan", name: "苍山旧道", x: 168, y: 610, status: "current" },
@@ -240,7 +283,8 @@ const MAPS = {
       { id: "scout_archer", x: 2040, y: 1840, width: 260, height: 230, label: "挑战竹林弩手" },
       { id: "scout_road", x: 2380, y: 1500, width: 260, height: 230, label: "挑战拦路密探" },
       { id: "scout_monk", x: 2700, y: 1320, width: 280, height: 230, label: "挑战寺前护卫" },
-      { id: "scout_gate", x: 3100, y: 1640, width: 280, height: 230, label: "挑战山门密探" }
+      { id: "scout_gate", x: 3100, y: 1640, width: 280, height: 230, label: "挑战山门密探" },
+      { id: "boss_lantern_wraith", x: 1580, y: 940, width: 360, height: 300, label: "调查残灯禁地" }
     ],
     npcs: [
       { id: "keeper", name: "客栈掌柜", sprite: "keeper", x: 2735, y: 2525, direction: "right" },
@@ -251,7 +295,8 @@ const MAPS = {
       { id: "scout_archer", name: "竹林弩手", sprite: "scoutArcher", x: 2168, y: 1930, direction: "down" },
       { id: "scout_road", name: "拦路密探", sprite: "scout", x: 2508, y: 1590, direction: "down" },
       { id: "scout_monk", name: "寺前护卫", sprite: "monkGuard", x: 2840, y: 1410, direction: "down" },
-      { id: "scout_gate", name: "山门首领", sprite: "yipintangLeader", x: 3240, y: 1730, direction: "down" }
+      { id: "scout_gate", name: "山门首领", sprite: "yipintangLeader", x: 3240, y: 1730, direction: "down" },
+      { id: "boss_lantern_wraith", name: "引灯魇客", sprite: "lanternWraith", x: 1760, y: 1080, direction: "down" }
     ]
   },
   moonValley: {
@@ -286,13 +331,15 @@ const MAPS = {
       { id: "qin_wanyao", x: 315, y: 630, width: 160, height: 170, label: "拜会秦晚瑶" },
       { id: "mu_zhiyan", x: 480, y: 1080, width: 160, height: 170, label: "询问穆芷烟" },
       { id: "moon_disciple", x: 300, y: 1360, width: 170, height: 180, label: "询问月华弟子" },
-      { id: "scout_moon", x: 340, y: 500, width: 170, height: 170, label: "挑战谷中叛徒" }
+      { id: "scout_moon", x: 340, y: 500, width: 170, height: 170, label: "挑战谷中叛徒" },
+      { id: "boss_bone_mirror_hag", x: 80, y: 860, width: 190, height: 220, label: "调查裂镜药圃" }
     ],
     npcs: [
       { id: "qin_wanyao", name: "秦晚瑶", sprite: "qinWanyao", x: 392, y: 700, direction: "down" },
       { id: "mu_zhiyan", name: "穆芷烟", sprite: "muZhiyan", x: 555, y: 1160, direction: "left" },
       { id: "moon_disciple", name: "月华弟子", sprite: "moonValleyDisciple", x: 385, y: 1450, direction: "up" },
-      { id: "scout_moon", name: "谷中叛徒", sprite: "moonValleyTraitor", x: 425, y: 575, direction: "down" }
+      { id: "scout_moon", name: "谷中叛徒", sprite: "moonValleyTraitor", x: 425, y: 575, direction: "down" },
+      { id: "boss_bone_mirror_hag", name: "照骨婆", sprite: "boneMirrorHag", x: 175, y: 970, direction: "right" }
     ]
   },
   moonMedicineHall: {
@@ -352,4 +399,4 @@ const MAPS = {
   }
 };
 
-module.exports = { GAME, ASSETS, MAPS, BATTLE, SCOUT_IDS, WORLD_NODES };
+module.exports = { GAME, ASSETS, MAPS, BATTLE, BOSS_BATTLES, BOSS_IDS, SCOUT_IDS, WORLD_NODES };

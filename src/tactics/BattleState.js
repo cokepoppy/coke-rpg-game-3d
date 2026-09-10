@@ -96,8 +96,22 @@ export class BattleState {
     attacker.acted = true;
     attacker.moved = true;
     target.takeDamage(skill.damage);
-    attacker.animation = { type: "attack", target: { ...target.cell }, time: 0.28, duration: 0.28, effectId: skill.effectId || "sword_slash" };
-    target.animation = { type: "hit", time: 0.34, duration: 0.34, damage: skill.damage };
+    attacker.animation = {
+      type: "attack",
+      target: { ...target.cell },
+      time: 0.42,
+      duration: 0.42,
+      effectId: skill.effectId || "sword_slash",
+      attackSprite: attacker.attackSprite || attacker.spriteId,
+      melee: skill.range <= 1
+    };
+    target.animation = {
+      type: "hit",
+      time: 0.42,
+      duration: 0.42,
+      damage: skill.damage,
+      from: { ...attacker.cell }
+    };
     this.events.push({
       type: "attack",
       attackerId: attacker.id,

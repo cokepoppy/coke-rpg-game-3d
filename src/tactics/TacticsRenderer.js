@@ -15,6 +15,8 @@ export class TacticsRenderer {
       height: map.pixelHeight
     };
     this.impactTimer = 0;
+    this.renderedAttackFrames = [];
+    this.attackFrameAudit = new WeakMap();
   }
 
   draw() {
@@ -25,7 +27,7 @@ export class TacticsRenderer {
     ctx.imageSmoothingEnabled = false;
     ctx.save();
     if (this.impactTimer > 0) {
-      const shake = Math.round(Math.sin(this.impactTimer * 115) * 4);
+      const shake = Math.round(Math.sin(this.impactTimer * 145) * 5);
       ctx.translate(shake, 0);
     }
     ctx.drawImage(this.map.image, this.view.x, this.view.y, this.view.width, this.view.height);
@@ -33,6 +35,10 @@ export class TacticsRenderer {
     this.drawHighlights();
     this.drawUnits();
     ctx.restore();
+    if (this.impactTimer > 0) {
+      ctx.fillStyle = `rgba(255, 237, 180, ${Math.min(0.11, this.impactTimer * 0.45)})`;
+      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    }
   }
 
   cellFromCanvasPoint(point) {
@@ -92,21 +98,34 @@ export class TacticsRenderer {
       const center = this.map.cellCenter(unit.cell);
       const px = this.view.x + center.x;
       const py = this.view.y + center.y;
-      const hit = unit.animation?.type === "hit" ? 5 : 0;
+      const attack = unit.animation?.type === "attack" ? unit.animation : null;
+      const hitAnimation = unit.animation?.type === "hit" ? unit.animation : null;
+      const hitProgress = hitAnimation ? 1 - hitAnimation.time / hitAnimation.duration : 0;
+      const hitKick = hitAnimation ? Math.sin(Math.max(0, Math.min(1, hitProgress)) * Math.PI) * 9 : 0;
+      const hit = hitAnimation ? 5 : 0;
       const hitFlash = unit.animation?.type === "hit" && Math.floor(unit.animation.time * 28) % 2 === 0;
-      const frame = unit.animation?.type === "attack" ? 2 : unit.frame;
-      const drewSprite = this.spriteRenderer.draw(ctx, unit.spriteId || unit.id, {
-        x: px,
-        y: py + hit + 22,
+      const attackProgress = attack ? 1 - attack.time / attack.duration : 0;
+      const attackFrame = attack ? Math.min(3, Math.floor(attackProgress * 4)) : unit.frame;
+      const attackLunge = attack?.melee ? Math.sin(Math.max(0, Math.min(1, attackProgress)) * Math.PI) * 14 : 0;
+      const attackDx = attack?.melee ? Math.sign(attack.target.x - unit.cell.x) * attackLunge : 0;
+      const attackDy = attack?.melee ? Math.sign(attack.target.y - unit.cell.y) * attackLunge : 0;
+      const drawX = px + attackDx + (hitAnimation?.from ? Math.sign(unit.cell.x - hitAnimation.from.x) * hitKick : 0);
+      const drawY = py + hit + attackDy;
+      const frame = attack ? attackFrame : unit.frame;
+      if (attack) this.auditAttackFrame(unit, attack, attackFrame);
+      const drewSprite = this.spriteRenderer.draw(ctx, attack?.attackSprite || unit.spriteId || unit.id, {
+        x: drawX,
+        y: drawY + 22,
         direction: unit.direction,
         frame,
         alpha: hitFlash ? 0.38 : 1,
-        acted: unit.acted
+        acted: unit.acted,
+        sheet: attack ? "attack" : "walk"
       });
       if (drewSprite) {
         this.drawUnitLabels(unit, px, py);
         if (unit.animation?.type === "hit") this.drawDamageText(unit, px, py);
-        if (unit.animation?.type === "attack") this.drawAttackArc(unit);
+        if (attack) this.drawAttackArc(unit);
         continue;
       }
       const body = unit.side === "player" ? "#2d6fb2" : "#8f2d2d";
@@ -134,7 +153,7 @@ export class TacticsRenderer {
       ctx.fillStyle = "rgba(27, 16, 13, 0.88)";
       ctx.fillRect(-24, 30, 48, 6);
       ctx.fillStyle = unit.side === "player" ? "#6cd48b" : "#f16d62";
-      ctx.fillRect(-24, 30, 48 * (unit.hp / unit.maxHp), 6);
+      ctx.fillRect(-24, 30, 48 * ((unit.visualHp ?? unit.hp) / unit.maxHp), 6);
       if (unit.acted) {
         ctx.fillStyle = "rgba(0, 0, 0, 0.36)";
         ctx.beginPath();
@@ -142,8 +161,8 @@ export class TacticsRenderer {
         ctx.fill();
       }
       ctx.restore();
-      if (unit.animation?.type === "hit") this.drawDamageText(unit, px, py);
-      if (unit.animation?.type === "attack") this.drawAttackArc(unit);
+      if (hitAnimation) this.drawDamageText(unit, drawX, drawY);
+      if (attack) this.drawAttackArc(unit);
     }
   }
 
@@ -176,7 +195,7 @@ export class TacticsRenderer {
     ctx.fillStyle = "rgba(27, 16, 13, 0.88)";
     ctx.fillRect(px - 24, py + 30, 48, 6);
     ctx.fillStyle = unit.side === "player" ? "#6cd48b" : "#f16d62";
-    ctx.fillRect(px - 24, py + 30, 48 * (unit.hp / unit.maxHp), 6);
+    ctx.fillRect(px - 24, py + 30, 48 * ((unit.visualHp ?? unit.hp) / unit.maxHp), 6);
     ctx.restore();
   }
 
@@ -184,15 +203,25 @@ export class TacticsRenderer {
     const ctx = this.context;
     const from = this.map.cellCenter(unit.cell);
     const to = this.map.cellCenter(unit.animation.target);
+    const progress = 1 - unit.animation.time / unit.animation.duration;
     if (
       this.effectRenderer.draw(ctx, unit.animation.effectId || "sword_slash", {
         x: this.view.x + to.x,
         y: this.view.y + to.y - 16,
         time: unit.animation.time,
-        duration: unit.animation.duration || 0.28,
+        duration: unit.animation.duration || 0.42,
         scale: 0.86
       })
     ) {
+      if (progress > 0.45) {
+        this.effectRenderer.draw(ctx, "hit_spark", {
+          x: this.view.x + to.x,
+          y: this.view.y + to.y - 16,
+          time: Math.max(0, 0.18 - (progress - 0.45) * 0.36),
+          duration: 0.18,
+          scale: 0.72
+        });
+      }
       return;
     }
     ctx.save();
@@ -203,6 +232,17 @@ export class TacticsRenderer {
     ctx.lineTo(this.view.x + to.x, this.view.y + to.y - 16);
     ctx.stroke();
     ctx.restore();
+  }
+
+  auditAttackFrame(unit, animation, frame) {
+    let seen = this.attackFrameAudit.get(animation);
+    if (!seen) {
+      seen = new Set();
+      this.attackFrameAudit.set(animation, seen);
+    }
+    if (seen.has(frame)) return;
+    seen.add(frame);
+    this.renderedAttackFrames.push({ unitId: unit.id, frame });
   }
 
   fillCell(cell, color) {

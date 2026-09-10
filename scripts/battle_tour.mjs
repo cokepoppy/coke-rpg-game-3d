@@ -69,7 +69,7 @@ await shot("06-skill-targeting");
 await clickCell(8, 7);
 await page.waitForTimeout(180);
 await shot("07-player-skill-hit");
-const attackAudit = await page.evaluate(() => {
+let attackAudit = await page.evaluate(() => {
   const scene = window.__battleScene;
   const attacker = scene.state.units.find((unit) => unit.id === "duan_yu");
   const target = scene.state.units.find((unit) => unit.id === "scout_1");
@@ -89,7 +89,9 @@ const attackAudit = await page.evaluate(() => {
       alive: target.alive
     },
     sfxEvents: scene.sfx.played,
-    impactTimer: scene.renderer.impactTimer
+    impactTimer: scene.renderer.impactTimer,
+    attackSpriteLoaded: Boolean(scene.renderer.spriteRenderer.sprites.get("duan_yu")?.attackImage),
+    renderedAttackFrames: scene.renderer.renderedAttackFrames
   };
 });
 await waitDialog();
@@ -97,6 +99,31 @@ await shot("08-victory-dialog");
 await clickFirst();
 await waitHidden();
 await page.waitForFunction(() => !window.__battleScene?.active);
+attackAudit = await page.evaluate(() => {
+  const scene = window.__battleScene;
+  const attacker = scene.state.units.find((unit) => unit.id === "duan_yu");
+  const target = scene.state.units.find((unit) => unit.id === "scout_1");
+  return {
+    phase: scene.state.phase,
+    result: scene.state.result,
+    attacker: {
+      id: attacker.id,
+      direction: attacker.direction,
+      acted: attacker.acted,
+      qi: attacker.qi
+    },
+    target: {
+      id: target.id,
+      direction: target.direction,
+      hp: target.hp,
+      alive: target.alive
+    },
+    sfxEvents: scene.sfx.played,
+    impactTimer: scene.renderer.impactTimer,
+    attackSpriteLoaded: Boolean(scene.renderer.spriteRenderer.sprites.get("duan_yu")?.attackImage),
+    renderedAttackFrames: scene.renderer.renderedAttackFrames
+  };
+});
 await shot("09-back-to-world");
 
 const battleLog = await page.evaluate(() => window.__battleScene?.state?.log || []);
@@ -111,6 +138,15 @@ if (attackAudit.attacker.direction !== "right") failures.push(`attacker did not 
 if (attackAudit.target.direction !== "left") failures.push(`target did not face attacker: ${attackAudit.target.direction}`);
 if (attackAudit.target.hp !== 0 || attackAudit.target.alive) failures.push("target was not defeated by audited skill hit");
 if (attackAudit.result !== "victory") failures.push(`expected victory after audited hit, received ${attackAudit.result}`);
+if (!attackAudit.attackSpriteLoaded) failures.push("duan_yu attack sprite was not loaded");
+const renderedFrames = new Set(
+  attackAudit.renderedAttackFrames
+    .filter((entry) => entry.unitId === "duan_yu")
+    .map((entry) => entry.frame)
+);
+for (const frame of [0, 1, 2, 3]) {
+  if (!renderedFrames.has(frame)) failures.push(`attack frame ${frame} was not rendered for duan_yu`);
+}
 
 console.log(JSON.stringify({ outDir, errors, responses, battleLog, attackAudit, failures }, null, 2));
 if (failures.length || errors.length || responses.length) process.exit(1);

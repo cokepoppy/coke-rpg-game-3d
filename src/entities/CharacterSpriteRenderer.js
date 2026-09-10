@@ -9,23 +9,26 @@ export class CharacterSpriteRenderer {
     this.sprites = sprites;
   }
 
-  draw(context, spriteId, { x, y, direction = "down", frame = 0, alpha = 1, acted = false }) {
+  draw(context, spriteId, { x, y, direction = "down", frame = 0, alpha = 1, acted = false, sheet = "walk" }) {
     const sprite = this.sprites.get(spriteId);
     if (!sprite) return false;
     const { config, image } = sprite;
+    const sourceImage = sheet === "attack" ? sprite.attackImage || image : image;
+    const frameWidth = sheet === "attack" ? config.attackFrameWidth || config.frameWidth : config.frameWidth;
+    const frameHeight = sheet === "attack" ? config.attackFrameHeight || config.frameHeight : config.frameHeight;
     const row = Math.max(0, DIRECTIONS.indexOf(direction));
-    const col = frame % config.framesPerDirection;
-    const drawWidth = config.drawWidth || 88;
-    const drawHeight = config.drawHeight || 88;
+    const col = frame % (sheet === "attack" ? config.attackFramesPerDirection || config.framesPerDirection : config.framesPerDirection);
+    const drawWidth = sheet === "attack" ? config.attackDrawWidth || config.drawWidth || 88 : config.drawWidth || 88;
+    const drawHeight = sheet === "attack" ? config.attackDrawHeight || config.drawHeight || 88 : config.drawHeight || 88;
     context.save();
     context.globalAlpha = alpha;
     context.imageSmoothingEnabled = false;
     context.drawImage(
-      image,
-      col * config.frameWidth,
-      row * config.frameHeight,
-      config.frameWidth,
-      config.frameHeight,
+      sourceImage,
+      col * frameWidth,
+      row * frameHeight,
+      frameWidth,
+      frameHeight,
       Math.round(x - drawWidth / 2),
       Math.round(y - drawHeight * 0.82),
       drawWidth,

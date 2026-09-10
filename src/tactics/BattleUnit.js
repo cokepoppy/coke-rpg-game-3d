@@ -3,6 +3,7 @@ export class BattleUnit {
     Object.assign(this, config);
     this.maxHp = config.maxHp ?? config.hp;
     this.hp = config.hp ?? this.maxHp;
+    this.visualHp = this.hp;
     this.maxQi = config.maxQi ?? config.qi ?? 100;
     this.qi = config.qi ?? this.maxQi;
     this.moveRange = config.moveRange ?? 3;
@@ -18,6 +19,7 @@ export class BattleUnit {
   }
 
   update(dt) {
+    this.visualHp += (this.hp - this.visualHp) * Math.min(1, dt * 12);
     this.frameClock += dt;
     if (this.frameClock >= 0.18) {
       this.frameClock = 0;

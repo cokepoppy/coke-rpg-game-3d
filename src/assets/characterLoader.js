@@ -8,7 +8,8 @@ export async function loadCharacterSprites(ids) {
       if (!config) return null;
       try {
         const image = await loadImage(config.sheet);
-        return [id, { config, image }];
+        const attackImage = config.attackSheet ? await loadImage(config.attackSheet).catch(() => null) : null;
+        return [id, { config, image, attackImage }];
       } catch {
         return null;
       }

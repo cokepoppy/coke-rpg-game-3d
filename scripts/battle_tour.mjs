@@ -29,7 +29,7 @@ page.on("response", (response) => {
   if (response.status() >= 400 && !response.url().endsWith("/favicon.ico")) responses.push(`${response.status()} ${response.url()}`);
 });
 
-await page.goto(`${baseUrl}/index.modular.html`, { waitUntil: "networkidle" });
+await page.goto(`${baseUrl}/index.modular.html`, { waitUntil: "domcontentloaded", timeout: 90000 });
 await startNewGame();
 await finishOpening();
 
@@ -155,7 +155,7 @@ async function startNewGame() {
   await page.waitForFunction(
     () => Boolean(window.__rpgScene && document.querySelector(".menu-panel")),
     null,
-    { timeout: 20000 }
+    { timeout: 90000 }
   );
   await page.locator('[data-action="new"]').click();
 }

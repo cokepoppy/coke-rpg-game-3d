@@ -27,3 +27,14 @@ npm run wechat:moon:test
 ```
 
 浏览器测试会验证三条路线各自完成两次对话推进，并检查好感、关键 flag、王府请帖和调包孩子线索仍然存在。
+
+## 自动播放演示
+
+启动本地调试页后，可用同一套画布按钮和方向移动逻辑播放完整的感情线演示：
+
+```bash
+npm run wechat:debug
+DEMO_HEADLESS=0 DEMO_RECORD=1 npm run wechat:romance:demo
+```
+
+演示会从新游戏开始，进入客房触发苏萝，再前往月华谷触发秦晚瑶和穆芷烟；视频与截图保存在 `screenshots/wechat-romance-demo/`。设置 `DEMO_STEP_DELAY_MS=0` 可用于快速验收，默认会放慢每一步方便观察。

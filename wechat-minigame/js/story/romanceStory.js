@@ -42,15 +42,15 @@ function romanceDialogue({ trackId, stage, heroName, onChoice }) {
       return [
         {
           speaker: "苏萝",
-          text: "你把佩剑抱得这样紧，是怕旧案咬人，还是怕我看见你手在抖？苍山的风会替人藏话，却藏不住心跳。"
+          text: "你把剑抱这么紧，是怕旧案，还是怕我看见你手在抖？"
         },
         {
           speaker: heroName,
-          text: "我怕的不是风，也不是旧案。我怕走到最后，身边的人都只剩一封没有署名的信。"
+          text: "我怕的不是旧案。我怕查到最后，身边的人都一个个走了，只留下一封没署名的信。"
         },
         {
           speaker: "苏萝",
-          text: "那便把信分我一半。春水不问归舟，我也不问你从哪里来；可你若要往险处去，至少让我知道该在何处等你。",
+          text: "那就把信给我看看。你要去危险的地方，至少先告诉我一声，别总想着一个人扛。",
           choices: [
             choose("把无名信交给她", "trust"),
             choose("笑说自己只怕她的药", "tease")
@@ -62,15 +62,15 @@ function romanceDialogue({ trackId, stage, heroName, onChoice }) {
       return [
         {
           speaker: "苏萝",
-          text: "月华谷的月亮很近，近得像能照见人的旧梦。若我找到了母亲留下的信，却发现她并不想让我找到呢？"
+          text: "月华谷的月亮很亮。我有点怕，真找到我娘留下的信，里面写的却不是我想听的话。"
         },
         {
           speaker: heroName,
-          text: "那就由我陪你读完。信里若有离别，也不必一个人把它咽下去。"
+          text: "那我们一起看。就算是离别，也不用你一个人面对。"
         },
         {
           speaker: "苏萝",
-          text: "你说得这样轻巧，倒像把一生都当作山路。可山路会有尽头，人心却会在尽头处问一句：你留下，究竟是因为我，还是因为案子？",
+          text: "你说得倒轻松。可我要是查完就想离开这里呢？你会留下来陪我，还是只把我当成查案的同伴？",
           choices: [
             choose("答应陪她查母亲的旧信", "promise"),
             choose("先查旧案，叫她不要独自涉险", "protect")
@@ -80,7 +80,7 @@ function romanceDialogue({ trackId, stage, heroName, onChoice }) {
     }
     return [{
       speaker: "苏萝",
-      text: "风从苍山来，吹乱了我的药草，也吹乱了你的心。你若还要走，我便把灯留着；只是这一次，别让我等到天明。",
+      text: "你要是还想走，就走吧。我会给你留盏灯。不过这次别让我等太久。",
       choices: [choose("听她把话说完", "listen")]
     }];
   }
@@ -90,17 +90,17 @@ function romanceDialogue({ trackId, stage, heroName, onChoice }) {
       return [
         {
           speaker: "秦晚瑶",
-          text: "南岭的月色照在请帖上，像一层薄霜。请帖能替你打开王府的门，却不能替你挡住门后的旧债。"
+          text: "这封请帖可以让你进王府，但王府里的旧账，不会因为有请帖就消失。"
         },
         {
           speaker: heroName,
-          text: "你把门钥匙交给一个刚认识的人，不怕我把王府的秘密带进江湖？"
+          text: "你把请帖交给我，不怕我把王府的秘密带到江湖上？"
         },
         {
           speaker: "秦晚瑶",
-          text: "怕。所以我只给你一半真话。另一半若由我说出口，便会变成王府的命令；若由你问出来，才算你的选择。",
+          text: "当然怕。所以我没有把所有事情都告诉你。剩下的，你想问就问；不想问，也没人逼你。",
           choices: [
-            choose("问她为何把心意藏在请帖里", "ask_heart"),
+            choose("问她为什么亲自送请帖", "ask_heart"),
             choose("只收请帖，不问王府私事", "keep_distance")
           ]
         }
@@ -110,15 +110,15 @@ function romanceDialogue({ trackId, stage, heroName, onChoice }) {
       return [
         {
           speaker: "秦晚瑶",
-          text: "礼法教人知进退，却没有教过人如何在想见一个人的时候，仍然装作只是路过。"
+          text: "礼法教我该怎么做，却没教我该怎么面对一个我想见、又不敢见的人。"
         },
         {
           speaker: heroName,
-          text: "若你不愿再替王府传话，便不必传。你可以只做秦晚瑶，不做谁家的女儿。"
+          text: "如果你不想再替王府传话，就别替他们说。你可以先做回秦晚瑶，再考虑自己是谁家的女儿。"
         },
         {
           speaker: "秦晚瑶",
-          text: "你可知这句话比请帖更重？收下它的人，便不能再把心事推给家门。",
+          text: "你知道吗？这句话比请帖还重。你让我自己做决定，就等于让我承担决定的后果。",
           choices: [
             choose("让她为自己选择", "free"),
             choose("劝她先守住王府的礼法", "distance")
@@ -128,8 +128,8 @@ function romanceDialogue({ trackId, stage, heroName, onChoice }) {
     }
     return [{
       speaker: "秦晚瑶",
-      text: "你来时，我把琴弦调得太紧；你走后，我才知道有些弦不是为守礼而绷着，是怕一松手，便再也留不住春风。",
-      choices: [choose("替她把琴弦放松", "listen")]
+      text: "你来的时候，我总把琴弦调得太紧。你走之后我才明白，我不是怕失礼，只是怕一放松，就留不住你。",
+      choices: [choose("帮她把琴弦放松", "listen")]
     }];
   }
 
@@ -138,17 +138,17 @@ function romanceDialogue({ trackId, stage, heroName, onChoice }) {
       return [
         {
           speaker: "穆芷烟",
-          text: "你看苏萝的时候，眼里有光；看秦晚瑶的时候，眼里有敬意。轮到我，你只看见毒。很好，至少毒不会骗人。"
+          text: "你看苏萝，眼神总是很软；看秦晚瑶，又多了几分敬意。到了我这里，你只防着我的毒。也好，至少你还知道怕。"
         },
         {
           speaker: heroName,
-          text: "毒也会骗人。它说只要先伤人，自己便不会再被伤。"
+          text: "毒不会骗人？我看未必。很多人先伤别人，只是因为怕自己先受伤。"
         },
         {
           speaker: "穆芷烟",
-          text: "那你敢不敢接住我的恨？别急着救我，也别急着教我做个好人。你若只想要线索，我给你线索；你若想要我的心，便先受得住它的刺。",
+          text: "那你还敢靠近我吗？别急着救我，也别急着教我改。你要线索，我给你；你想知道我在想什么，就先别怕被我刺伤。",
           choices: [
-            choose("接住她的恨", "accept_hurt"),
+            choose("告诉她，你不怕她", "accept_hurt"),
             choose("只问调包孩子的线索", "ask_clue")
           ]
         }
@@ -158,15 +158,15 @@ function romanceDialogue({ trackId, stage, heroName, onChoice }) {
       return [
         {
           speaker: "穆芷烟",
-          text: "你护苏萝时，像护一盏灯；你对秦晚瑶时，像对一座不能碰的雪山。只有我，配得上你一句‘不要胡闹’。"
+          text: "你护着苏萝的时候，眼神都变了；你面对秦晚瑶，又客气得像在面对贵客。只有对我，你会说‘别闹’。"
         },
         {
           speaker: heroName,
-          text: "因为你每一次靠近，都像要先把我推下悬崖。"
+          text: "因为你每次靠近我，都像是先把刀架到我脖子上。"
         },
         {
           speaker: "穆芷烟",
-          text: "那你便站稳。若你连我的坏都不肯看，凭什么说你看见过我？",
+          text: "那你就站稳了。你要是只喜欢我好说话的时候，就别说你真的了解我。",
           choices: [
             choose("告诉她不怕她的恨", "face_anger"),
             choose("说她不该用毒试人心", "set_boundary")
@@ -176,7 +176,7 @@ function romanceDialogue({ trackId, stage, heroName, onChoice }) {
     }
     return [{
       speaker: "穆芷烟",
-      text: "别把我和她们放在同一盏灯下。我若真要走，连影子都不会留给你；可你若叫我留下，便别只在夜里叫。",
+      text: "别拿我和她们比。我真要走，连一句告别都不会留给你。可你要我留下，就别只在想起我的时候叫我。",
       choices: [choose("不许她独自离开", "listen")]
     }];
   }

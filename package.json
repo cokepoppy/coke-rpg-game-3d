@@ -15,6 +15,7 @@
     "wechat:battle:actions:test": "node scripts/test-wechat-battle-actions.mjs",
     "wechat:map:debug": "node scripts/test-wechat-map-debug.mjs",
     "wechat:moon:test": "node scripts/test-wechat-moon-valley.mjs",
+    "wechat:romance:test": "node scripts/test-wechat-romance.mjs",
     "story:campaign:test": "node scripts/test-story-campaign.mjs",
     "wechat:worldmap:test": "node scripts/test-wechat-worldmap.mjs",
     "wechat:inventory:test": "node scripts/test-wechat-inventory.mjs",

@@ -9,6 +9,7 @@ const { CutscenePlayer } = require("./cutscenePlayer");
 const { recordCutsceneDiagnostic } = require("./cutsceneDiagnostics");
 const { CUTSCENES } = require("./cutsceneCatalog");
 const { daoistMasterDialogue } = require("./story/daoistMasterStory");
+const { ROMANCE_SCORE_DEFAULTS, romanceStage, romanceDialogue } = require("./story/romanceStory");
 const { inventoryEntries, itemById, shopById, shopEntries, equipmentModifiers } = require("./itemCatalog");
 
 const SAVE_KEY = "cangshan-rpg-save-v1";
@@ -32,6 +33,7 @@ class GameApp {
     this.seenCutscenes = new Set();
     this.storyFlags = new Set();
     this.storyLog = [];
+    this.romanceScores = { ...ROMANCE_SCORE_DEFAULTS };
     this.cutsceneFallback = null;
     this.cutsceneDebug = null;
     this.currentBattleTriggerId = null;
@@ -243,6 +245,7 @@ class GameApp {
     this.seenCutscenes = new Set();
     this.storyFlags = new Set();
     this.storyLog = [];
+    this.romanceScores = { ...ROMANCE_SCORE_DEFAULTS };
     this.currentBattleTriggerId = null;
     this.worldMapUnlocked = false;
     this.activeShopId = null;
@@ -254,7 +257,8 @@ class GameApp {
     this.dialog.show([
       { speaker: GAME.companionName, text: "你终于醒了。昨夜苍山钟声忽断，客栈外又多了几名陌生人。" },
       { speaker: GAME.heroName, text: "我的佩剑不见了，只记得昏迷前听见一阵短笛。" },
-      { speaker: GAME.companionName, text: "先去客栈内室查找账册。靠近木门后，点右下角的“交互”。如果钟声真的在第七响前断了，那就不是普通失窃。" }
+      { speaker: GAME.companionName, text: "先去客栈内室查找账册。靠近木门后，点右下角的“交互”。如果钟声真的在第七响前断了，那就不是普通失窃。" },
+      { speaker: GAME.companionName, text: "若你愿意把秘密分我一半，我便把山风分你一半。只是别把我当作随行的药囊——我也有自己的路要走。" }
     ]);
   }
 
@@ -318,6 +322,8 @@ class GameApp {
         { label: exit.label, action: () => this.enterMap(exit.mapId, exit.spawn) },
         { label: "继续搜索" }
       ] });
+    } else if (trigger.id === "su_luo") {
+      this.showRomanceDialogue("su_luo");
     } else if (trigger.id === "wardrobe" || trigger.id === "desk") {
       this.inspectClueSpot(trigger.id);
     } else if (trigger.id === "vendor") {
@@ -331,27 +337,8 @@ class GameApp {
         learned: this.learnedSkills.has("fuyou_step"),
         onTeach: () => this.playCutscene("daoistTeaching")
       }));
-    } else if (trigger.id === "qin_wanyao") {
-      const invited = this.items.palace_invitation > 0;
-      this.dialog.show({ speaker: "秦晚瑶", text: invited
-        ? "请帖已经交给你。进王府以后，听到什么都不要立刻相信，尤其是关于上一代人的清白。"
-        : "谷中药账被人改过，少侠若要追查旧案，先从书房残图看起。这封王府请帖，也许能让你问到更深的真相。",
-      choices: invited ? [
-        { label: "记下提醒" },
-        { label: "请她配些伤药", action: () => this.openShop("apothecary") }
-      ] : [
-        { label: "收下王府请帖", action: () => this.acceptPalaceInvitation() },
-        { label: "请她配些伤药", action: () => this.openShop("apothecary") }
-      ] });
-    } else if (trigger.id === "mu_zhiyan") {
-      const heard = this.storyFlags.has("heard_swapped_children_clue");
-      this.dialog.show({ speaker: "穆芷烟", text: heard
-        ? "我说过了，被调包的孩子不止一个。你若只盯着自己的身世，就会漏掉真正下棋的人。"
-        : "昨夜有人从桥后翻入药圃，只留下半枚青铜扣。那人应还藏在谷中。被调包的孩子，也许不止你以为的那一个。",
-      choices: [
-        { label: "记下调包线索", action: () => this.rememberMoonClue() },
-        { label: "暂时离开" }
-      ] });
+    } else if (trigger.id === "qin_wanyao" || trigger.id === "mu_zhiyan") {
+      this.showRomanceDialogue(trigger.id);
     } else if (trigger.id === "moon_disciple") {
       if (!this.storyFlags.has("moon_disciple_gift_taken")) {
         this.storyFlags.add("moon_disciple_gift_taken");
@@ -369,6 +356,57 @@ class GameApp {
         { label: "暂避锋芒" }
       ] });
     }
+  }
+
+  showRomanceDialogue(trackId) {
+    const stage = romanceStage(this.storyFlags, trackId);
+    this.dialog.show(romanceDialogue({
+      trackId,
+      stage,
+      heroName: GAME.heroName,
+      onChoice: (choice) => this.applyRomanceChoice(trackId, stage, choice)
+    }));
+  }
+
+  applyRomanceChoice(trackId, stage, choice) {
+    const effects = {
+      su_luo: {
+        trust: { delta: 2, flag: "romance_su_luo_trusted", text: "沈临川把无名信交给苏萝，两人的秘密第一次有了共同的重量。" },
+        tease: { delta: 1, flag: "romance_su_luo_teased", text: "沈临川以玩笑遮住心事，苏萝笑了，却没有放过他眼底的迟疑。" },
+        promise: { delta: 2, flag: "romance_su_luo_promised", text: "沈临川答应陪苏萝寻找母亲的旧信，月华谷的月色从此多了一盏同行的灯。" },
+        protect: { delta: -1, flag: "romance_su_luo_protected", text: "沈临川让苏萝留在身后，苏萝没有争辩，只把药瓶收得更紧。" },
+        listen: { delta: 0, text: "沈临川听苏萝把未说完的话说完。" }
+      },
+      qin_wanyao: {
+        ask_heart: { delta: 2, flag: "romance_qin_wanyao_heart", text: "沈临川没有只收下请帖，也问秦晚瑶为何把心意藏在礼法之后。" },
+        keep_distance: { delta: 0, flag: "romance_qin_wanyao_distance", text: "沈临川只收下请帖，不让王府私情先于旧案牵动两人。" },
+        free: { delta: 2, flag: "romance_qin_wanyao_freed", text: "沈临川劝秦晚瑶先做她自己，秦晚瑶第一次没有替王府回答。" },
+        distance: { delta: -1, flag: "romance_qin_wanyao_bound", text: "沈临川劝秦晚瑶守住礼法，她低头应了，琴弦却绷得更紧。" },
+        listen: { delta: 0, text: "沈临川替秦晚瑶把琴弦放松，听她说完没有说出口的春风。" }
+      },
+      mu_zhiyan: {
+        accept_hurt: { delta: 2, flag: "romance_mu_zhiyan_hurt_shared", text: "沈临川没有躲开穆芷烟的恨，穆芷烟第一次把毒针收回袖中。" },
+        ask_clue: { delta: 0, flag: "romance_mu_zhiyan_clue_only", text: "沈临川先问被调包孩子的线索，穆芷烟笑他谨慎，却把半枚青铜扣交了出来。" },
+        face_anger: { delta: 2, flag: "romance_mu_zhiyan_anger_faced", text: "沈临川告诉穆芷烟不怕她的恨，她反而沉默了很久。" },
+        set_boundary: { delta: -2, flag: "romance_mu_zhiyan_boundary", text: "沈临川拒绝用毒试探人心，穆芷烟转身离开，袖口落下一点冷香。" },
+        listen: { delta: 0, text: "沈临川没有让穆芷烟独自离开，却也没有替她决定该恨谁。" }
+      }
+    }[trackId]?.[choice];
+    if (!effects) return;
+
+    if (stage === "first") this.storyFlags.add(`romance_${trackId}_opened`);
+    if (stage === "turning") this.storyFlags.add(`romance_${trackId}_turning`);
+    this.romanceScores[trackId] = (this.romanceScores[trackId] || 0) + effects.delta;
+    if (effects.flag) this.storyFlags.add(effects.flag);
+
+    if (trackId === "qin_wanyao" && stage === "first" && !this.items.palace_invitation) {
+      this.addItem("palace_invitation", 1);
+      this.storyFlags.add("palace_invitation_received");
+    }
+    if (trackId === "mu_zhiyan" && stage === "first") {
+      this.storyFlags.add("heard_swapped_children_clue");
+    }
+    this.rememberStory(effects.text);
   }
 
   inspectClueSpot(kind) {
@@ -630,19 +668,6 @@ class GameApp {
     ]);
   }
 
-  acceptPalaceInvitation() {
-    this.addItem("palace_invitation", 1);
-    this.storyFlags.add("palace_invitation_received");
-    this.rememberStory("秦晚瑶交出南岭王府请帖，并警告沈临川不要轻信王府密卷。");
-    this.dialog.show({ speaker: "秦晚瑶", text: "上一代人的错，不该一直压在你们身上。请帖给你，至于我的心意，等你活着回来再问。", choices: [{ label: "收好请帖" }] });
-  }
-
-  rememberMoonClue() {
-    this.storyFlags.add("heard_swapped_children_clue");
-    this.rememberStory("穆芷烟透露旧案中存在多个被调包的孩子。");
-    this.dialog.show({ speaker: "穆芷烟", text: "被调包的孩子不止一个。你以为自己是谁，王府也未必知道。", choices: [{ label: "记下线索" }] });
-  }
-
   rememberStory(text) {
     this.storyLog.unshift({ text, at: Date.now() });
     this.storyLog = this.storyLog.slice(0, 20);
@@ -667,7 +692,8 @@ class GameApp {
       learnedSkills: [...this.learnedSkills],
       seenCutscenes: [...this.seenCutscenes],
       storyFlags: [...this.storyFlags],
-      storyLog: this.storyLog
+      storyLog: this.storyLog,
+      romanceScores: { ...this.romanceScores }
     });
     this.menuNotice = "存档成功";
     this.buySfx?.play();
@@ -690,6 +716,7 @@ class GameApp {
     this.seenCutscenes = new Set(save.seenCutscenes || []);
     this.storyFlags = new Set(save.storyFlags || []);
     this.storyLog = Array.isArray(save.storyLog) ? save.storyLog.slice(0, 20) : [];
+    this.romanceScores = { ...ROMANCE_SCORE_DEFAULTS, ...(save.romanceScores || {}) };
     this.enterMap(save.mapId || "world", { x: save.x, y: save.y });
     this.menuCanResume = true;
     this.menuNotice = "";

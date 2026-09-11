@@ -49,6 +49,12 @@ try {
   audit.dialogs.push(await dialogState(page, "qin-wanyao-dialog"));
   await page.screenshot({ path: `${output}/06-qin-wanyao-dialog.png` });
   await clickButton(page, "choice:0");
+  await page.waitForFunction(() => globalThis.__cangshanGame.dialog.page?.speaker === "沈临川", null, { timeout: 3000 });
+  audit.dialogs.push(await dialogState(page, "qin-wanyao-hero-response"));
+  await clickButton(page, "choice:0");
+  await page.waitForFunction(() => globalThis.__cangshanGame.dialog.page?.speaker === "秦晚瑶", null, { timeout: 3000 });
+  audit.dialogs.push(await dialogState(page, "qin-wanyao-choice"));
+  await clickButton(page, "choice:0");
   await page.waitForFunction(() => globalThis.__cangshanGame.items.palace_invitation === 1, null, { timeout: 3000 });
   audit.dialogs.push(await dialogState(page, "qin-wanyao-invitation"));
   await page.screenshot({ path: `${output}/07-qin-wanyao-invitation.png` });
@@ -61,6 +67,12 @@ try {
   await page.waitForFunction(() => globalThis.__cangshanGame.dialog.page?.speaker === "穆芷烟", null, { timeout: 3000 });
   audit.dialogs.push(await dialogState(page, "mu-zhiyan-dialog"));
   await page.screenshot({ path: `${output}/09-mu-zhiyan-dialog.png` });
+  await clickButton(page, "choice:0");
+  await page.waitForFunction(() => globalThis.__cangshanGame.dialog.page?.speaker === "沈临川", null, { timeout: 3000 });
+  audit.dialogs.push(await dialogState(page, "mu-zhiyan-hero-response"));
+  await clickButton(page, "choice:0");
+  await page.waitForFunction(() => globalThis.__cangshanGame.dialog.page?.speaker === "穆芷烟", null, { timeout: 3000 });
+  audit.dialogs.push(await dialogState(page, "mu-zhiyan-choice"));
   await clickButton(page, "choice:0");
   await page.waitForFunction(() => globalThis.__cangshanGame.storyFlags.has("heard_swapped_children_clue"), null, { timeout: 3000 });
   audit.dialogs.push(await dialogState(page, "mu-zhiyan-clue"));

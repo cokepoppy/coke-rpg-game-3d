@@ -29,6 +29,37 @@ export const wuxiaStoryBible = {
       description: "终局不是简单杀掉反派，而是在真相、宽恕和必须承担的代价之间做选择。"
     }
   ],
+  romanceArcs: [
+    {
+      id: "su_luo_route",
+      characterId: "su_luo",
+      temperament: "灵动、温暖、嘴硬心软",
+      premise: "苏萝寻找失踪的母亲，沈临川在共同查信的过程中发现，陪伴本身也可能成为一种承诺。",
+      stages: ["把秘密分给彼此", "在月华谷面对母亲旧信", "在离别前决定是否留下灯"],
+      conflict: "她害怕自己只是主角追查旧案时顺手带上的同伴。"
+    },
+    {
+      id: "qin_wanyao_route",
+      characterId: "qin_wanyao",
+      temperament: "清冷、克制、把真心藏在礼法之后",
+      premise: "秦晚瑶以王府请帖引主角入局，却在礼法与真心之间逐渐失去可以躲藏的身份。",
+      stages: ["请帖里的半句真话", "让她为自己选择", "王府门外的琴声与告别"],
+      conflict: "她若承认爱情，便必须面对家族旧案和王府名声的反噬。"
+    },
+    {
+      id: "mu_zhiyan_route",
+      characterId: "mu_zhiyan",
+      temperament: "偏执、锋利、爱恨都不肯留余地",
+      premise: "穆芷烟以毒针和妒意试探主角，主角必须在接住她的恨与划清边界之间作出选择。",
+      stages: ["接住她的毒针", "直面她的嫉恨", "在她离开前说出不能再迟疑的话"],
+      conflict: "她最想被看见，却总用伤人的方式确认自己不会再次被抛下。"
+    }
+  ],
+  romanceDesignRules: [
+    "三条感情线使用原创人物、原创冲突和原创对白，只借鉴先秦文字的意象、节奏与留白。",
+    "好感不是简单奖励；每次选择都可能带来靠近、克制、误解或离别，并写入可保存的剧情状态。",
+    "三位女主都必须拥有自己的目标与拒绝主角的权利，爱情不能替代她们的个人主线。"
+  ],
   factions: [
     {
       id: "cangshan_house",
@@ -95,7 +126,8 @@ export const wuxiaStoryBible = {
       combatRole: "药术支援",
       desire: "找到失踪的母亲，并证明月华谷没有参与旧案。",
       secret: "她随身铃铛里藏着开启无尘经楼侧门的铜芯。",
-      arc: "从只相信小聪明，到愿意承担保护他人的责任。"
+      arc: "从只相信小聪明，到愿意承担保护他人的责任。",
+      romanceRoute: "su_luo_route"
     },
     {
       id: "qin_wanyao",
@@ -106,7 +138,8 @@ export const wuxiaStoryBible = {
       combatRole: "琴阵控制",
       desire: "保护王府名声，同时不让沈临川卷入上一代情债。",
       secret: "她读过王府密卷，知道沈临川并非王府唯一遗孤。",
-      arc: "从礼法和责任中压抑真心，到承认选择本身也需要勇气。"
+      arc: "从礼法和责任中压抑真心，到承认选择本身也需要勇气。",
+      romanceRoute: "qin_wanyao_route"
     },
     {
       id: "mu_zhiyan",
@@ -117,7 +150,8 @@ export const wuxiaStoryBible = {
       combatRole: "毒针刺客",
       desire: "让所有辜负她的人付出代价。",
       secret: "她知道父辈旧案中一个被调包的婴儿线索。",
-      arc: "从以伤害换关注，到看清自己的痛苦不该继续传给别人。"
+      arc: "从以伤害换关注，到看清自己的痛苦不该继续传给别人。",
+      romanceRoute: "mu_zhiyan_route"
     },
     {
       id: "xiao_beichen",
@@ -280,10 +314,10 @@ export const wuxiaStoryBible = {
       id: "act2_love_and_palace",
       title: "第二章：月华旧信",
       mapId: "moon_valley",
-      synopsis: "三条感情线同时推进：苏萝寻找母亲，秦晚瑶送来王府密信，穆芷烟以毒试探沈临川。玩家逐步知道上一代情债与身世迷雾有关。",
-      objectives: ["解开月华谷药庐谜题", "选择先救谁", "取得王府请帖", "发现被调包的婴儿线索"],
+      synopsis: "三条感情线同时推进：苏萝寻找母亲，秦晚瑶送来王府密信，穆芷烟以毒试探沈临川。每一次靠近都可能变成承诺、误解或离别，玩家逐步知道上一代情债与身世迷雾有关。",
+      objectives: ["解开月华谷药庐谜题", "选择先救谁", "取得王府请帖", "发现被调包的婴儿线索", "完成至少一条感情线的转折对话"],
       battles: ["poison_needles", "valley_trial", "palace_agents"],
-      keyScripts: ["moon_valley_arrival", "qin_letter", "mu_poison_choice"]
+      keyScripts: ["moon_valley_arrival", "qin_letter", "mu_poison_choice", "su_luo_route_opening", "qin_wanyao_route_opening", "mu_zhiyan_route_opening"]
     },
     {
       id: "act3_yanyun_truth",

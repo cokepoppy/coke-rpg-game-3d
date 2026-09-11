@@ -306,5 +306,104 @@ export const wuxiaCampaignScripts = {
         ]
       }
     }
+  },
+  su_luo_route_opening: {
+    id: "su_luo_route_opening",
+    start: "share",
+    chapterId: "act2_love_and_palace",
+    mapId: "moon_valley",
+    romanceRoute: "su_luo_route",
+    nodes: {
+      share: {
+        speaker: "苏萝",
+        text: "你把无名信分我一半，我便把月华谷的月色分你一半。只是信里若写着离别，你还肯陪我读到最后吗？",
+        choices: [
+          { label: "陪她读完", next: "promise" },
+          { label: "先查旧案", next: "protect" }
+        ]
+      },
+      promise: {
+        speaker: "沈临川",
+        text: "若信中有离别，便由我们一起看见。春水不问归舟，我也不问你最后要往哪里去。",
+        actions: [
+          { type: "setFlag", flag: "romance_su_luo_promised" },
+          { type: "remember", text: "沈临川答应陪苏萝读完母亲留下的旧信。" }
+        ]
+      },
+      protect: {
+        speaker: "苏萝",
+        text: "你总叫我留在身后。可我若只做被保护的人，便永远走不到母亲离开的地方。",
+        actions: [
+          { type: "setFlag", flag: "romance_su_luo_protected" },
+          { type: "remember", text: "苏萝不愿只做被保护的人，感情线留下了未解的隔阂。" }
+        ]
+      }
+    }
+  },
+  qin_wanyao_route_opening: {
+    id: "qin_wanyao_route_opening",
+    start: "invitation",
+    chapterId: "act2_love_and_palace",
+    mapId: "southern_palace",
+    romanceRoute: "qin_wanyao_route",
+    nodes: {
+      invitation: {
+        speaker: "秦晚瑶",
+        text: "请帖能替你开王府的门，却不能替我回答：若我不再替家门说话，你还愿不愿意叫我的名字？",
+        choices: [
+          { label: "让她只做秦晚瑶", next: "free" },
+          { label: "先守住王府礼法", next: "bound" }
+        ]
+      },
+      free: {
+        speaker: "沈临川",
+        text: "你可以只做秦晚瑶。王府的门若因此关上，我便从门外问你，不叫你一个人承担。",
+        actions: [
+          { type: "setFlag", flag: "romance_qin_wanyao_freed" },
+          { type: "remember", text: "沈临川让秦晚瑶先为自己选择，不再只替王府传话。" }
+        ]
+      },
+      bound: {
+        speaker: "秦晚瑶",
+        text: "你说得对。只是礼法若真能护住人，王府就不会留下这么多无名的墓。",
+        actions: [
+          { type: "setFlag", flag: "romance_qin_wanyao_bound" },
+          { type: "remember", text: "秦晚瑶暂时退回王府礼法之后，心意因此更难言明。" }
+        ]
+      }
+    }
+  },
+  mu_zhiyan_route_opening: {
+    id: "mu_zhiyan_route_opening",
+    start: "needle",
+    chapterId: "act2_love_and_palace",
+    mapId: "moon_valley",
+    romanceRoute: "mu_zhiyan_route",
+    nodes: {
+      needle: {
+        speaker: "穆芷烟",
+        text: "你若只问线索，我便给你线索；你若想看见我，便先别躲我的毒针。人心比毒难解，你敢不敢试？",
+        choices: [
+          { label: "接住她的恨", next: "face" },
+          { label: "只问调包线索", next: "clue" }
+        ]
+      },
+      face: {
+        speaker: "沈临川",
+        text: "我不替你辩白，也不替你遮丑。你若要恨，便让我看见你为何而恨。",
+        actions: [
+          { type: "setFlag", flag: "romance_mu_zhiyan_hurt_shared" },
+          { type: "remember", text: "沈临川没有躲开穆芷烟的恨，两人之间留下危险却真实的靠近。" }
+        ]
+      },
+      clue: {
+        speaker: "穆芷烟",
+        text: "你果然只要答案。也罢，被调包的孩子不止一个；可你若只盯着答案，迟早会把人也看成证据。",
+        actions: [
+          { type: "setFlag", flag: "heard_swapped_children_clue" },
+          { type: "remember", text: "穆芷烟给出调包孩子线索，却警告沈临川不要把活人只当证据。" }
+        ]
+      }
+    }
   }
 };

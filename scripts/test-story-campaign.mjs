@@ -38,8 +38,11 @@ const runner = new ScriptRunner({
 const scriptOrder = [
   "daoist_master_teach",
   "moon_valley_arrival",
+  "su_luo_route_opening",
   "qin_letter",
+  "qin_wanyao_route_opening",
   "mu_poison_choice",
+  "mu_zhiyan_route_opening",
   "xiao_beichen_join",
   "border_massacre_reveal",
   "red_lotus_debate",
@@ -104,6 +107,9 @@ assert(snapshot.unlockedWorldNodes.includes("southern_palace"), "southern palace
 assert(snapshot.party.includes("xiao_beichen"), "Xiao Beichen did not join party");
 assert(snapshot.unlockedWorldNodes.includes("red_lotus_temple"), "red lotus temple did not unlock");
 assert(snapshot.unlockedWorldNodes.includes("hidden_library"), "hidden library did not unlock");
+assert(snapshot.flags.includes("romance_su_luo_promised"), "Su Luo romance route did not progress");
+assert(snapshot.flags.includes("romance_qin_wanyao_freed"), "Qin Wanyao romance route did not progress");
+assert(snapshot.flags.includes("romance_mu_zhiyan_hurt_shared"), "Mu Zhiyan romance route did not progress");
 assert(battles.some((battle) => battle.battleId === "poison_needles"), "poison needle battle request missing");
 assert(battles.some((battle) => battle.battleId === "two_fathers_boss"), "final boss battle request missing");
 

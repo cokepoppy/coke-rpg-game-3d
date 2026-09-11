@@ -190,6 +190,7 @@ const ROOM_COLLISIONS = [
 
 const ROOM_TRIGGERS = [
   { id: "roomExit", x: 520, y: 650, width: 240, height: 118, label: "离开房间" },
+  { id: "su_luo", x: 430, y: 155, width: 220, height: 190, label: "与苏萝说话" },
   { id: "wardrobe", x: 930, y: 240, width: 260, height: 250, label: "搜索木柜" },
   { id: "desk", x: 650, y: 100, width: 285, height: 190, label: "查看账册" }
 ];

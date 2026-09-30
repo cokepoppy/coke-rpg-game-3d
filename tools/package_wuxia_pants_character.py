@@ -23,7 +23,9 @@ PREVIEW = OUT / "shen-linchuan-pants-preview.png"
 CROP_Z = 0.79
 
 GAIT_AXES = {
-    "upper_arm.L": Vector((0, 0, 1)), "upper_arm.R": Vector((0, 0, 1)),
+    # The arms extend across X, so swing them around the lateral X axis. Using
+    # global Z here made the mirrored shoulder bones move both hands together.
+    "upper_arm.L": Vector((1, 0, 0)), "upper_arm.R": Vector((1, 0, 0)),
     "forearm.L": Vector((1, 0, 0)), "forearm.R": Vector((1, 0, 0)),
     "thigh.L": Vector((1, 0, 0)), "thigh.R": Vector((1, 0, 0)),
     "shin.L": Vector((1, 0, 0)), "shin.R": Vector((1, 0, 0)),
@@ -210,22 +212,24 @@ def make_clothes(rig):
     for side, sign in (("L", 1), ("R", -1)):
         x = lambda a: sign * a
         clothes.append(make_tube(f"Trousers {side}", side, [
-            (0.15, x(0.14), 0.102, 0.094),
-            (0.24, x(0.14), 0.115, 0.105),
-            (0.34, x(0.145), 0.132, 0.118),
-            (0.43, x(0.145), 0.139, 0.125),
-            (0.53, x(0.145), 0.15, 0.133),
-            (0.64, x(0.135), 0.154, 0.137),
-            (0.75, x(0.125), 0.15, 0.132),
-            (0.84, x(0.12), 0.142, 0.124),
+            # Separate, tapered trouser legs follow the slim source sprite.
+            # The old 0.14-0.15 m radii made each leg wider than its thigh.
+            (0.15, x(0.12), 0.066, 0.074),
+            (0.24, x(0.12), 0.072, 0.080),
+            (0.34, x(0.12), 0.078, 0.086),
+            (0.43, x(0.12), 0.084, 0.091),
+            (0.53, x(0.12), 0.091, 0.098),
+            (0.64, x(0.12), 0.096, 0.102),
+            (0.75, x(0.115), 0.098, 0.105),
+            (0.84, x(0.11), 0.095, 0.103),
         ], FABRIC))
         boots = make_tube(f"Boot shaft {side}", side, [
-            (0.07, x(0.14), 0.115, 0.11), (0.11, x(0.14), 0.122, 0.112),
-            (0.20, x(0.14), 0.116, 0.105), (0.28, x(0.14), 0.112, 0.099),
+            (0.07, x(0.12), 0.078, 0.078), (0.11, x(0.12), 0.084, 0.082),
+            (0.20, x(0.12), 0.082, 0.078), (0.28, x(0.12), 0.078, 0.075),
         ], LEATHER)
         boots.name = f"Boot shaft {side}"
         clothes.append(boots)
-        foot = make_ellipsoid(f"Boot foot {side}", (x(0.14), -0.085, 0.075), (0.087, 0.175, 0.073), LEATHER)
+        foot = make_ellipsoid(f"Boot foot {side}", (x(0.12), -0.065, 0.052), (0.067, 0.138, 0.052), LEATHER)
         foot_group = foot.vertex_groups.new(name=f"foot.{side}")
         foot_group.add(list(range(len(foot.data.vertices))), 1.0, "REPLACE")
         add_armature(foot, rig)
@@ -233,7 +237,7 @@ def make_clothes(rig):
 
         # A restrained cuff line makes the boot/trouser separation readable in motion.
         cuff = make_tube(f"Boot cuff {side}", side, [
-            (0.245, x(0.14), 0.12, 0.109), (0.275, x(0.14), 0.12, 0.109),
+            (0.245, x(0.12), 0.083, 0.078), (0.275, x(0.12), 0.083, 0.078),
         ], EDGE)
         clothes.append(cuff)
 
@@ -286,6 +290,8 @@ def create_actions(rig):
     def pose(root=0, arms=0, legs=0, knees=0, feet=0, spine=0, head=0, forearms=0, arms_both=False):
         result = {"root": root}
         for side, sign in (("L", 1), ("R", -1)):
+            # Mirrored shoulders reverse the local rotation response. The
+            # negative sign makes each hand swing opposite its same-side foot.
             result[f"upper_arm.{side}"] = arms if arms_both else -arms * sign
             result[f"forearm.{side}"] = forearms
             result[f"thigh.{side}"] = legs * sign
@@ -412,10 +418,15 @@ def main():
     for obj in clothes:
         obj.select_set(True)
     bpy.context.view_layer.objects.active = rig
-    bpy.ops.wm.save_as_mainfile(filepath=str(BLEND))
     bpy.ops.export_scene.gltf(filepath=str(GLB), export_format="GLB", use_selection=True,
                               export_apply=True, export_animations=True, export_nla_strips=True,
                               export_force_sampling=True)
+    # Keep every clip in the GLB, but open the editable Blender file and render
+    # its preview with a single unblended Walk track for honest motion review.
+    for track in rig.animation_data.nla_tracks:
+        track.mute = track.name != "Walk"
+    bpy.context.scene.frame_set(1)
+    bpy.ops.wm.save_as_mainfile(filepath=str(BLEND))
     bpy.ops.render.render(write_still=True)
     print(f"PANTS_HERO built from existing Hunyuan mesh; robe crop z={CROP_Z:.2f}")
     print(f"BLEND={BLEND}\nGLB={GLB}\nPREVIEW={PREVIEW}")

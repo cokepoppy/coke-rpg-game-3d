@@ -29,11 +29,13 @@ await page.waitForTimeout(150);
 await page.screenshot({ path: path.join(output, 'viewer.png') });
 
 const crops = [];
+const gaitSamples = [];
 for (let index = 0; index < phases.length; index += 1) {
   const phase = phases[index];
   const name = `walk-phase-${String(index + 1).padStart(2, '0')}.png`;
   await page.evaluate((value) => window.__characterViewer.setPhase(value), phase);
   await page.waitForTimeout(100);
+  gaitSamples.push({ phase, bones: await page.evaluate(() => window.__characterViewer.sampleBones()) });
   const file = path.join(output, name);
   await page.screenshot({ path: file });
   const thumbnail = await sharp(file).extract({ left: 320, top: 74, width: 1000, height: 780 })
@@ -48,6 +50,31 @@ await sharp({ create: { width: 1440, height: 622, channels: 4, background: '#0f1
   .composite(crops).png().toFile(path.join(output, 'walk-cycle-contact.png'));
 await page.close();
 await browser.close();
-const audit = { baseUrl, clips, phases, output, pageErrors };
+const correlation = (left, right) => {
+  const mean = (values) => values.reduce((sum, value) => sum + value, 0) / values.length;
+  const leftMean = mean(left);
+  const rightMean = mean(right);
+  const covariance = left.reduce((sum, value, index) => sum + (value - leftMean) * (right[index] - rightMean), 0);
+  const leftVariance = left.reduce((sum, value) => sum + (value - leftMean) ** 2, 0);
+  const rightVariance = right.reduce((sum, value) => sum + (value - rightMean) ** 2, 0);
+  return covariance / Math.sqrt(leftVariance * rightVariance);
+};
+const gaitAnalysis = {
+  forwardAxis: 'z',
+  sameSideArmLegCorrelation: Object.fromEntries(['L', 'R'].map((side) => [
+    side,
+    correlation(
+      gaitSamples.map(({ bones }) => bones[`hand${side}`].z),
+      gaitSamples.map(({ bones }) => bones[`foot${side}`].z)
+    )
+  ]))
+};
+gaitAnalysis.passesOppositeArmSwing = Object.values(gaitAnalysis.sameSideArmLegCorrelation)
+  .every((value) => Number.isFinite(value) && value < -0.25);
+const audit = { baseUrl, clips, phases, gaitSamples, gaitAnalysis, output, pageErrors };
 await fs.writeFile(path.join(output, 'audit.json'), `${JSON.stringify(audit, null, 2)}\n`);
 console.log(JSON.stringify(audit, null, 2));
+if (!gaitAnalysis.passesOppositeArmSwing) {
+  throw new Error('Walk audit failed: hands must swing opposite their same-side feet.');
+}
+if (pageErrors.length) throw new Error(`Viewer browser errors: ${pageErrors.join('; ')}`);

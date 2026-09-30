@@ -177,6 +177,15 @@ loader.load('./assets/generated/threejs-wuxia/models/shen-linchuan-pants-game-re
     clips: gltf.animations.map((clip) => ({ name: clip.name, duration: clip.duration })),
     setClip: (name) => { const clip = gltf.animations.find((item) => item.name === name); if (clip) selectClip(clip); },
     setPhase: (phase) => { timeline.value = String(Math.round(THREE.MathUtils.clamp(phase, 0, 1) * Number(timeline.max))); timeline.dispatchEvent(new Event('input')); },
+    sampleBones: () => {
+      model.updateMatrixWorld(true);
+      return Object.fromEntries(['handL', 'handR', 'footL', 'footR'].map((name) => {
+        const bone = model.getObjectByName(name);
+        if (!bone) return [name, null];
+        const position = bone.getWorldPosition(new THREE.Vector3());
+        return [name, { x: position.x, y: position.y, z: position.z }];
+      }));
+    },
     getState: () => ({ clip: currentClip?.name || null, phase: currentAction && currentClip ? currentAction.time / currentClip.duration : 0, paused })
   };
 }, undefined, (error) => {

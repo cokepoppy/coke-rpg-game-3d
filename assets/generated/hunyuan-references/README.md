@@ -6,6 +6,7 @@
 | --- | --- | --- |
 | 沈临川 | `assets/characters/hero/hero-walk-anchored-v4-motionfix.png` | `shen-linchuan-imagegen-reference.png` |
 | 苏萝 | `wechat-minigame/character-pack/companion.png` | `su-luo-imagegen-reference.png` |
+| 沈临川裤装版 | `shen-linchuan-imagegen-reference.png` | `shen-linchuan-pants-reference.png` |
 
 ## 沈临川 prompt
 
@@ -18,3 +19,5 @@ Use case: stylized-concept. Asset type: single-view image-to-3D character refere
 ## 模型状态
 
 混元 3D 单体 GLB 与 Blender 工程会在生成、下载、检查和打包后登记于 `assets/generated/threejs-wuxia/README.md`。原图和 prompt 保留在本目录，方便再次生成。
+
+裤装版当前复用已有沈临川混元网格的脸、头发和上身，将长袍裁到腰胯位置，再按裤装参考在 Blender 中重建分腿长裤和靴子，并生成独立的动作查看 GLB。它不是一件新生成的混元 3D 资产；后续若生成新的裤装混元模型，可沿用相同的 Blender 整理、动作查看与 Three.js 接入流程替换。

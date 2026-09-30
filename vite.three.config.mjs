@@ -8,7 +8,8 @@ export default {
     rollupOptions: {
       input: {
         game: resolve(process.cwd(), 'threejs-rpg.html'),
-        worldPreview: resolve(process.cwd(), 'threejs-world.html')
+        worldPreview: resolve(process.cwd(), 'threejs-world.html'),
+        characterViewer: resolve(process.cwd(), 'threejs-character-viewer.html')
       }
     }
   }

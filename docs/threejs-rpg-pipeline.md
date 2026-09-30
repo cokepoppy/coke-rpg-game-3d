@@ -69,3 +69,11 @@ npm run 3d:dev
 ```
 
 打开 `http://127.0.0.1:5180/threejs-rpg.html`。游戏顶部的“混元 3DGS”可打开地图重建预览。构建使用 `npm run 3d:build`，输出到忽略目录 `dist-threejs/`；如果本机已有角色 GLB 和重建 PLY，构建脚本会一并复制到产物目录。
+
+## 角色动作审看与剧情演示
+
+- `assets/generated/hunyuan-references/shen-linchuan-pants-reference.png` 是 ImageGen 生成的裤装版角色参考。当前裤装 GLB 复用已有沈临川混元网格的头部与上身，在 `tools/package_wuxia_pants_character.py` 中裁掉长袍下摆，按参考重建分开的裤腿与靴子。这个版本明确标记为 Blender 修改，不是新的混元生成结果。
+- `http://127.0.0.1:5180/threejs-character-viewer.html` 提供 Idle / Walk / Run / Jump / Attack 片段选择、播放速度、方向切换和逐相位滑块；滑块按 24 FPS 显示帧序号。检查走路时依次看双腿交替、脚抬离地面、手臂反向摆动，以及动作节奏和游戏移动速度是否一致。
+- `npm run 3d:character:inspect` 会操作同一个查看器，把 Walk 的 8 个相位保存到 `screenshots/cangshan-character-viewer/` 并拼成接触表，作为可重复的 AI/人工步态审看入口。
+- `http://127.0.0.1:5180/threejs-rpg.html?demo=1` 播放固定路线：走近苏萝并对话、沿集市外侧前往云来客栈、进入客房查看账册线索，再回到苍山旧道。演示模式不写入玩家剧情存档。
+- `npm run 3d:demo:record` 按旧 2D 剧情 tour 的 Playwright `recordVideo` 做法录制路线，默认使用前台 Chrome 与本机 WebGL，生成 `assets/generated/videos/cangshan-3d-story-demo.webm`、封面和结尾截图。设 `DEMO_HEADLESS=1` 可切到无头 SwiftShader。Chrome、WebGL 或资源加载错误会反映在运行输出里，不会将未完成的片段报告为成功演示。

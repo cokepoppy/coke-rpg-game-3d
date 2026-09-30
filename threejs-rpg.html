@@ -28,6 +28,8 @@
           <span id="chapter-label">第一章 · 钟断苍山</span>
         </div>
         <nav class="top-actions" aria-label="场景工具">
+          <a class="map-button" href="./threejs-rpg.html?demo=1" aria-label="自动播放剧情演示">剧情演示</a>
+          <a class="map-button" href="./threejs-character-viewer.html" aria-label="打开角色动作查看器">角色动作</a>
           <button class="map-button" id="map-button" type="button" aria-label="查看江湖地图">
             <span class="map-glyph">⌖</span> 江湖地图
           </button>
@@ -36,6 +38,13 @@
           </a>
         </nav>
       </header>
+
+      <section class="demo-caption" id="demo-caption" hidden aria-live="polite">
+        <span class="demo-kicker">苍山旧道 · 自动演示</span>
+        <strong id="demo-title">风起苍山</strong>
+        <p id="demo-subtitle">沈临川醒来，循着断钟声寻找线索。</p>
+        <button type="button" id="demo-replay" aria-label="重播剧情演示">⟲ 重播</button>
+      </section>
 
       <section class="status-strip" aria-label="角色状态">
         <div class="status-avatar">沈</div>

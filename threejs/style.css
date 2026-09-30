@@ -31,6 +31,12 @@ button { font: inherit; color: inherit; }
 .map-glyph { margin-right: 6px; color: var(--gold); font-size: 16px; vertical-align: -1px; }
 .top-actions { display: flex; gap: 8px; }
 .top-actions a { color: inherit; text-decoration: none; }
+.demo-caption { position: absolute; z-index: 2; top: 93px; left: 50%; transform: translateX(-50%); min-width: min(420px, calc(100vw - 330px)); padding: 11px 19px 12px; border: 1px solid rgba(224,202,153,.24); background: rgba(15,23,28,.78); text-align: center; box-shadow: 0 12px 36px rgba(0,0,0,.22); backdrop-filter: blur(14px); }
+.demo-kicker { display: block; color: #d1b271; font-size: 8px; letter-spacing: .2em; }
+.demo-caption strong { display: block; margin-top: 5px; color: #f0e6d0; font: 500 15px 'Noto Serif SC',serif; letter-spacing: .08em; }
+.demo-caption p { margin: 5px 0 0; color: #abb2ae; font: 10px/1.6 'Noto Serif SC',serif; }
+.demo-caption button { margin-top: 8px; padding: 4px 11px; border: 1px solid rgba(224,202,153,.35); color: #e7d5ad; background: rgba(10,16,20,.7); font: 10px 'Noto Serif SC',serif; cursor: pointer; }
+.demo-caption button:hover { border-color: rgba(224,202,153,.75); background: rgba(34,43,44,.88); }
 
 .status-strip { position: absolute; z-index: 2; top: 94px; left: 24px; display: flex; align-items: center; gap: 10px; width: 286px; padding: 10px 13px; border: 1px solid var(--line); background: var(--panel); backdrop-filter: blur(14px); box-shadow: 0 12px 40px rgba(0,0,0,.24); }
 .status-avatar { width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid rgba(211,173,105,.55); color: var(--gold); font: 18px 'Noto Serif SC', serif; background: linear-gradient(140deg,#314253,#192a33); }
@@ -111,6 +117,7 @@ kbd { display: inline-grid; min-width: 21px; height: 21px; place-items: center; 
   .quest-card p { font-size: 9px; }
   .control-dock { bottom: 10px; gap: 9px; padding: 8px 9px; }
   .camera-hint { display: none; }
+  .demo-caption { top: 160px; min-width: min(320px, calc(100vw - 24px)); }
   .control-group { font-size: 8px; }
   .control-separator { height: 16px; }
   .dialog-panel { bottom: 53px; grid-template-columns: 48px minmax(0,1fr); gap: 11px; padding: 12px; }

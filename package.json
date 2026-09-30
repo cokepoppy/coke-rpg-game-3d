@@ -5,6 +5,9 @@
   "scripts": {
     "3d:dev": "vite --host 127.0.0.1 --port 5180",
     "3d:build": "vite build --config vite.three.config.mjs && node tools/copy-threejs-assets.mjs",
+    "3d:character:build": "blender -b --python tools/package_wuxia_pants_character.py",
+    "3d:character:inspect": "node scripts/inspect-cangshan-character-actions.mjs",
+    "3d:demo:record": "node scripts/record-cangshan-3d-demo.mjs",
     "seedance:submit": "node scripts/seedance-submit.mjs",
     "wechat:assets": "node scripts/copy-wechat-assets.mjs",
     "wechat:debug": "npm run wechat:assets && node scripts/start-wechat-debug.mjs",

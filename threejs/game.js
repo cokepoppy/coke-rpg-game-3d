@@ -18,10 +18,11 @@ const CONFIG = {
     paifang: './assets/generated/threejs-wuxia/models/cangshan-paifang-game-ready.glb',
     pharmacy: './assets/generated/threejs-wuxia/models/hundred-herbs-pharmacy-game-ready.glb',
     innInterior: './assets/generated/threejs-wuxia/world/cangshan-inn-interior.glb',
-    hero: './assets/generated/threejs-wuxia/models/shen-linchuan-game-ready.glb',
+    hero: './assets/generated/threejs-wuxia/models/shen-linchuan-pants-game-ready.glb',
     heroine: './assets/generated/threejs-wuxia/models/su-luo-game-ready.glb'
   }
 };
+const DEMO_MODE = new URLSearchParams(location.search).get('demo') === '1';
 const MAP_METERS_PER_PIXEL = CONFIG.mapWidth / CONFIG.globalMapWidth;
 
 const canvas = document.querySelector('#world-canvas');
@@ -89,6 +90,7 @@ let storyFlags = readStoryFlags();
 let yaw = 0;
 let pitch = 0.96;
 let cameraDistance = 24.0;
+let demoCameraOffsetX = 0;
 function updateCameraProjection() {
   const halfHeight = cameraDistance * Math.tan(THREE.MathUtils.degToRad(44 * 0.5));
   const halfWidth = halfHeight * camera.aspect;
@@ -102,6 +104,7 @@ updateCameraProjection();
 let cameraDrag = null;
 let toastTimer = 0;
 let openingWasShown = false;
+let scriptedMove = null;
 
 // Measured in pixels on the stitched 4480 x 3584 source map. Keep scene
 // objects anchored to visible landmarks in world-west.png/world-east.png;
@@ -160,6 +163,7 @@ function readStoryFlags() {
 }
 
 function saveStoryFlags() {
+  if (DEMO_MODE) return;
   localStorage.setItem('cangshan3d-story', JSON.stringify(storyFlags));
 }
 
@@ -345,7 +349,7 @@ function loadCharacterAsset(actor, url, label) {
     actor.motion = '';
     actor.setMotion('idle');
     updateModelStatus();
-    if (label) showToast(`${actor.name}的混元 3D 模型已载入`);
+    if (label) showToast(actor.isPlayer ? '沈临川的裤装 3D 角色已载入' : `${actor.name}的 3D 模型已载入`);
   }, undefined, () => {
     actor.assetLoaded = false;
     updateModelStatus();
@@ -761,6 +765,36 @@ function updatePlayer(delta, time) {
   }
 }
 
+function movePlayerScripted(position, duration = 1.8) {
+  if (!player) return Promise.resolve();
+  const from = player.root.position.clone();
+  const to = new THREE.Vector3(position.x, 0, position.z);
+  const distance = from.distanceTo(to);
+  const moveDuration = Math.max(0.45, duration || distance / CONFIG.walkSpeed);
+  player.root.rotation.y = Math.atan2(to.x - from.x, to.z - from.z);
+  player.moving = distance > 0.02;
+  player.running = false;
+  if (player.moving) player.setMotion('walk');
+  return new Promise((resolve) => {
+    scriptedMove = { from, to, duration: moveDuration, startedAt: performance.now(), resolve };
+  });
+}
+
+function updateScriptedMove(delta) {
+  if (!scriptedMove) return;
+  const move = scriptedMove;
+  const elapsed = Math.min((performance.now() - move.startedAt) / 1000, move.duration);
+  const t = elapsed / move.duration;
+  const eased = t * t * (3 - 2 * t);
+  player.root.position.lerpVectors(move.from, move.to, eased);
+  if (t >= 1) {
+    scriptedMove = null;
+    player.moving = false;
+    player.setMotion('idle');
+    move.resolve();
+  }
+}
+
 function performAttack() {
   if (dialogue || isInRoom || !player || player.attackRemaining > 0) return;
   player.attackRemaining = 0.58;
@@ -770,7 +804,7 @@ function performAttack() {
 
 function updateCamera(delta) {
   if (!player) return;
-  const target = new THREE.Vector3(player.root.position.x, player.root.position.y + 1.06, player.root.position.z);
+  const target = new THREE.Vector3(player.root.position.x + demoCameraOffsetX, player.root.position.y + 1.06, player.root.position.z);
   const horizontal = Math.cos(pitch) * cameraDistance;
   const wanted = new THREE.Vector3(
     target.x + Math.sin(yaw) * horizontal,
@@ -835,11 +869,110 @@ function toggleMap() {
   modal.hidden = !modal.hidden;
 }
 
+function setDemoCaption(title, subtitle) {
+  const panel = document.querySelector('#demo-caption');
+  if (!panel) return;
+  panel.hidden = false;
+  document.querySelector('#demo-title').textContent = title;
+  document.querySelector('#demo-subtitle').textContent = subtitle;
+}
+
+function wait(ms) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+async function advanceDemoDialogue(interval = 1850) {
+  while (dialogue) {
+    await wait(interval);
+    advanceDialogue();
+  }
+  await wait(350);
+}
+
+function installDemoApi() {
+  let demoStep = 'ready';
+  const setStep = (step) => { demoStep = step; };
+  document.querySelector('#demo-replay')?.addEventListener('click', () => window.__cangshanDemo.run());
+  window.__cangshanDemo = {
+    ready: true,
+    running: false,
+    async run() {
+      if (this.running) return;
+      this.running = true;
+      try {
+        storyFlags = {};
+        yaw = 0;
+        pitch = 0.91;
+        demoCameraOffsetX = 0;
+        cameraDistance = 25.5;
+        updateCameraProjection();
+        setStep('opening');
+        setDemoCaption('风起苍山', '断钟惊醒了沈临川；苏萝在旧道旁等他同行。');
+        await wait(1400);
+        setStep('meet-suluo');
+        const companionApproach = mapPoint(2790, 2540);
+        await movePlayerScripted(companionApproach, 1.25);
+        talkToSuLuo();
+        setStep('suluo-dialogue');
+        await advanceDemoDialogue(1750);
+
+        setStep('east-road');
+        setDemoCaption('沿旧道东行', '绕过集市摊棚，穿过开阔的山路，前往云来客栈。');
+        const route = [
+          [2800, 2980], [3480, 2980], [3710, 3000], [3970, 2910]
+        ];
+        for (const [x, y] of route) {
+          const destination = mapPoint(x, y);
+          const distance = player.root.position.distanceTo(new THREE.Vector3(destination.x, 0, destination.z));
+          await movePlayerScripted(destination, Math.max(1.25, distance / 2.35));
+        }
+        await wait(750);
+        setStep('enter-inn');
+        setDemoCaption('云来客栈', '沈临川和苏萝循着昨夜的痕迹，进入客房查找线索。');
+        enterInn();
+        setStep('inn-dialogue');
+        await advanceDemoDialogue(1750);
+        setStep('approach-desk');
+        await movePlayerScripted({ x: -2.0, z: -1.72 }, 2.2);
+        setStep('inspect-ledger');
+        setDemoCaption('客房旧信', '桌上账册被撕去一页，窗沿还留着昨夜带进来的山泥。');
+        inspectDesk();
+        setStep('ledger-dialogue');
+        await advanceDemoDialogue(1750);
+        await wait(1400);
+        setStep('return-outside');
+        leaveInn();
+        demoCameraOffsetX = 7.6;
+        setDemoCaption('线索已经记下', '回到苍山旧道，下一站是石阶旁的灯亭。');
+        await wait(2800);
+        setStep('complete');
+        return { complete: true, location: isInRoom ? 'room' : 'world' };
+      } finally {
+        this.running = false;
+      }
+    },
+    state() {
+      return {
+        running: this.running,
+        location: isInRoom ? 'room' : 'world',
+        step: demoStep,
+        player: { x: player?.root.position.x ?? 0, z: player?.root.position.z ?? 0 },
+        heroLoaded: Boolean(player?.assetLoaded),
+        heroineLoaded: Boolean(heroine?.assetLoaded),
+        dialogueOpen: Boolean(dialogue)
+      };
+    }
+  };
+}
+
 function animate() {
   requestAnimationFrame(animate);
   const delta = Math.min(clock.getDelta(), 0.04);
   const time = clock.elapsedTime;
-  if (player) updatePlayer(delta, time);
+  if (player) {
+    if (scriptedMove) updateScriptedMove(delta);
+    else updatePlayer(delta, time);
+  }
   for (const actor of actors) actor.update(delta, time);
   updateNearestInteraction();
   updateCamera(delta);
@@ -854,7 +987,18 @@ async function initialize() {
   animate();
   window.setTimeout(() => {
     loadingScreen.classList.add('done');
-    if (!openingWasShown) {
+    if (DEMO_MODE) {
+      openingWasShown = true;
+      installDemoApi();
+      setDemoCaption('风起苍山', '苍山旧道的 3D 剧情演示即将开始。');
+      const startWhenModelsAreReady = () => {
+        if (player?.assetLoaded && heroine?.assetLoaded) {
+          window.setTimeout(() => window.__cangshanDemo.run().catch((error) => console.error('剧情演示失败', error)), 1400);
+        }
+        else window.setTimeout(startWhenModelsAreReady, 250);
+      };
+      startWhenModelsAreReady();
+    } else if (!openingWasShown) {
       openingWasShown = true;
       openDialogue([
         ['苏萝', '你醒啦。这里是苍山旧道，再往上就是苍山古寺。昨夜山门钟声断了三次，像是有人闯进了禁地。'],

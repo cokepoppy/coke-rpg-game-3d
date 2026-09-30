@@ -1,0 +1,205 @@
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const canvas = document.querySelector('#character-canvas');
+const status = document.querySelector('#model-status');
+const detail = document.querySelector('#model-detail');
+const clipList = document.querySelector('#clip-list');
+const frameLabel = document.querySelector('#frame-label');
+const timeline = document.querySelector('#timeline');
+const speedInput = document.querySelector('#speed');
+const speedLabel = document.querySelector('#speed-label');
+const playToggle = document.querySelector('#play-toggle');
+const errorLabel = document.querySelector('#viewer-error');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.7));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#151f27');
+const camera = new THREE.PerspectiveCamera(32, window.innerWidth / window.innerHeight, 0.1, 80);
+camera.position.set(2.15, 2.0, 4.1);
+scene.add(new THREE.HemisphereLight('#e0d2b0', '#26323c', 2.2));
+const key = new THREE.DirectionalLight('#f0d9a7', 3.1);
+key.position.set(-2, 4.5, 3.5);
+key.castShadow = true;
+key.shadow.mapSize.set(1024, 1024);
+scene.add(key);
+const rim = new THREE.DirectionalLight('#829cad', 2.0);
+rim.position.set(2.5, 3.0, -3.0);
+scene.add(rim);
+
+const floorMaterial = new THREE.MeshStandardMaterial({ color: '#303b40', roughness: 0.9 });
+const floor = new THREE.Mesh(new THREE.CircleGeometry(5.4, 64), floorMaterial);
+floor.rotation.x = -Math.PI / 2;
+floor.position.y = -0.035;
+floor.receiveShadow = true;
+scene.add(floor);
+const grid = new THREE.GridHelper(10, 20, '#70654d', '#3b4749');
+grid.position.y = -0.025;
+grid.material.transparent = true;
+grid.material.opacity = 0.35;
+scene.add(grid);
+
+const controls = new OrbitControls(camera, canvas);
+controls.target.set(0, 0.94, 0);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.minDistance = 2.25;
+controls.maxDistance = 7.5;
+controls.minPolarAngle = 0.2;
+controls.maxPolarAngle = Math.PI * 0.49;
+
+const clock = new THREE.Clock();
+let mixer = null;
+let model = null;
+let clipActions = new Map();
+let currentAction = null;
+let currentClip = null;
+let paused = false;
+let playbackRate = 1;
+let actualModelHeight = 2.18;
+
+function updateFrameLabel() {
+  if (!currentClip || !currentAction) return;
+  const duration = Math.max(currentClip.duration, 0.001);
+  const fraction = THREE.MathUtils.clamp(currentAction.time / duration, 0, 1);
+  timeline.value = String(Math.round(fraction * Number(timeline.max)));
+  const total = Math.max(1, Math.round(duration * 24));
+  const frame = Math.min(total, Math.round(fraction * total) + 1);
+  frameLabel.textContent = `帧 ${frame} / ${total}`;
+}
+
+function selectClip(clip) {
+  currentClip = clip;
+  const next = clipActions.get(clip.name);
+  if (!next) return;
+  if (currentAction && currentAction !== next) currentAction.fadeOut(0.14);
+  next.reset();
+  next.enabled = true;
+  next.setEffectiveTimeScale(playbackRate);
+  next.setEffectiveWeight(1);
+  next.setLoop(['Idle', 'Walk', 'Run'].includes(clip.name) ? THREE.LoopRepeat : THREE.LoopOnce,
+    ['Idle', 'Walk', 'Run'].includes(clip.name) ? Infinity : 1);
+  next.clampWhenFinished = true;
+  if (paused) next.paused = true;
+  next.fadeIn(0.14).play();
+  currentAction = next;
+  clipList.querySelectorAll('button').forEach((button) => {
+    button.classList.toggle('active', button.dataset.clip === clip.name);
+  });
+  timeline.value = '0';
+  updateFrameLabel();
+}
+
+function labelForClip(name) {
+  return ({ Idle: '站立', Walk: '走路', Run: '奔跑', Jump: '跳跃', Attack: '出招' })[name] || name;
+}
+
+function setView(view) {
+  const target = controls.target.clone();
+  const distance = camera.position.distanceTo(target);
+  const positions = {
+    front: [0, 0.06, 1],
+    threequarter: [0.47, 0.17, 0.87],
+    side: [1, 0.08, 0],
+    back: [0, 0.07, -1]
+  };
+  const direction = new THREE.Vector3(...(positions[view] || positions.threequarter)).normalize();
+  camera.position.copy(target).add(direction.multiplyScalar(distance));
+  controls.update();
+  document.querySelectorAll('[data-view]').forEach((button) => button.classList.toggle('selected', button.dataset.view === view));
+}
+
+document.querySelectorAll('[data-view]').forEach((button) => button.addEventListener('click', () => setView(button.dataset.view)));
+playToggle.addEventListener('click', () => {
+  paused = !paused;
+  if (currentAction) currentAction.paused = paused;
+  playToggle.textContent = paused ? '▶ 播放' : '❚❚ 暂停';
+});
+speedInput.addEventListener('input', () => {
+  playbackRate = Number(speedInput.value);
+  speedLabel.textContent = `${playbackRate.toFixed(1)}×`;
+  if (currentAction) currentAction.setEffectiveTimeScale(playbackRate);
+});
+timeline.addEventListener('input', () => {
+  if (!currentAction || !currentClip) return;
+  paused = true;
+  currentAction.paused = false;
+  currentAction.time = (Number(timeline.value) / Number(timeline.max)) * currentClip.duration;
+  mixer.update(0);
+  currentAction.paused = true;
+  playToggle.textContent = '▶ 播放';
+  updateFrameLabel();
+});
+
+const loader = new GLTFLoader();
+loader.load('./assets/generated/threejs-wuxia/models/shen-linchuan-pants-game-ready.glb', (gltf) => {
+  model = gltf.scene;
+  model.traverse((object) => {
+    if (!object.isMesh) return;
+    object.castShadow = true;
+    object.receiveShadow = true;
+    if (object.material) object.material.side = THREE.DoubleSide;
+  });
+  let bounds = new THREE.Box3().setFromObject(model);
+  const size = bounds.getSize(new THREE.Vector3());
+  actualModelHeight = size.y || 2.18;
+  const scale = 2.18 / actualModelHeight;
+  model.scale.setScalar(scale);
+  bounds = new THREE.Box3().setFromObject(model);
+  model.position.y -= bounds.min.y;
+  scene.add(model);
+  mixer = new THREE.AnimationMixer(model);
+  for (const clip of gltf.animations) {
+    clipActions.set(clip.name, mixer.clipAction(clip));
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.dataset.clip = clip.name;
+    button.className = 'clip-button';
+    button.textContent = labelForClip(clip.name);
+    button.addEventListener('click', () => selectClip(clip));
+    clipList.append(button);
+  }
+  document.querySelector('#clip-count').textContent = `${gltf.animations.length} 段`;
+  const walk = gltf.animations.find((clip) => clip.name === 'Walk') || gltf.animations[0];
+  if (walk) selectClip(walk);
+  status.textContent = '裤装角色 GLB 已载入';
+  detail.textContent = `${gltf.animations.length} 个动作 · 模型高 ${actualModelHeight.toFixed(2)} m · 可拖时间轴逐相位检查`;
+  window.__characterViewer = {
+    ready: true,
+    clips: gltf.animations.map((clip) => ({ name: clip.name, duration: clip.duration })),
+    setClip: (name) => { const clip = gltf.animations.find((item) => item.name === name); if (clip) selectClip(clip); },
+    setPhase: (phase) => { timeline.value = String(Math.round(THREE.MathUtils.clamp(phase, 0, 1) * Number(timeline.max))); timeline.dispatchEvent(new Event('input')); },
+    getState: () => ({ clip: currentClip?.name || null, phase: currentAction && currentClip ? currentAction.time / currentClip.duration : 0, paused })
+  };
+}, undefined, (error) => {
+  console.error('Failed to load pants character model', error);
+  status.textContent = '裤装角色模型尚未生成';
+  detail.textContent = '先运行 npm run 3d:character:build';
+  errorLabel.hidden = false;
+  errorLabel.textContent = '请先生成 Pants GLB';
+});
+
+function render() {
+  requestAnimationFrame(render);
+  const delta = Math.min(clock.getDelta(), 0.05);
+  if (mixer) mixer.update(delta);
+  controls.update();
+  updateFrameLabel();
+  renderer.render(scene, camera);
+}
+render();
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.7));
+});

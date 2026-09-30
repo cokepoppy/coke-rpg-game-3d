@@ -21,6 +21,12 @@ npm run 3d:dev
 
 打开 `http://127.0.0.1:5180/threejs-rpg.html`。WASD 移动、Shift 奔跑、空格轻功跳跃、Q 沉掌出招、E 交互；拖动视角，滚轮缩放。可以和苏萝、掌柜、药摊老人及逍遥道人交谈，打开云纹铜匣，进入客栈检查账册、木柜和红漆箱。`npm run 3d:build` 会输出静态版本到 `dist-threejs/`。
 
+- 角色动作查看器：`http://127.0.0.1:5180/threejs-character-viewer.html`，可以选择 Idle / Walk / Run / Jump / Attack、逐相位拖动时间轴和切换观察方向。
+- 动作帧审看：`npm run 3d:character:inspect` 会把 Walk 循环按 8 个相位截图并拼成接触表，方便快速检查两腿、脚步和摆臂变化。
+- 固定剧情演示：`http://127.0.0.1:5180/threejs-rpg.html?demo=1`；运行 `npm run 3d:demo:record` 会录制苏萝相遇、沿旧道走到客栈、进入客房查账册、回到旧道的完整路线。
+- 最新录像：[苍山 3D 剧情演示](assets/generated/videos/cangshan-3d-story-demo.webm)，并附有封面与结束画面。
+- 裤装主角可用 `npm run 3d:character:build` 从现有混元网格和新的 ImageGen 裤装参考重建。该版本保留混元头部与上身，用 Blender 重做下身和步态；尚未生成新的混元裤装模型。
+
 首次生成场景 GLB：
 
 ```bash

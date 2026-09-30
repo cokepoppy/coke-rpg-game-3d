@@ -1,0 +1,14 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #10171d; color: #e7e0d2; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; }
+#world-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+.preview-header { position: absolute; inset: 0 0 auto; min-height: 74px; padding: 16px 22px; display: flex; align-items: center; gap: 25px; background: linear-gradient(180deg, rgba(10,16,20,.92), rgba(10,16,20,.08)); }
+.preview-header a { color: #dfc17f; text-decoration: none; font-size: 12px; }
+.preview-header div { display: grid; gap: 4px; }
+.preview-header strong { font: 500 16px Georgia, serif; letter-spacing: .08em; }
+.preview-header span { color: #a5aaa5; font-size: 10px; }
+#load-status { margin-left: auto; }
+.preview-note { position: absolute; left: 18px; bottom: 18px; width: min(370px, calc(100vw - 36px)); padding: 14px 16px; border: 1px solid rgba(218,190,130,.24); background: rgba(14,22,27,.82); backdrop-filter: blur(12px); }
+.preview-note strong { font: 500 13px Georgia, serif; color: #e2c889; }
+.preview-note p { margin: 7px 0; color: #ded9cc; font-size: 11px; line-height: 1.7; }
+.preview-note span { color: #8e9997; font-size: 9px; line-height: 1.7; }
+@media (max-width: 640px) { .preview-header { gap: 10px; padding: 12px; } .preview-header a { font-size: 10px; } .preview-header strong { font-size: 12px; } .preview-header div span { font-size: 8px; } #load-status { font-size: 8px; } }

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#10171d" />
+    <title>苍山旧道 · 混元世界重建</title>
+    <link rel="stylesheet" href="./threejs/world-preview.css" />
+  </head>
+  <body>
+    <canvas id="world-canvas" aria-label="HunyuanWorld 苍山旧道重建预览"></canvas>
+    <header class="preview-header">
+      <a href="./threejs-rpg.html">← 返回苍山侠影</a>
+      <div><strong>苍山旧道 · 混元世界重建</strong><span>腾讯混元世界 3DGS · 50,173 splats</span></div>
+      <span id="load-status">正在载入重建场景…</span>
+    </header>
+    <aside class="preview-note">
+      <strong>开场地图 · 世界重建</strong>
+      <p>以原版 world-east.png 提交单图重建。鼠标拖动旋转，滚轮缩放，右键平移。</p>
+      <span>此页是 3D Gaussian Splatting 重建预览；游戏运行时使用独立 Blender 网格 GLB 场景，原图只作建模参照。</span>
+    </aside>
+    <script type="module" src="./threejs/world-preview.js"></script>
+  </body>
+</html>

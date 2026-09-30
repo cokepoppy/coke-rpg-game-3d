@@ -10,6 +10,29 @@ python3 -m http.server 5173
 
 然后打开 `http://localhost:5173`。
 
+## Three.js 3D RPG
+
+当前分支还包含一个独立的 Three.js 第三人称原型，复用沈临川、苏萝、苍山旧道布局、第一章剧情和云来客栈内室。户外地图与室内均由 Blender 网格模型搭建，原始像素图只作位置与风格参照，不作为运行时背景贴图：
+
+```bash
+npm install
+npm run 3d:dev
+```
+
+打开 `http://127.0.0.1:5180/threejs-rpg.html`。WASD 移动、Shift 奔跑、空格轻功跳跃、Q 沉掌出招、E 交互；拖动视角，滚轮缩放。可以和苏萝、掌柜、药摊老人及逍遥道人交谈，打开云纹铜匣，进入客栈检查账册、木柜和红漆箱。`npm run 3d:build` 会输出静态版本到 `dist-threejs/`。
+
+首次生成场景 GLB：
+
+```bash
+blender --background --factory-startup --python tools/build_cangshan_world.py
+```
+
+该命令会输出 Blender 工程、户外场景预览、户外世界 GLB 和独立客栈室内 GLB 到 `assets/generated/threejs-wuxia/world/`；构建静态站点时会把两个 GLB 复制到 `dist-threejs/`。
+
+生成式图生 3D、Blender 打包与场景重建的记录在 [Three.js RPG 工作流](docs/threejs-rpg-pipeline.md)。
+
+混元下载的角色 GLB 放入 `assets/generated/threejs-wuxia/source/` 后，可运行 `blender -b --python tools/package_wuxia_character.py`，输出可编辑 `.blend`、带 Idle/Walk/Run/Jump/Attack 动画的 Three.js GLB 和预览图。生成模型不会提交进 Git；图片参考与 Blender 打包脚本会保留在分支中。
+
 也可以直接用浏览器打开 `index.html`。
 
 模块化原型入口：

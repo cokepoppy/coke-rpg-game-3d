@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "sourceMap": {
+    "parts": ["wechat-minigame/world-west-pack", "wechat-minigame/world-east-pack"],
+    "stitchedPixels": [4480, 3584],
+    "layoutScale": 1.6,
+    "authority": "2D map owns anchors, footprints, paths, density, and collision; generated models own object appearance."
+  },
+  "assets": [
+    {
+      "id": "cangshan-paifang",
+      "label": "苍山牌坊",
+      "anchorPx": [2040, 2700],
+      "footprintMeters": [5.44, 1.49],
+      "heightMeters": 3.44,
+      "source": "blender-authored",
+      "status": "runtime-glb-ready; ImageGen four-view reference ready; Hunyuan generation pending",
+      "runtime": "assets/generated/threejs-wuxia/models/cangshan-paifang-game-ready.glb",
+      "collisionPx": [[1916, 2673, 48, 55], [2116, 2673, 48, 55]],
+      "notes": "Crosses source image seam; stitch west/east before cropping. Upright pillars and level beams are calibrated in Blender."
+    },
+    {
+      "id": "cangshan-inn",
+      "label": "云来客栈",
+      "anchorPx": [3970, 2730],
+      "source": "hunyuan3d-3.1-single-image",
+      "status": "runtime-glb-ready",
+      "runtime": "assets/generated/threejs-wuxia/models/yunlai-inn-game-ready.glb",
+      "notes": "Separate door interaction anchor at [3970, 2900]."
+    },
+    {
+      "id": "autumn-maple",
+      "label": "秋枫树",
+      "anchorPx": [4100, 2390],
+      "source": "hunyuan3d-trunk-plus-blender-leaf-mesh",
+      "status": "runtime-glb-ready",
+      "runtime": "assets/generated/threejs-wuxia/models/autumn-maple-game-ready.glb",
+      "notes": "Hunyuan trials omitted the crown; thick five-lobed 3D leaves are editable Blender geometry."
+    },
+    {
+      "id": "shen-linchuan",
+      "label": "沈临川",
+      "source": "hunyuan3d-character",
+      "status": "runtime-glb-ready; Blender rig and walk-cycle driven",
+      "runtime": "assets/generated/threejs-wuxia/models/shen-linchuan-game-ready.glb"
+    },
+    {
+      "id": "su-luo",
+      "label": "苏萝",
+      "source": "hunyuan3d-character",
+      "status": "runtime-glb-ready; Blender rig and animation driven",
+      "runtime": "assets/generated/threejs-wuxia/models/su-luo-game-ready.glb"
+    },
+    {
+      "id": "hundred-herbs-pharmacy",
+      "label": "百草药铺",
+      "anchorPx": [3110, 2300],
+      "footprintMeters": [4.4, 3.398],
+      "heightMeters": 3.74,
+      "source": "blender-authored",
+      "status": "runtime-glb-ready; ImageGen four-view reference ready; Hunyuan generation pending",
+      "runtime": "assets/generated/threejs-wuxia/models/hundred-herbs-pharmacy-game-ready.glb",
+      "collisionPx": [[2925, 2110, 370, 330]],
+      "notes": "Standalone model shares the map anchor and door heading of the previous procedural shell; source crop and four-view references are in hundred-herbs-pharmacy/."
+    },
+    {
+      "id": "market-stall",
+      "label": "药摊",
+      "anchorPx": [3090, 2710],
+      "source": "blender-procedural",
+      "status": "in-scene; individual asset replacement queued"
+    },
+    {
+      "id": "bridge",
+      "label": "木桥",
+      "anchorPx": [3380, 930],
+      "source": "blender-procedural",
+      "status": "in-scene; individual asset replacement queued"
+    },
+    {
+      "id": "temple-pavilions-tea-lodge-trail-shelter",
+      "label": "古寺、两处亭、山茶舍与山路庇护所",
+      "anchorPx": [[2040, 460], [580, 1170], [2230, 1320], [2320, 520], [1040, 2890]],
+      "source": "blender-procedural",
+      "status": "in-scene; model each landmark as a replaceable asset"
+    },
+    {
+      "id": "training-yard",
+      "label": "练武围场与练功桩",
+      "anchorPx": [3640, 1550],
+      "source": "deterministic-blender-geometry",
+      "status": "layout structure; preserve clear playable interior"
+    },
+    {
+      "id": "forest-trees-cliffs-rocks",
+      "label": "松树、阔叶树、红叶树、林缘岩石",
+      "source": "blender-procedural",
+      "status": "in-scene; create a few reusable variants, then instance near source-map clusters"
+    },
+    {
+      "id": "lanterns-well-crates-barrels",
+      "label": "石灯、井、箱桶与小道具",
+      "source": "blender-procedural",
+      "status": "in-scene; create reusable variants and instance from map anchors"
+    },
+    {
+      "id": "inn-interior",
+      "label": "客栈内室与家具",
+      "source": "deterministic-blender-geometry",
+      "status": "separate interior GLB; refine against original room image and keep clues/interactions independent"
+    },
+    {
+      "id": "terrain-roads-water-fences-forest",
+      "label": "地面、道路、水系、围栏和林缘",
+      "source": "deterministic-blender-geometry",
+      "status": "layout geometry; preserve navigable clearings and source-map silhouettes"
+    }
+  ]
+}

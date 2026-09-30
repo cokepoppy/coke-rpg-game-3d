@@ -1,12 +1,14 @@
 .DS_Store
 node_modules/
 dist/
+dist-threejs/
 build/
 .env
 .env.*
 .vite/
 coverage/
 wechat-debug/.generated/
+/assets/generated/threejs-wuxia/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

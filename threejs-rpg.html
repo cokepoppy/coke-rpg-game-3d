@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#111a24" />
+    <title>苍山侠影 · 3D RPG</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="./threejs/style.css" />
+  </head>
+  <body>
+    <main id="game-shell">
+      <canvas id="world-canvas" aria-label="苍山侠影三维场景"></canvas>
+      <div class="vignette"></div>
+
+      <header class="topbar">
+        <div class="brand-lockup">
+          <span class="brand-seal">苍</span>
+          <div>
+            <strong>苍山侠影</strong>
+            <span>风起云岭 · 旧案新踪</span>
+          </div>
+        </div>
+        <div class="location-lockup">
+          <span class="location-dot"></span>
+          <span id="location-label">苍山旧道</span>
+          <span class="location-divider">/</span>
+          <span id="chapter-label">第一章 · 钟断苍山</span>
+        </div>
+        <nav class="top-actions" aria-label="场景工具">
+          <button class="map-button" id="map-button" type="button" aria-label="查看江湖地图">
+            <span class="map-glyph">⌖</span> 江湖地图
+          </button>
+          <a class="map-button" href="./threejs-world.html" aria-label="查看混元世界重建">
+            <span class="map-glyph">◇</span> 混元 3DGS
+          </a>
+        </nav>
+      </header>
+
+      <section class="status-strip" aria-label="角色状态">
+        <div class="status-avatar">沈</div>
+        <div class="status-info">
+          <strong>沈临川</strong>
+          <span>机动剑客 · 佩剑失踪</span>
+        </div>
+        <div class="status-meter"><span></span><i>88 / 88</i></div>
+        <div class="status-currency"><span>◇</span> <b>120</b></div>
+      </section>
+
+      <aside class="quest-card" id="quest-card">
+        <div class="quest-kicker"><span></span> 当前线索</div>
+        <strong id="quest-title">寻找云纹铜匣</strong>
+        <p id="quest-description">沿旧道搜寻灯亭与石阶，铜匣里也许藏着失剑的线索。</p>
+        <div class="quest-progress"><span></span><small id="quest-progress-label">主线 · 未完成</small></div>
+      </aside>
+
+      <div class="model-status" id="model-status">3D角色模型 · 正在准备</div>
+      <div class="interaction-prompt" id="interaction-prompt" hidden>
+        <kbd>E</kbd><span id="interaction-label">交互</span>
+      </div>
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+      <section class="dialog-panel" id="dialog-panel" hidden aria-live="polite">
+        <div class="dialog-portrait" id="dialog-portrait">苏</div>
+        <div class="dialog-copy">
+          <div class="dialog-speaker" id="dialog-speaker">苏萝</div>
+          <p id="dialog-text"></p>
+          <div class="dialog-footer">
+            <span id="dialog-hint">按 Enter 继续</span>
+            <button id="dialog-next" type="button">继续 <span>↵</span></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="map-modal" id="map-modal" hidden>
+        <div class="map-sheet">
+          <button class="modal-close" id="map-close" type="button" aria-label="关闭地图">×</button>
+          <div class="map-sheet-kicker">苍山 · 洱海</div>
+          <h2>行至山水之间</h2>
+          <img src="./wechat-minigame/world-map-pack/world-map.png" alt="苍山旧道与周边地区的像素风江湖地图" />
+          <div class="map-sheet-caption"><span class="current-marker"></span> 当前所在：苍山旧道 <i>·</i> 下一章：月华谷</div>
+        </div>
+      </section>
+
+      <footer class="control-dock">
+        <div class="control-group movement-keys"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span>移动</span></div>
+        <div class="control-separator"></div>
+        <div class="control-group"><kbd>E</kbd><span>对话 / 搜索 / 进出房间</span></div>
+        <div class="control-separator"></div>
+        <div class="control-group"><kbd>Space</kbd><span>轻功跳跃</span></div>
+        <div class="control-separator"></div>
+        <div class="control-group"><kbd>Q</kbd><span>沉掌出招</span></div>
+        <div class="camera-hint"><span>拖动</span> 调整视角 <b>·</b> 滚轮缩放</div>
+      </footer>
+
+      <div class="loading-screen" id="loading-screen">
+        <div class="loading-seal">苍</div>
+        <strong>风起苍山</strong>
+        <span>正在铺开江湖旧卷</span>
+        <div class="loading-line"><i></i></div>
+      </div>
+    </main>
+    <script type="module" src="./threejs/game.js"></script>
+  </body>
+</html>

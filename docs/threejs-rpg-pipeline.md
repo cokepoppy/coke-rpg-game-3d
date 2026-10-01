@@ -76,5 +76,6 @@ npm run 3d:dev
 - 角色与 2D 原图的阶段差异、比例测量及正面查看器复核见 `docs/character-proportion-pipeline-audit.md`。
 - `http://127.0.0.1:5180/threejs-character-viewer.html` 提供 Idle / Walk / Run / Jump / Attack 片段选择、播放速度、方向切换和逐相位滑块；滑块按 24 FPS 显示帧序号。检查走路时依次看双腿交替、脚抬离地面、手臂反向摆动，以及动作节奏和游戏移动速度是否一致。
 - `npm run 3d:character:inspect` 会操作同一个查看器，把 Walk 的 8 个相位保存到 `screenshots/cangshan-character-viewer/` 并拼成接触表，作为可重复的 AI/人工步态审看入口。
+- 八相位通过不能只检查同侧手脚反相；还要检查左右手臂彼此反相、肩轴确实让手臂前后摆动，并观察支撑脚、脚跟着地和脚尖蹬离。将 Walk 周期和游戏位移速度核对；剧情演示也用玩家步速等速移动，避免缓动或另一个速度造成滑步。沈临川 v2 的本次轴向和相位修正记录在 `docs/character-proportion-pipeline-audit.md`。
 - `http://127.0.0.1:5180/threejs-rpg.html?demo=1` 播放固定路线：走近苏萝并对话、沿集市外侧前往云来客栈、进入客房查看账册线索，再回到苍山旧道。演示模式不写入玩家剧情存档。
 - `npm run 3d:demo:record` 按旧 2D 剧情 tour 的 Playwright `recordVideo` 做法录制路线，默认使用前台 Chrome 与本机 WebGL，生成 `assets/generated/videos/cangshan-3d-story-demo.webm`、封面和结尾截图。设 `DEMO_HEADLESS=1` 可切到无头 SwiftShader。Chrome、WebGL 或资源加载错误会反映在运行输出里，不会将未完成的片段报告为成功演示。

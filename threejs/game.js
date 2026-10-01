@@ -785,8 +785,9 @@ function updateScriptedMove(delta) {
   const move = scriptedMove;
   const elapsed = Math.min((performance.now() - move.startedAt) / 1000, move.duration);
   const t = elapsed / move.duration;
-  const eased = t * t * (3 - 2 * t);
-  player.root.position.lerpVectors(move.from, move.to, eased);
+  // Keep scripted walking at a constant measured speed so the in-place Walk
+  // cycle advances at the same rate as the character moves through the world.
+  player.root.position.lerpVectors(move.from, move.to, t);
   if (t >= 1) {
     scriptedMove = null;
     player.moving = false;
@@ -911,7 +912,7 @@ function installDemoApi() {
         await wait(1400);
         setStep('meet-suluo');
         const companionApproach = mapPoint(2790, 2540);
-        await movePlayerScripted(companionApproach, 1.25);
+        await movePlayerScripted(companionApproach);
         talkToSuLuo();
         setStep('suluo-dialogue');
         await advanceDemoDialogue(1750);
@@ -923,8 +924,7 @@ function installDemoApi() {
         ];
         for (const [x, y] of route) {
           const destination = mapPoint(x, y);
-          const distance = player.root.position.distanceTo(new THREE.Vector3(destination.x, 0, destination.z));
-          await movePlayerScripted(destination, Math.max(1.25, distance / 2.35));
+          await movePlayerScripted(destination);
         }
         await wait(750);
         setStep('enter-inn');
@@ -933,7 +933,7 @@ function installDemoApi() {
         setStep('inn-dialogue');
         await advanceDemoDialogue(1750);
         setStep('approach-desk');
-        await movePlayerScripted({ x: -2.0, z: -1.72 }, 2.2);
+        await movePlayerScripted({ x: -2.0, z: -1.72 });
         setStep('inspect-ledger');
         setDemoCaption('客房旧信', '桌上账册被撕去一页，窗沿还留着昨夜带进来的山泥。');
         inspectDesk();

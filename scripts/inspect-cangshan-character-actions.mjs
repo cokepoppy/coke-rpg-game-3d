@@ -81,14 +81,19 @@ const gaitAnalysis = {
       gaitSamples.map(({ bones }) => bones[`hand${side}`].z),
       gaitSamples.map(({ bones }) => bones[`foot${side}`].z)
     )
-  ]))
+  ])),
+  leftRightArmCorrelation: correlation(
+    gaitSamples.map(({ bones }) => bones.handL.z),
+    gaitSamples.map(({ bones }) => bones.handR.z)
+  )
 };
 gaitAnalysis.passesOppositeArmSwing = Object.values(gaitAnalysis.sameSideArmLegCorrelation)
-  .every((value) => Number.isFinite(value) && value < -0.25);
+  .every((value) => Number.isFinite(value) && value < -0.25) &&
+  Number.isFinite(gaitAnalysis.leftRightArmCorrelation) && gaitAnalysis.leftRightArmCorrelation < -0.25;
 const audit = { baseUrl, clips, phases, gaitSamples, gaitAnalysis, output, pageErrors };
 await fs.writeFile(path.join(output, 'audit.json'), `${JSON.stringify(audit, null, 2)}\n`);
 console.log(JSON.stringify(audit, null, 2));
 if (!gaitAnalysis.passesOppositeArmSwing) {
-  throw new Error('Walk audit failed: hands must swing opposite their same-side feet.');
+  throw new Error('Walk audit failed: each hand must oppose its same-side foot, and the hands must oppose each other.');
 }
 if (pageErrors.length) throw new Error(`Viewer browser errors: ${pageErrors.join('; ')}`);

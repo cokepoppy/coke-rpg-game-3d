@@ -25,12 +25,16 @@ else:
 # Rotating every bone around Euler X twists some sleeves instead of swinging
 # them. Express each intended world-space gait axis in that bone's rest frame.
 GAIT_WORLD_AXES = {
-    "upper_arm.L": Vector((0, 0, 1)), "upper_arm.R": Vector((0, 0, 1)),
+    # The torso faces along Y. Shoulder swing must rotate around the lateral X
+    # axis; Z is the vertical axis and only spins an arm around the shoulder,
+    # leaving the elbows flared out instead of swinging naturally front/back.
+    "upper_arm.L": Vector((1, 0, 0)), "upper_arm.R": Vector((1, 0, 0)),
     "forearm.L": Vector((1, 0, 0)), "forearm.R": Vector((1, 0, 0)),
     "thigh.L": Vector((1, 0, 0)), "thigh.R": Vector((1, 0, 0)),
     "shin.L": Vector((1, 0, 0)), "shin.R": Vector((1, 0, 0)),
     "foot.L": Vector((1, 0, 0)), "foot.R": Vector((1, 0, 0)),
     "spine": Vector((1, 0, 0)), "head": Vector((1, 0, 0)),
+    "pelvis": Vector((0, 0, 1)), "chest": Vector((0, 0, 1)),
 }
 
 
@@ -226,26 +230,46 @@ def make_action(rig, name, frames, gait_gain=1.0, profile="legacy"):
     rig.animation_data.action = action
     pose = rig.pose.bones
     for frame, pose_data in frames:
-        bpy.context.scene.frame_set(frame)
+        whole_frame = int(frame)
+        bpy.context.scene.frame_set(whole_frame, subframe=frame - whole_frame)
         for bone_name, values in pose_data.items():
             bone = pose[bone_name]
             if profile == "proportion-v2" and name in {"Walk", "Run"} and bone_name in {"foot.L", "foot.R"}:
-                # Keep the boot sole level as the thigh and shin swing. All three
-                # bones rotate around world X, so this cancels inherited pitch.
+                # Cancel inherited leg pitch, then retain the keyed ankle pitch:
+                # toe-up on heel contact and toe-down during push-off.
                 side = bone_name[-1]
                 leg_angle = pose_data[f"thigh.{side}"][0] + pose_data[f"shin.{side}"][0]
-                values = (-leg_angle, 0.0, 0.0)
+                values = (values[0] - leg_angle, 0.0, 0.0)
             if bone_name == "root":
                 bob_gain = gait_gain if name in {"Walk", "Run"} else 1.0
-                bone.location = (0, 0, values[0] * bob_gain)
+                side_shift, vertical_bob = values
+                bone.location = (side_shift * bob_gain, 0, vertical_bob * bob_gain)
                 bone.keyframe_insert(data_path="location", frame=frame, group=bone_name)
+            elif profile == "proportion-v2" and bone_name in {"upper_arm.L", "upper_arm.R"}:
+                rest_inverse = rig.data.bones[bone_name].matrix_local.to_3x3().inverted()
+                side_sign = 1.0 if bone_name.endswith(".L") else -1.0
+                adduction_axis = (rest_inverse @ Vector((0, 1, 0))).normalized()
+                adduction = Quaternion(adduction_axis, side_sign * 0.34 *
+                                       (gait_gain if name in {"Walk", "Run"} else 1.0))
+                if name in {"Walk", "Run"}:
+                    # The two shoulder swings must be opposite in world space.
+                    # The old right-side sign compensation became wrong when
+                    # the shoulder axis was corrected from vertical to lateral.
+                    swing_axis = (rest_inverse @ Vector((1, 0, 0))).normalized()
+                    # On this imported rest orientation, a positive shoulder
+                    # value tracks the same-side foot. Reverse it for the
+                    # human contralateral arm/leg rhythm.
+                    swing = Quaternion(swing_axis, -values[0] * gait_gain)
+                    bone.rotation_quaternion = adduction @ swing
+                else:
+                    bone.rotation_quaternion = adduction @ Euler(values, "XYZ").to_quaternion()
+                bone.keyframe_insert(data_path="rotation_quaternion", frame=frame, group=bone_name)
             elif name in {"Walk", "Run"} and bone_name in GAIT_WORLD_AXES:
                 world_axis = GAIT_WORLD_AXES[bone_name]
-                # Hunyuan's mirrored right upper-arm bone has the opposite local
-                # handedness from the left. Correct only this new rig profile;
-                # otherwise both hands travel in the same world-space direction.
-                if profile == "proportion-v2" and bone_name == "upper_arm.R":
-                    world_axis = -world_axis
+                if profile != "proportion-v2" and bone_name in {"upper_arm.L", "upper_arm.R"}:
+                    # Keep the older character rigs on their previously tuned
+                    # shoulder axis; the lateral swing is specific to this rig.
+                    world_axis = Vector((0, 0, 1))
                 local_axis = rig.data.bones[bone_name].matrix_local.to_3x3().inverted() @ world_axis
                 bone.rotation_mode = "QUATERNION"
                 bone.rotation_quaternion = Quaternion(local_axis.normalized(), values[0] * gait_gain)
@@ -272,43 +296,44 @@ def make_action(rig, name, frames, gait_gain=1.0, profile="legacy"):
 
 def create_actions(rig, gait_gain=1.0, profile="legacy"):
     zero = (0.0, 0.0, 0.0)
-    def frame(root=0, arm_l=zero, arm_r=zero, leg_l=zero, leg_r=zero,
+    def frame(root=0, side_shift=0, arm_l=zero, arm_r=zero, leg_l=zero, leg_r=zero,
               shin_l=zero, shin_r=zero, foot_l=zero, foot_r=zero,
-              spine=zero, head=zero, fore_l=zero, fore_r=zero):
-        return {"root": (root,), "upper_arm.L": arm_l, "upper_arm.R": arm_r,
+              pelvis=zero, spine=zero, chest=zero, head=zero, fore_l=zero, fore_r=zero):
+        return {"root": (side_shift, root), "pelvis": pelvis,
+                "upper_arm.L": arm_l, "upper_arm.R": arm_r,
                 "thigh.L": leg_l, "thigh.R": leg_r,
                 "shin.L": shin_l, "shin.R": shin_r,
                 "foot.L": foot_l, "foot.R": foot_r, "spine": spine,
-                "head": head, "forearm.L": fore_l, "forearm.R": fore_r}
+                "chest": chest, "head": head,
+                "forearm.L": fore_l, "forearm.R": fore_r}
+
+    def walk_pose(root, side, arm, leg, shin_l, shin_r, foot_l, foot_r, twist):
+        return frame(
+            root=root, side_shift=side,
+            arm_l=(-arm, 0, 0), arm_r=(arm, 0, 0),
+            leg_l=(leg, 0, 0), leg_r=(-leg, 0, 0),
+            shin_l=(shin_l, 0, 0), shin_r=(shin_r, 0, 0),
+            foot_l=(foot_l, 0, 0), foot_r=(foot_r, 0, 0),
+            pelvis=(twist, 0, 0), spine=(0.018, 0, 0),
+            chest=(-twist * 0.65, 0, 0), head=(-0.008, 0, 0),
+            fore_l=(0.10, 0, 0), fore_r=(0.10, 0, 0))
 
     make_action(rig, "Idle", [
         (1, frame()), (12, frame(0.025, spine=(0.015, 0, 0), head=(-0.015, 0, 0))),
         (24, frame()),
     ], profile=profile)
     make_action(rig, "Walk", [
-        (1, frame(0.022, arm_l=(-0.30, 0, 0), arm_r=(0.30, 0, 0),
-                  leg_l=(0.43, 0, 0), leg_r=(-0.43, 0, 0),
-                  shin_l=(0.05, 0, 0), shin_r=(0.43, 0, 0),
-                  foot_l=(-0.08, 0, 0), foot_r=(0.12, 0, 0),
-                  fore_l=(0.07, 0, 0), fore_r=(0.07, 0, 0))),
-        (6, frame(0.052, arm_l=(-0.12, 0, 0), arm_r=(0.12, 0, 0),
-                  leg_l=(0.12, 0, 0), leg_r=(-0.12, 0, 0),
-                  shin_l=(0.24, 0, 0), shin_r=(0.18, 0, 0),
-                  foot_l=(-0.04, 0, 0), foot_r=(0.06, 0, 0))),
-        (11, frame(0.022, arm_l=(0.30, 0, 0), arm_r=(-0.30, 0, 0),
-                   leg_l=(-0.43, 0, 0), leg_r=(0.43, 0, 0),
-                   shin_l=(0.43, 0, 0), shin_r=(0.05, 0, 0),
-                   foot_l=(0.12, 0, 0), foot_r=(-0.08, 0, 0),
-                   fore_l=(0.07, 0, 0), fore_r=(0.07, 0, 0))),
-        (16, frame(0.052, arm_l=(0.12, 0, 0), arm_r=(-0.12, 0, 0),
-                   leg_l=(-0.12, 0, 0), leg_r=(0.12, 0, 0),
-                   shin_l=(0.18, 0, 0), shin_r=(0.24, 0, 0),
-                   foot_l=(0.06, 0, 0), foot_r=(-0.04, 0, 0))),
-        (21, frame(0.022, arm_l=(-0.30, 0, 0), arm_r=(0.30, 0, 0),
-                   leg_l=(0.43, 0, 0), leg_r=(-0.43, 0, 0),
-                   shin_l=(0.05, 0, 0), shin_r=(0.43, 0, 0),
-                   foot_l=(-0.08, 0, 0), foot_r=(0.12, 0, 0),
-                   fore_l=(0.07, 0, 0), fore_r=(0.07, 0, 0))),
+        # Eight clear poses per stride: contact, down, pass, rise, then mirror.
+        # 21 frames at 24 fps keeps the 0.875 s cycle aligned with game speed.
+        (1, walk_pose(0.022, -0.015, -0.30, 0.43, 0.03, 0.18, -0.12, 0.12, 0.022)),
+        (3.5, walk_pose(0.000, 0.000, -0.21, 0.30, 0.10, 0.26, -0.04, 0.18, 0.018)),
+        (6, walk_pose(0.034, 0.018, 0.000, 0.00, 0.05, 0.42, 0.00, -0.10, 0.000)),
+        (8.5, walk_pose(0.052, 0.000, 0.21, -0.30, 0.18, 0.24, 0.12, -0.08, -0.018)),
+        (11, walk_pose(0.022, 0.015, 0.30, -0.43, 0.18, 0.03, 0.12, -0.12, -0.022)),
+        (13.5, walk_pose(0.000, 0.000, 0.21, -0.30, 0.26, 0.10, 0.18, -0.04, -0.018)),
+        (16, walk_pose(0.034, -0.018, 0.000, 0.00, 0.42, 0.05, -0.10, 0.00, 0.000)),
+        (18.5, walk_pose(0.052, 0.000, -0.21, 0.30, 0.24, 0.18, -0.08, 0.12, 0.018)),
+        (21, walk_pose(0.022, -0.015, -0.30, 0.43, 0.03, 0.18, -0.12, 0.12, 0.022)),
     ], gait_gain=gait_gain, profile=profile)
     make_action(rig, "Run", [
         (1, frame(0.038, arm_l=(-0.26, 0, 0), arm_r=(0.26, 0, 0),

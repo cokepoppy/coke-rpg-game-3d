@@ -177,15 +177,21 @@ loader.load('./assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2
     clips: gltf.animations.map((clip) => ({ name: clip.name, duration: clip.duration })),
     setGroundVisible: (enabled) => { floor.visible = Boolean(enabled); grid.visible = Boolean(enabled); },
     setClip: (name) => { const clip = gltf.animations.find((item) => item.name === name); if (clip) selectClip(clip); },
+    setView,
     setPhase: (phase) => { timeline.value = String(Math.round(THREE.MathUtils.clamp(phase, 0, 1) * Number(timeline.max))); timeline.dispatchEvent(new Event('input')); },
     sampleBones: () => {
       model.updateMatrixWorld(true);
-      return Object.fromEntries(['handL', 'handR', 'footL', 'footR'].map((name) => {
-        const bone = model.getObjectByName(name);
-        if (!bone) return [name, null];
+      const samples = {};
+      model.traverse((bone) => {
+        if (!bone.isBone) return;
         const position = bone.getWorldPosition(new THREE.Vector3());
-        return [name, { x: position.x, y: position.y, z: position.z }];
-      }));
+        const quaternion = bone.quaternion;
+        samples[bone.name] = {
+          x: position.x, y: position.y, z: position.z,
+          qx: quaternion.x, qy: quaternion.y, qz: quaternion.z, qw: quaternion.w
+        };
+      });
+      return samples;
     },
     getState: () => ({ clip: currentClip?.name || null, phase: currentAction && currentClip ? currentAction.time / currentClip.duration : 0, paused })
   };

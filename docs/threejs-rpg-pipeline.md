@@ -75,7 +75,7 @@ npm run 3d:dev
 - `assets/generated/hunyuan-references/shen-linchuan-pants-reference.png` 是 ImageGen 生成的裤装版角色参考。当前裤装 GLB 复用已有沈临川混元网格的头部与上身，在 `tools/package_wuxia_pants_character.py` 中裁掉长袍下摆，按参考重建分开的裤腿与靴子。这个版本明确标记为 Blender 修改，不是新的混元生成结果。
 - 角色与 2D 原图的阶段差异、比例测量及正面查看器复核见 `docs/character-proportion-pipeline-audit.md`。
 - `http://127.0.0.1:5180/threejs-character-viewer.html` 提供 Idle / Walk / Run / Jump / Attack 片段选择、播放速度、方向切换和逐相位滑块；滑块按 24 FPS 显示帧序号。检查走路时依次看双腿交替、脚抬离地面、手臂反向摆动，以及动作节奏和游戏移动速度是否一致。
-- `npm run 3d:character:inspect` 会操作同一个查看器，把 Walk 的 8 个相位保存到 `screenshots/cangshan-character-viewer/` 并拼成接触表，作为可重复的 AI/人工步态审看入口。
-- 八相位通过不能只检查同侧手脚反相；还要检查左右手臂彼此反相、肩轴确实让手臂前后摆动，并观察支撑脚、脚跟着地和脚尖蹬离。将 Walk 周期和游戏位移速度核对；剧情演示也用玩家步速等速移动，避免缓动或另一个速度造成滑步。沈临川 v2 的本次轴向和相位修正记录在 `docs/character-proportion-pipeline-audit.md`。
+- `npm run 3d:character:inspect` 会操作同一个查看器，在侧视图采样 Walk 的每个实际帧（当前 0.875 秒周期、24 fps 共 21 帧），保存逐帧截图、骨骼坐标和接触表到 `screenshots/cangshan-character-viewer/`。
+- 步态审查要一起看双腿交替、脚踝高度、支撑脚在游戏前进速度下的世界漂移、髋部垂直与侧向轨迹、左右手臂是否反相。腿脚轨迹确定后再安排腰和上身跟随；对 Blender 根骨平移要先通过 rest matrix 把世界方向换算进 bone-local 轴，不能把 Three.js 世界 Y 误当成 PoseBone 本地 Z。沈临川 v2 的本次逐帧解算和轴向修复记录在 `docs/character-proportion-pipeline-audit.md`。
 - `http://127.0.0.1:5180/threejs-rpg.html?demo=1` 播放固定路线：走近苏萝并对话、沿集市外侧前往云来客栈、进入客房查看账册线索，再回到苍山旧道。演示模式不写入玩家剧情存档。
 - `npm run 3d:demo:record` 按旧 2D 剧情 tour 的 Playwright `recordVideo` 做法录制路线，默认使用前台 Chrome 与本机 WebGL，生成 `assets/generated/videos/cangshan-3d-story-demo.webm`、封面和结尾截图。设 `DEMO_HEADLESS=1` 可切到无头 SwiftShader。Chrome、WebGL 或资源加载错误会反映在运行输出里，不会将未完成的片段报告为成功演示。

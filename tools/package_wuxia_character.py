@@ -9,6 +9,7 @@ playable GLB carries the same clips through glTF animation export.
 """
 
 from pathlib import Path
+from math import acos, atan2, cos, pi, sin
 import os
 import bpy
 from mathutils import Euler, Quaternion, Vector
@@ -243,7 +244,14 @@ def make_action(rig, name, frames, gait_gain=1.0, profile="legacy"):
             if bone_name == "root":
                 bob_gain = gait_gain if name in {"Walk", "Run"} else 1.0
                 side_shift, vertical_bob = values
-                bone.location = (side_shift * bob_gain, 0, vertical_bob * bob_gain)
+                # PoseBone.location is expressed in the root bone's rest axes.
+                # This rig's root local Y points up and local Z points forward;
+                # writing vertical_bob into local Z made the torso slide forward
+                # and back while its world-space height stayed fixed. Convert the
+                # intended armature-space offset through the rest basis instead.
+                desired_offset = Vector((side_shift, 0.0, vertical_bob)) * bob_gain
+                root_local_offset = rig.data.bones[bone_name].matrix_local.to_3x3().inverted() @ desired_offset
+                bone.location = root_local_offset
                 bone.keyframe_insert(data_path="location", frame=frame, group=bone_name)
             elif profile == "proportion-v2" and bone_name in {"upper_arm.L", "upper_arm.R"}:
                 rest_inverse = rig.data.bones[bone_name].matrix_local.to_3x3().inverted()
@@ -281,10 +289,14 @@ def make_action(rig, name, frames, gait_gain=1.0, profile="legacy"):
     slot = rig.animation_data.action_slot
     curves = action.layers[0].strips[0].channelbag(slot).fcurves
     for curve in curves:
+        bone_name = curve.group.name if curve.group else ""
         for key in curve.keyframe_points:
-            key.interpolation = "BEZIER"
-            key.handle_left_type = "AUTO_CLAMPED"
-            key.handle_right_type = "AUTO_CLAMPED"
+            preserve_foot_plant = (profile == "proportion-v2" and name == "Walk" and
+                                   bone_name in {"root", "thigh.L", "thigh.R", "shin.L", "shin.R", "foot.L", "foot.R"})
+            key.interpolation = "LINEAR" if preserve_foot_plant else "BEZIER"
+            if not preserve_foot_plant:
+                key.handle_left_type = "AUTO_CLAMPED"
+                key.handle_right_type = "AUTO_CLAMPED"
         if name in {"Idle", "Walk", "Run"}:
             curve.modifiers.new("CYCLES")
     rig.animation_data.action = None
@@ -292,6 +304,38 @@ def make_action(rig, name, frames, gait_gain=1.0, profile="legacy"):
     track.name = name
     track.strips.new(name, 1, action)
     return action
+
+
+def solve_walk_leg(profile, side, forward, lift, root_vertical):
+    """Solve a two-bone leg for a foot target in the sagittal plane.
+
+    `forward` and `lift` are armature-space distances; positive forward points
+    along the character's facing direction. The knee bends behind the leg so
+    the boot can clear the ground during swing without lifting the whole body.
+    Returned angles are rotations around world X, before the action gain.
+    """
+    spec = bone_spec(profile)
+    thigh_head, thigh_tail, _ = spec[f"thigh.{side}"]
+    shin_head, shin_tail, _ = spec[f"shin.{side}"]
+    foot_head, _, _ = spec[f"foot.{side}"]
+    upper_length = (Vector(thigh_tail) - Vector(thigh_head)).length
+    lower_length = (Vector(shin_tail) - Vector(shin_head)).length
+    hip_z = thigh_head[2] + root_vertical
+    ankle_z = foot_head[2] + lift
+    down = hip_z - ankle_z
+    distance = max(0.001, (forward * forward + down * down) ** 0.5)
+    distance = min(distance, upper_length + lower_length - 0.001)
+
+    base = atan2(forward, down)
+    offset_cos = (upper_length ** 2 + distance ** 2 - lower_length ** 2) / (2 * upper_length * distance)
+    internal_cos = (upper_length ** 2 + lower_length ** 2 - distance ** 2) / (2 * upper_length * lower_length)
+    offset = acos(max(-1.0, min(1.0, offset_cos)))
+    knee_bend = pi - acos(max(-1.0, min(1.0, internal_cos)))
+    upper_direction = base - offset
+    lower_direction = upper_direction + knee_bend
+    thigh_angle = -upper_direction
+    shin_angle = -(lower_direction - upper_direction)
+    return thigh_angle, shin_angle
 
 
 def create_actions(rig, gait_gain=1.0, profile="legacy"):
@@ -307,34 +351,111 @@ def create_actions(rig, gait_gain=1.0, profile="legacy"):
                 "chest": chest, "head": head,
                 "forearm.L": fore_l, "forearm.R": fore_r}
 
-    def walk_pose(root, side, arm, leg, shin_l, shin_r, foot_l, foot_r, twist):
-        return frame(
+    def walk_pose(root, side, arm, step_l, step_r, foot_l, foot_r, twist):
+        pose = frame(
             root=root, side_shift=side,
             arm_l=(-arm, 0, 0), arm_r=(arm, 0, 0),
-            leg_l=(leg, 0, 0), leg_r=(-leg, 0, 0),
-            shin_l=(shin_l, 0, 0), shin_r=(shin_r, 0, 0),
             foot_l=(foot_l, 0, 0), foot_r=(foot_r, 0, 0),
             pelvis=(twist, 0, 0), spine=(0.018, 0, 0),
             chest=(-twist * 0.65, 0, 0), head=(-0.008, 0, 0),
             fore_l=(0.10, 0, 0), fore_r=(0.10, 0, 0))
+        if profile == "proportion-v2":
+            # Leg keys are solved from ankle targets rather than independently
+            # swinging thigh and knee angles. This gives the support foot a
+            # stable ground path and makes the leg drive the small body response.
+            root_actual = root * gait_gain
+            for side_name, (forward, lift) in (("L", step_l), ("R", step_r)):
+                thigh_angle, shin_angle = solve_walk_leg(
+                    profile, side_name, forward, lift, root_actual)
+                pose[f"thigh.{side_name}"] = (thigh_angle / gait_gain, 0.0, 0.0)
+                pose[f"shin.{side_name}"] = (shin_angle / gait_gain, 0.0, 0.0)
+                foot_name = f"foot.{side_name}"
+                pose[foot_name] = (pose[foot_name][0] / gait_gain, 0.0, 0.0)
+        else:
+            # Keep the older Hunyuan rigs on their tuned swing range while
+            # retaining the same alternating pose timing.
+            pose["thigh.L"] = (-step_l[0] * 1.3, 0.0, 0.0)
+            pose["thigh.R"] = (-step_r[0] * 1.3, 0.0, 0.0)
+            pose["shin.L"] = (step_l[1] * 3.0, 0.0, 0.0)
+            pose["shin.R"] = (step_r[1] * 3.0, 0.0, 0.0)
+        return pose
+
+    def smoothstep(value):
+        value = max(0.0, min(1.0, value))
+        return value * value * (3.0 - 2.0 * value)
+
+    def root_height_for_step(local_phase):
+        keys = ((0.0, -0.052), (0.25, -0.062), (0.50, -0.035),
+                (0.75, -0.016), (1.0, -0.052))
+        for (start, start_height), (end, end_height) in zip(keys, keys[1:]):
+            if local_phase <= end:
+                weight = smoothstep((local_phase - start) / (end - start))
+                return start_height + (end_height - start_height) * weight
+        return keys[-1][1]
+
+    def walk_frames():
+        frames = []
+        # Frame 0 through frame 21 gives 21 intervals at 24 fps (0.875 s).
+        # Include the repeated contact at frame 21 to close the loop without
+        # leaving a one-frame hold at the start of the exported clip.
+        for index in range(22):
+            phase = index / 21.0
+            loop_phase = 0.0 if index == 21 else phase
+            step_phase = (loop_phase * 2.0) % 1.0
+            support = "R" if loop_phase < 0.5 else "L"
+            swing = "L" if support == "R" else "R"
+
+            stride_half = 0.333
+            stance_forward = stride_half - (2.0 * stride_half * step_phase)
+            swing_forward = -stride_half + (2.0 * stride_half * step_phase)
+            toe_off = smoothstep((step_phase - 0.72) / 0.28)
+            heel_settle = smoothstep(step_phase / 0.18)
+            stance_lift = 0.025 * toe_off
+            swing_lift = 0.020 + 0.110 * sin(pi * step_phase)
+            stance_pitch = 0.10 * (1.0 - heel_settle) - 0.12 * toe_off
+            swing_pitch = 0.08 * sin(pi * step_phase)
+
+            step_l = (stance_forward, stance_lift) if support == "L" else (swing_forward, swing_lift)
+            step_r = (stance_forward, stance_lift) if support == "R" else (swing_forward, swing_lift)
+            foot_l = stance_pitch if support == "L" else swing_pitch
+            foot_r = stance_pitch if support == "R" else swing_pitch
+            root = root_height_for_step(step_phase)
+            side = -0.008 if support == "R" else 0.008
+            arm = -0.30 * cos(2.0 * pi * loop_phase)
+            twist = 0.010 * cos(2.0 * pi * loop_phase)
+            frames.append((index, walk_pose(root, side, arm, step_l, step_r,
+                                            foot_l, foot_r, twist)))
+        return frames
 
     make_action(rig, "Idle", [
         (1, frame()), (12, frame(0.025, spine=(0.015, 0, 0), head=(-0.015, 0, 0))),
         (24, frame()),
     ], profile=profile)
-    make_action(rig, "Walk", [
-        # Eight clear poses per stride: contact, down, pass, rise, then mirror.
-        # 21 frames at 24 fps keeps the 0.875 s cycle aligned with game speed.
-        (1, walk_pose(0.022, -0.015, -0.30, 0.43, 0.03, 0.18, -0.12, 0.12, 0.022)),
-        (3.5, walk_pose(0.000, 0.000, -0.21, 0.30, 0.10, 0.26, -0.04, 0.18, 0.018)),
-        (6, walk_pose(0.034, 0.018, 0.000, 0.00, 0.05, 0.42, 0.00, -0.10, 0.000)),
-        (8.5, walk_pose(0.052, 0.000, 0.21, -0.30, 0.18, 0.24, 0.12, -0.08, -0.018)),
-        (11, walk_pose(0.022, 0.015, 0.30, -0.43, 0.18, 0.03, 0.12, -0.12, -0.022)),
-        (13.5, walk_pose(0.000, 0.000, 0.21, -0.30, 0.26, 0.10, 0.18, -0.04, -0.018)),
-        (16, walk_pose(0.034, -0.018, 0.000, 0.00, 0.42, 0.05, -0.10, 0.00, 0.000)),
-        (18.5, walk_pose(0.052, 0.000, -0.21, 0.30, 0.24, 0.18, -0.08, 0.12, 0.018)),
-        (21, walk_pose(0.022, -0.015, -0.30, 0.43, 0.03, 0.18, -0.12, 0.12, 0.022)),
-    ], gait_gain=gait_gain, profile=profile)
+    if profile == "proportion-v2":
+        make_action(rig, "Walk", walk_frames(), gait_gain=gait_gain, profile=profile)
+    else:
+        def legacy_walk_pose(root, side, arm, leg, shin_l, shin_r, foot_l, foot_r, twist):
+            return frame(
+                root=root, side_shift=side,
+                arm_l=(-arm, 0, 0), arm_r=(arm, 0, 0),
+                leg_l=(leg, 0, 0), leg_r=(-leg, 0, 0),
+                shin_l=(shin_l, 0, 0), shin_r=(shin_r, 0, 0),
+                foot_l=(foot_l, 0, 0), foot_r=(foot_r, 0, 0),
+                pelvis=(twist, 0, 0), spine=(0.018, 0, 0),
+                chest=(-twist * 0.65, 0, 0), head=(-0.008, 0, 0),
+                fore_l=(0.10, 0, 0), fore_r=(0.10, 0, 0))
+
+        make_action(rig, "Walk", [
+            (1, legacy_walk_pose(0.022, -0.015, -0.30, 0.43, 0.03, 0.18, -0.12, 0.12, 0.022)),
+            (3.5, legacy_walk_pose(0.000, 0.000, -0.21, 0.30, 0.10, 0.26, -0.04, 0.18, 0.018)),
+            (6, legacy_walk_pose(0.034, 0.018, 0.000, 0.00, 0.05, 0.42, 0.00, -0.10, 0.000)),
+            (8.5, legacy_walk_pose(0.052, 0.000, 0.21, -0.30, 0.18, 0.24, 0.12, -0.08, -0.018)),
+            (11, legacy_walk_pose(0.022, 0.015, 0.30, -0.43, 0.18, 0.03, 0.12, -0.12, -0.022)),
+            (13.5, legacy_walk_pose(0.000, 0.000, 0.21, -0.30, 0.26, 0.10, 0.18, -0.04, -0.018)),
+            (16, legacy_walk_pose(0.034, -0.018, 0.000, 0.00, 0.42, 0.05, -0.10, 0.00, 0.000)),
+            (18.5, legacy_walk_pose(0.052, 0.000, -0.21, 0.30, 0.24, 0.18, -0.08, 0.12, 0.018)),
+            (21, legacy_walk_pose(0.022, -0.015, -0.30, 0.43, 0.03, 0.18, -0.12, 0.12, 0.022)),
+        ], gait_gain=gait_gain, profile=profile)
     make_action(rig, "Run", [
         (1, frame(0.038, arm_l=(-0.26, 0, 0), arm_r=(0.26, 0, 0),
                   leg_l=(0.38, 0, 0), leg_r=(-0.38, 0, 0),

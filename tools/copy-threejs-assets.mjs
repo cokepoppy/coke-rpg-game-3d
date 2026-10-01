@@ -7,13 +7,15 @@ const copies = [
   ['assets/generated/threejs-wuxia/world/cangshan-inn-interior.glb', 'dist-threejs/assets/generated/threejs-wuxia/world/cangshan-inn-interior.glb'],
   ['assets/generated/threejs-wuxia/models/shen-linchuan-game-ready.glb', 'dist-threejs/assets/generated/threejs-wuxia/models/shen-linchuan-game-ready.glb'],
   ['assets/generated/threejs-wuxia/models/shen-linchuan-pants-game-ready.glb', 'dist-threejs/assets/generated/threejs-wuxia/models/shen-linchuan-pants-game-ready.glb'],
+  ['assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-game-ready.glb', 'dist-threejs/assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-game-ready.glb'],
   ['assets/generated/threejs-wuxia/models/su-luo-game-ready.glb', 'dist-threejs/assets/generated/threejs-wuxia/models/su-luo-game-ready.glb'],
   ['assets/generated/threejs-wuxia/models/yunlai-inn-game-ready.glb', 'dist-threejs/assets/generated/threejs-wuxia/models/yunlai-inn-game-ready.glb'],
   ['assets/generated/threejs-wuxia/models/autumn-maple-game-ready.glb', 'dist-threejs/assets/generated/threejs-wuxia/models/autumn-maple-game-ready.glb'],
   ['assets/generated/threejs-wuxia/models/cangshan-paifang-game-ready.glb', 'dist-threejs/assets/generated/threejs-wuxia/models/cangshan-paifang-game-ready.glb'],
   ['assets/generated/threejs-wuxia/models/hundred-herbs-pharmacy-game-ready.glb', 'dist-threejs/assets/generated/threejs-wuxia/models/hundred-herbs-pharmacy-game-ready.glb'],
   ['assets/generated/threejs-wuxia/source/cangshan-opening-3dgs.ply', 'dist-threejs/assets/generated/threejs-wuxia/source/cangshan-opening-3dgs.ply'],
-  ['assets/generated/hunyuan-references/shen-linchuan-pants-reference.png', 'dist-threejs/assets/generated/hunyuan-references/shen-linchuan-pants-reference.png']
+  ['assets/generated/hunyuan-references/shen-linchuan-pants-reference.png', 'dist-threejs/assets/generated/hunyuan-references/shen-linchuan-pants-reference.png'],
+  ['assets/generated/hunyuan-references/shen-linchuan-pants-reference-v2.png', 'dist-threejs/assets/generated/hunyuan-references/shen-linchuan-pants-reference-v2.png']
 ];
 
 let copied = 0;

@@ -18,7 +18,7 @@ const CONFIG = {
     paifang: './assets/generated/threejs-wuxia/models/cangshan-paifang-game-ready.glb',
     pharmacy: './assets/generated/threejs-wuxia/models/hundred-herbs-pharmacy-game-ready.glb',
     innInterior: './assets/generated/threejs-wuxia/world/cangshan-inn-interior.glb',
-    hero: './assets/generated/threejs-wuxia/models/shen-linchuan-pants-game-ready.glb',
+    hero: './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-game-ready.glb',
     heroine: './assets/generated/threejs-wuxia/models/su-luo-game-ready.glb'
   }
 };

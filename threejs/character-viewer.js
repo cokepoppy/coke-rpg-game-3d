@@ -24,7 +24,7 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const scene = new THREE.Scene();
 scene.background = new THREE.Color('#151f27');
 const camera = new THREE.PerspectiveCamera(32, window.innerWidth / window.innerHeight, 0.1, 80);
-camera.position.set(2.15, 2.0, 4.1);
+camera.position.set(2.55, 2.22, 4.85);
 scene.add(new THREE.HemisphereLight('#e0d2b0', '#26323c', 2.2));
 const key = new THREE.DirectionalLight('#f0d9a7', 3.1);
 key.position.set(-2, 4.5, 3.5);
@@ -140,7 +140,7 @@ timeline.addEventListener('input', () => {
 });
 
 const loader = new GLTFLoader();
-loader.load('./assets/generated/threejs-wuxia/models/shen-linchuan-pants-game-ready.glb', (gltf) => {
+loader.load('./assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-game-ready.glb', (gltf) => {
   model = gltf.scene;
   model.traverse((object) => {
     if (!object.isMesh) return;
@@ -170,11 +170,12 @@ loader.load('./assets/generated/threejs-wuxia/models/shen-linchuan-pants-game-re
   document.querySelector('#clip-count').textContent = `${gltf.animations.length} 段`;
   const walk = gltf.animations.find((clip) => clip.name === 'Walk') || gltf.animations[0];
   if (walk) selectClip(walk);
-  status.textContent = '裤装角色 GLB 已载入';
+  status.textContent = '混元比例修正版 GLB 已载入';
   detail.textContent = `${gltf.animations.length} 个动作 · 模型高 ${actualModelHeight.toFixed(2)} m · 可拖时间轴逐相位检查`;
   window.__characterViewer = {
     ready: true,
     clips: gltf.animations.map((clip) => ({ name: clip.name, duration: clip.duration })),
+    setGroundVisible: (enabled) => { floor.visible = Boolean(enabled); grid.visible = Boolean(enabled); },
     setClip: (name) => { const clip = gltf.animations.find((item) => item.name === name); if (clip) selectClip(clip); },
     setPhase: (phase) => { timeline.value = String(Math.round(THREE.MathUtils.clamp(phase, 0, 1) * Number(timeline.max))); timeline.dispatchEvent(new Event('input')); },
     sampleBones: () => {
@@ -189,11 +190,11 @@ loader.load('./assets/generated/threejs-wuxia/models/shen-linchuan-pants-game-re
     getState: () => ({ clip: currentClip?.name || null, phase: currentAction && currentClip ? currentAction.time / currentClip.duration : 0, paused })
   };
 }, undefined, (error) => {
-  console.error('Failed to load pants character model', error);
-  status.textContent = '裤装角色模型尚未生成';
-  detail.textContent = '先运行 npm run 3d:character:build';
+  console.error('Failed to load proportion-v2 character model', error);
+  status.textContent = '比例修正版角色模型尚未生成';
+  detail.textContent = '先运行 npm run 3d:character:build:v2';
   errorLabel.hidden = false;
-  errorLabel.textContent = '请先生成 Pants GLB';
+  errorLabel.textContent = '请先生成比例修正版 GLB';
 });
 
 function render() {

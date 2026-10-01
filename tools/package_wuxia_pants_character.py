@@ -212,24 +212,24 @@ def make_clothes(rig):
     for side, sign in (("L", 1), ("R", -1)):
         x = lambda a: sign * a
         clothes.append(make_tube(f"Trousers {side}", side, [
-            # Separate, tapered trouser legs follow the slim source sprite.
-            # The old 0.14-0.15 m radii made each leg wider than its thigh.
-            (0.15, x(0.12), 0.066, 0.074),
-            (0.24, x(0.12), 0.072, 0.080),
-            (0.34, x(0.12), 0.078, 0.086),
-            (0.43, x(0.12), 0.084, 0.091),
-            (0.53, x(0.12), 0.091, 0.098),
-            (0.64, x(0.12), 0.096, 0.102),
-            (0.75, x(0.115), 0.098, 0.105),
-            (0.84, x(0.11), 0.095, 0.103),
+            # Keep the trouser diameter below 36% of the 0.40 m thigh bone;
+            # the previous 0.196 m maximum looked like two padded columns.
+            (0.15, x(0.12), 0.052, 0.060),
+            (0.24, x(0.12), 0.056, 0.064),
+            (0.34, x(0.12), 0.060, 0.068),
+            (0.43, x(0.12), 0.063, 0.072),
+            (0.53, x(0.12), 0.066, 0.076),
+            (0.64, x(0.12), 0.069, 0.079),
+            (0.75, x(0.115), 0.071, 0.082),
+            (0.84, x(0.11), 0.069, 0.080),
         ], FABRIC))
         boots = make_tube(f"Boot shaft {side}", side, [
-            (0.07, x(0.12), 0.078, 0.078), (0.11, x(0.12), 0.084, 0.082),
-            (0.20, x(0.12), 0.082, 0.078), (0.28, x(0.12), 0.078, 0.075),
+            (0.07, x(0.12), 0.054, 0.057), (0.11, x(0.12), 0.060, 0.061),
+            (0.20, x(0.12), 0.058, 0.058), (0.28, x(0.12), 0.057, 0.056),
         ], LEATHER)
         boots.name = f"Boot shaft {side}"
         clothes.append(boots)
-        foot = make_ellipsoid(f"Boot foot {side}", (x(0.12), -0.065, 0.052), (0.067, 0.138, 0.052), LEATHER)
+        foot = make_ellipsoid(f"Boot foot {side}", (x(0.12), -0.055, 0.045), (0.056, 0.118, 0.045), LEATHER)
         foot_group = foot.vertex_groups.new(name=f"foot.{side}")
         foot_group.add(list(range(len(foot.data.vertices))), 1.0, "REPLACE")
         add_armature(foot, rig)
@@ -237,7 +237,7 @@ def make_clothes(rig):
 
         # A restrained cuff line makes the boot/trouser separation readable in motion.
         cuff = make_tube(f"Boot cuff {side}", side, [
-            (0.245, x(0.12), 0.083, 0.078), (0.275, x(0.12), 0.083, 0.078),
+            (0.245, x(0.12), 0.061, 0.059), (0.275, x(0.12), 0.061, 0.059),
         ], EDGE)
         clothes.append(cuff)
 

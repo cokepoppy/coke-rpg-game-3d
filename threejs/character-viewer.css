@@ -34,7 +34,8 @@ button { color: inherit; }
 .clip-button:hover, .clip-button.active { border-color: rgba(211,173,105,.66); background: rgba(211,173,105,.13); color: #f0ddad; }
 #timeline, #speed { width: 100%; height: 17px; accent-color: #d4b36f; cursor: pointer; }
 .timeline-head { margin: 0 0 3px; }
-.timeline-marks { display: flex; justify-content: space-between; margin-top: -2px; color: #727d80; font-size: 8px; }
+.timeline-marks { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); margin-top: -2px; color: #727d80; font-size: 7px; }
+.timeline-marks span { text-align: center; white-space: nowrap; }
 .playback-row { display: flex; align-items: center; justify-content: space-between; margin-top: 18px; }
 .primary-button { min-width: 95px; padding: 8px 10px; border: 1px solid rgba(211,173,105,.53); background: rgba(211,173,105,.13); color: #e9d39d; cursor: pointer; font-size: 10px; }
 .playback-row label { display: flex; gap: 9px; align-items: center; color: #9ba5a4; font-size: 9px; }
@@ -43,6 +44,8 @@ button { color: inherit; }
 .view-presets { display: grid; grid-template-columns: repeat(4,1fr); gap: 5px; }
 .view-presets button { padding: 7px 0; border: 1px solid rgba(218,199,158,.14); background: rgba(223,217,200,.035); color: #aeb7b3; cursor: pointer; font-size: 8px; }
 .view-presets button:hover, .view-presets button.selected { border-color: rgba(211,173,105,.58); color: #e8d39d; }
+.rig-toggle { width: 100%; margin-top: 7px; padding: 8px 10px; border: 1px solid rgba(98,210,202,.28); background: rgba(98,210,202,.06); color: #a9cfca; cursor: pointer; font-size: 9px; text-align: left; }
+.rig-toggle:hover, .rig-toggle[aria-pressed="true"] { border-color: rgba(98,210,202,.7); background: rgba(98,210,202,.15); color: #d0fff8; }
 .model-status-card { display: flex; gap: 9px; align-items: flex-start; margin-top: 20px; padding: 11px; border: 1px solid rgba(213,197,157,.12); background: rgba(5,11,15,.3); }
 .model-status-card .status-dot { flex: none; margin-top: 4px; }
 .model-status-card strong, .model-status-card small { display: block; }
@@ -66,6 +69,6 @@ button { color: inherit; }
   .control-panel { top: auto; bottom: 0; left: 0; right: 0; width: auto; max-height: 48vh; padding: 13px 15px; }
   .panel-copy { margin-bottom: 12px; }
   .clip-grid { margin: 7px 0 12px; }
-  .view-title, .view-presets, .model-status-card, .demo-link { display: none; }
+  .view-title, .view-presets, .rig-toggle, .model-status-card, .demo-link { display: none; }
   .viewer-hint { right: 14px; top: 68px; bottom: auto; }
 }

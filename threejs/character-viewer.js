@@ -63,8 +63,9 @@ let clipActions = new Map();
 let currentAction = null;
 let currentClip = null;
 let paused = false;
-let playbackRate = 1;
+let playbackRate = Number(speedInput.value);
 let actualModelHeight = 2.18;
+let skeletonHelper = null;
 
 function updateFrameLabel() {
   if (!currentClip || !currentAction) return;
@@ -118,6 +119,13 @@ function setView(view) {
 }
 
 document.querySelectorAll('[data-view]').forEach((button) => button.addEventListener('click', () => setView(button.dataset.view)));
+const rigToggle = document.querySelector('#rig-toggle');
+rigToggle.addEventListener('click', () => {
+  const visible = !skeletonHelper?.visible;
+  if (skeletonHelper) skeletonHelper.visible = visible;
+  rigToggle.setAttribute('aria-pressed', String(visible));
+  rigToggle.textContent = visible ? '隐藏骨骼结构' : '显示骨骼结构';
+});
 playToggle.addEventListener('click', () => {
   paused = !paused;
   if (currentAction) currentAction.paused = paused;
@@ -140,7 +148,47 @@ timeline.addEventListener('input', () => {
 });
 
 const loader = new GLTFLoader();
-loader.load('./assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-game-ready.glb', (gltf) => {
+const requestedModel = new URLSearchParams(window.location.search).get('model');
+const characterAsset = requestedModel === 'pants'
+  ? './assets/generated/threejs-wuxia/models/shen-linchuan-pants-game-ready.glb'
+  : requestedModel === 'island-rig-zelda'
+    ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-prototype-game-ready.glb'
+  : requestedModel === 'island-rig-zelda-review-v2'
+    ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v2-game-ready.glb'
+  : requestedModel === 'island-rig-zelda-review-v3'
+    ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v3-game-ready.glb'
+  : requestedModel === 'island-rig-zelda-review-v4'
+    ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v4-game-ready.glb'
+  : requestedModel === 'island-rig-zelda-review-v5'
+    ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v5-game-ready.glb'
+  : requestedModel === 'island-rig-zelda-review-v6'
+    ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v6-game-ready.glb'
+  : requestedModel === 'island-rig-zelda-review-v7'
+    ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v7-game-ready.glb'
+  : requestedModel === 'island-rig-zelda-review-v8'
+    ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v8-game-ready.glb'
+  : requestedModel === 'island-rig-zelda-review-v9'
+    ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v9-game-ready.glb'
+  : requestedModel === 'island-rig-zelda-review-v10'
+    ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v10-game-ready.glb'
+  : requestedModel === 'island-rig-zelda-review-v11'
+    ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v11-game-ready.glb'
+  : requestedModel === 'island-rig-zelda-review-v12'
+    ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v12-game-ready.glb'
+  : requestedModel === 'island-rig-zelda-review-v13'
+    ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v13-game-ready.glb'
+  : requestedModel === 'island-rig-zelda-review-v14'
+    ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v14-game-ready.glb'
+  : requestedModel === 'island-rig-zelda-review-v15'
+    ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v15-game-ready.glb'
+  : requestedModel === 'island-rig-zelda-review-v16'
+    ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v16-game-ready.glb'
+  : requestedModel === 'island-rig-zelda-review-v17'
+    ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v17-game-ready.glb'
+  : requestedModel === 'island-rig'
+    ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-prototype-game-ready.glb'
+  : './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-game-ready.glb';
+loader.load(characterAsset, (gltf) => {
   model = gltf.scene;
   model.traverse((object) => {
     if (!object.isMesh) return;
@@ -156,6 +204,16 @@ loader.load('./assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2
   bounds = new THREE.Box3().setFromObject(model);
   model.position.y -= bounds.min.y;
   scene.add(model);
+  skeletonHelper = new THREE.SkeletonHelper(model);
+  skeletonHelper.material = new THREE.LineBasicMaterial({
+    color: '#65e7d0',
+    depthTest: false,
+    transparent: true,
+    opacity: 0.92
+  });
+  skeletonHelper.visible = false;
+  skeletonHelper.renderOrder = 10;
+  scene.add(skeletonHelper);
   mixer = new THREE.AnimationMixer(model);
   for (const clip of gltf.animations) {
     clipActions.set(clip.name, mixer.clipAction(clip));
@@ -170,12 +228,42 @@ loader.load('./assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2
   document.querySelector('#clip-count').textContent = `${gltf.animations.length} 段`;
   const walk = gltf.animations.find((clip) => clip.name === 'Walk') || gltf.animations[0];
   if (walk) selectClip(walk);
-  status.textContent = '混元比例修正版 GLB 已载入';
+  status.textContent = requestedModel === 'pants' ? '独立裤腿 GLB 已载入'
+    : requestedModel === 'island-rig-zelda-review-v17' ? '落地重心压缩与膝轴修正版 v17 已载入'
+    : requestedModel === 'island-rig-zelda-review-v16' ? '按真实关节枢轴求解步态 v16 已载入'
+    : requestedModel === 'island-rig-zelda-review-v15' ? '前弯膝轴与自然步幅 v15 已载入'
+    : requestedModel === 'island-rig-zelda-review-v14' ? '膝盖前弯 IK 修正版 v14 已载入'
+    : requestedModel === 'island-rig-zelda-review-v13' ? '髋下起腿与收敛重心步态 v13 已载入'
+    : requestedModel === 'island-rig-zelda-review-v12' ? '胯下髋轴与闭合肩袖修正版 v12 已载入'
+    : requestedModel === 'island-rig-zelda-review-v11' ? '髋关节与肩袖分区修正版 v11 已载入'
+    : requestedModel === 'island-rig-zelda-review-v10' ? '骨架深度校准修正版 v10 已载入'
+    : requestedModel === 'island-rig-zelda-review-v9' ? '肩袖连续性与胳膊摆幅修正版 v9 已载入'
+    : requestedModel === 'island-rig-zelda-review-v8' ? '髋肩连续蒙皮修正版 v8 已载入'
+    : requestedModel === 'island-rig-zelda-review-v7' ? '髋肩解剖边界修正版 v7 已载入'
+    : requestedModel === 'island-rig-zelda-review-v6' ? '髋肩绑定修正版 v6 已载入'
+    : requestedModel === 'island-rig-zelda-review-v5' ? '步态修正版 v5 已载入'
+    : requestedModel === 'island-rig-zelda-review-v4' ? '步态修正版 v4 已载入'
+    : requestedModel === 'island-rig-zelda-review-v3' ? '步态修正版 v3 已载入'
+    : requestedModel === 'island-rig-zelda-review-v2' ? '步态修正版 v2 已载入'
+    : requestedModel === 'island-rig-zelda' ? 'Zelda 骨骼节奏绑定原型已载入'
+    : requestedModel === 'island-rig' ? '网格连通岛骨骼绑定原型已载入'
+      : '混元比例修正版 GLB 已载入';
   detail.textContent = `${gltf.animations.length} 个动作 · 模型高 ${actualModelHeight.toFixed(2)} m · 可拖时间轴逐相位检查`;
   window.__characterViewer = {
     ready: true,
     clips: gltf.animations.map((clip) => ({ name: clip.name, duration: clip.duration })),
     setGroundVisible: (enabled) => { floor.visible = Boolean(enabled); grid.visible = Boolean(enabled); },
+    setRigVisible: (enabled) => {
+      if (skeletonHelper) skeletonHelper.visible = Boolean(enabled);
+      rigToggle.setAttribute('aria-pressed', String(Boolean(enabled)));
+      rigToggle.textContent = enabled ? '隐藏骨骼结构' : '显示骨骼结构';
+    },
+    setCameraDistance: (distance) => {
+      const target = controls.target.clone();
+      const direction = camera.position.clone().sub(target).normalize();
+      camera.position.copy(target).add(direction.multiplyScalar(THREE.MathUtils.clamp(distance, controls.minDistance, controls.maxDistance)));
+      controls.update();
+    },
     setClip: (name) => { const clip = gltf.animations.find((item) => item.name === name); if (clip) selectClip(clip); },
     setView,
     setPhase: (phase) => { timeline.value = String(Math.round(THREE.MathUtils.clamp(phase, 0, 1) * Number(timeline.max))); timeline.dispatchEvent(new Event('input')); },
@@ -207,6 +295,7 @@ function render() {
   requestAnimationFrame(render);
   const delta = Math.min(clock.getDelta(), 0.05);
   if (mixer) mixer.update(delta);
+  if (skeletonHelper?.visible) skeletonHelper.updateMatrixWorld(true);
   controls.update();
   updateFrameLabel();
   renderer.render(scene, camera);

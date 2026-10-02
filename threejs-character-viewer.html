@@ -20,20 +20,20 @@
       <aside class="control-panel">
         <div class="panel-kicker">ANIMATION INSPECTOR</div>
         <h1>动作检查</h1>
-        <p class="panel-copy">选一个动作，拖动时间轴逐帧看步幅、抬脚和摆臂。拖动画面可绕角色旋转，滚轮缩放。</p>
+        <p class="panel-copy">按接地、下沉、经过、抬升四个关键姿势逐帧检查步态。开启骨架线可核对动作有没有真正带动裤腿和脚掌。</p>
 
         <div class="clip-title"><span>动作片段</span><small id="clip-count">载入中</small></div>
         <div class="clip-grid" id="clip-list"></div>
 
         <div class="timeline-head"><span>相位</span><b id="frame-label">帧 1 / 1</b></div>
         <input id="timeline" type="range" min="0" max="1000" value="0" aria-label="动作相位" />
-        <div class="timeline-marks"><span>起步</span><span>支撑</span><span>换脚</span><span>循环</span></div>
+        <div class="timeline-marks"><span>接地</span><span>下沉</span><span>经过</span><span>抬升</span><span>接地</span><span>下沉</span><span>经过</span><span>抬升</span></div>
 
         <div class="playback-row">
           <button id="play-toggle" class="primary-button" type="button">❚❚ 暂停</button>
-          <label for="speed"><span>播放速度</span><b id="speed-label">1.0×</b></label>
+          <label for="speed"><span>播放速度</span><b id="speed-label">1.1×</b></label>
         </div>
-        <input id="speed" type="range" min="0.45" max="1.5" step="0.05" value="1" aria-label="播放速度" />
+        <input id="speed" type="range" min="0.45" max="1.5" step="0.05" value="1.1" aria-label="播放速度" />
 
         <div class="view-title">观察方向</div>
         <div class="view-presets" role="group" aria-label="观察方向">
@@ -42,6 +42,7 @@
           <button type="button" data-view="side">侧面</button>
           <button type="button" data-view="back">背面</button>
         </div>
+        <button id="rig-toggle" class="rig-toggle" type="button" aria-pressed="false">显示骨骼结构</button>
 
         <div class="model-status-card">
           <span class="status-dot"></span><div><strong id="model-status">正在载入角色 GLB</strong><small id="model-detail">动作数据读取中</small></div>

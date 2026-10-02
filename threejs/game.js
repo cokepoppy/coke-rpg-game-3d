@@ -8,7 +8,8 @@ const CONFIG = {
   mapDepth: 56.32,
   globalMapWidth: 4480,
   globalMapHeight: 3584,
-  walkSpeed: 1.9,
+  walkSpeed: 1.35,
+  walkCycleReferenceSpeed: 1.2,
   runSpeed: 3.8,
   assets: {
     overview: './wechat-minigame/world-map-pack/world-map.png',
@@ -22,7 +23,44 @@ const CONFIG = {
     heroine: './assets/generated/threejs-wuxia/models/su-luo-game-ready.glb'
   }
 };
-const DEMO_MODE = new URLSearchParams(location.search).get('demo') === '1';
+const query = new URLSearchParams(location.search);
+const HERO_RIG_VARIANT = query.get('hero');
+if (HERO_RIG_VARIANT === 'island-rig-zelda') {
+  CONFIG.assets.hero = './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-prototype-game-ready.glb';
+} else if (HERO_RIG_VARIANT === 'island-rig-zelda-review-v2') {
+  CONFIG.assets.hero = './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v2-game-ready.glb';
+} else if (HERO_RIG_VARIANT === 'island-rig-zelda-review-v3') {
+  CONFIG.assets.hero = './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v3-game-ready.glb';
+} else if (HERO_RIG_VARIANT === 'island-rig-zelda-review-v4') {
+  CONFIG.assets.hero = './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v4-game-ready.glb';
+} else if (HERO_RIG_VARIANT === 'island-rig-zelda-review-v5') {
+  CONFIG.assets.hero = './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v5-game-ready.glb';
+} else if (HERO_RIG_VARIANT === 'island-rig-zelda-review-v6') {
+  CONFIG.assets.hero = './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v6-game-ready.glb';
+} else if (HERO_RIG_VARIANT === 'island-rig-zelda-review-v7') {
+  CONFIG.assets.hero = './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v7-game-ready.glb';
+} else if (HERO_RIG_VARIANT === 'island-rig-zelda-review-v8') {
+  CONFIG.assets.hero = './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v8-game-ready.glb';
+} else if (HERO_RIG_VARIANT === 'island-rig-zelda-review-v9') {
+  CONFIG.assets.hero = './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v9-game-ready.glb';
+} else if (HERO_RIG_VARIANT === 'island-rig-zelda-review-v10') {
+  CONFIG.assets.hero = './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v10-game-ready.glb';
+} else if (HERO_RIG_VARIANT === 'island-rig-zelda-review-v11') {
+  CONFIG.assets.hero = './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v11-game-ready.glb';
+} else if (HERO_RIG_VARIANT === 'island-rig-zelda-review-v12') {
+  CONFIG.assets.hero = './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v12-game-ready.glb';
+} else if (HERO_RIG_VARIANT === 'island-rig-zelda-review-v13') {
+  CONFIG.assets.hero = './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v13-game-ready.glb';
+} else if (HERO_RIG_VARIANT === 'island-rig-zelda-review-v14') {
+  CONFIG.assets.hero = './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v14-game-ready.glb';
+} else if (HERO_RIG_VARIANT === 'island-rig-zelda-review-v15') {
+  CONFIG.assets.hero = './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v15-game-ready.glb';
+} else if (HERO_RIG_VARIANT === 'island-rig-zelda-review-v16') {
+  CONFIG.assets.hero = './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v16-game-ready.glb';
+} else if (HERO_RIG_VARIANT === 'island-rig-zelda-review-v17') {
+  CONFIG.assets.hero = './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v17-game-ready.glb';
+}
+const DEMO_MODE = query.get('demo') === '1';
 const MAP_METERS_PER_PIXEL = CONFIG.mapWidth / CONFIG.globalMapWidth;
 
 const canvas = document.querySelector('#world-canvas');
@@ -368,6 +406,9 @@ function setAction(actor, desired) {
   const candidates = aliases[desired] || [desired];
   const next = candidates.map((candidate) => actor.actions.get(candidate)).find(Boolean);
   if (!next || next === actor.currentAction) return;
+  next.setEffectiveTimeScale(desired === 'walk'
+    ? CONFIG.walkSpeed / CONFIG.walkCycleReferenceSpeed
+    : 1);
   next.reset().fadeIn(0.18).play();
   actor.currentAction?.fadeOut(0.15);
   actor.currentAction = next;
@@ -682,7 +723,8 @@ function showToast(message) {
 function updateModelStatus() {
   const heroReady = player?.assetLoaded;
   const companionReady = heroine?.assetLoaded;
-  if (heroReady && companionReady) modelStatus.textContent = '3D场景与角色模型 · 沈临川 / 苏萝';
+  const heroName = ['island-rig-zelda', 'island-rig-zelda-review-v2'].includes(HERO_RIG_VARIANT) ? '沈临川步态修正版' : '沈临川';
+  if (heroReady && companionReady) modelStatus.textContent = `3D场景与角色模型 · ${heroName} / 苏萝`;
   else if (heroReady) modelStatus.textContent = '3D场景与角色模型 · 沈临川已载入';
   else modelStatus.textContent = '3D场景已载入 · 角色模型载入中';
 }
@@ -765,7 +807,7 @@ function updatePlayer(delta, time) {
   }
 }
 
-function movePlayerScripted(position, duration = 1.8) {
+function movePlayerScripted(position, duration) {
   if (!player) return Promise.resolve();
   const from = player.root.position.clone();
   const to = new THREE.Vector3(position.x, 0, position.z);

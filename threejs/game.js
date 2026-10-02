@@ -24,11 +24,15 @@ const CONFIG = {
   }
 };
 const query = new URLSearchParams(location.search);
-const HERO_RIG_VARIANT = query.get('hero');
+const DEMO_MODE = query.get('demo') === '1';
 const generatedCharacterFilename = /^[a-z0-9][a-z0-9._-]*\.glb$/i;
 const requestedHeroAsset = query.get('heroAsset');
 const requestedHeroineAsset = query.get('heroineAsset');
-if (requestedHeroAsset && generatedCharacterFilename.test(requestedHeroAsset)) {
+const hasValidRequestedHeroAsset = Boolean(requestedHeroAsset && generatedCharacterFilename.test(requestedHeroAsset));
+const HERO_RIG_VARIANT = query.get('hero') || (DEMO_MODE && !hasValidRequestedHeroAsset
+  ? 'island-rig-zelda-review-v19'
+  : null);
+if (hasValidRequestedHeroAsset) {
   CONFIG.assets.hero = `./assets/generated/threejs-wuxia/models/${encodeURIComponent(requestedHeroAsset)}`;
 }
 if (requestedHeroineAsset && generatedCharacterFilename.test(requestedHeroineAsset)) {
@@ -73,7 +77,6 @@ if (HERO_RIG_VARIANT === 'island-rig-zelda') {
 } else if (HERO_RIG_VARIANT === 'island-rig-zelda-review-v19') {
   CONFIG.assets.hero = './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v19-game-ready.glb';
 }
-const DEMO_MODE = query.get('demo') === '1';
 const MAP_METERS_PER_PIXEL = CONFIG.mapWidth / CONFIG.globalMapWidth;
 
 const canvas = document.querySelector('#world-canvas');
@@ -383,6 +386,7 @@ function fitModel(gltf, targetHeight = 2.18) {
 }
 
 function loadCharacterAsset(actor, url, label) {
+  actor.assetUrl = url;
   gltfLoader.load(url, (gltf) => {
     const model = fitModel(gltf);
     actor.fallbackRoot.visible = false;
@@ -1009,13 +1013,15 @@ function installDemoApi() {
       }
     },
     state() {
-      return {
-        running: this.running,
-        location: isInRoom ? 'room' : 'world',
-        step: demoStep,
-        player: { x: player?.root.position.x ?? 0, z: player?.root.position.z ?? 0 },
-        heroLoaded: Boolean(player?.assetLoaded),
-        heroineLoaded: Boolean(heroine?.assetLoaded),
+    return {
+      running: this.running,
+      location: isInRoom ? 'room' : 'world',
+      step: demoStep,
+      player: { x: player?.root.position.x ?? 0, z: player?.root.position.z ?? 0 },
+      heroLoaded: Boolean(player?.assetLoaded),
+      heroAsset: player?.assetUrl || CONFIG.assets.hero,
+      heroClips: player?.clips?.map((clip) => clip.name) || [],
+      heroineLoaded: Boolean(heroine?.assetLoaded),
         dialogueOpen: Boolean(dialogue)
       };
     }

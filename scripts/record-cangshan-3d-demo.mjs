@@ -9,7 +9,12 @@ const { chromium } = require('playwright-core');
 const root = process.cwd();
 const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:5180/threejs-rpg.html?demo=1';
 const outputDir = path.join(root, 'assets/generated/videos');
-const outputPath = path.join(outputDir, 'cangshan-3d-story-demo.webm');
+const outputSuffix = process.env.DEMO_OUTPUT_SUFFIX || '';
+if (outputSuffix && !/^[a-z0-9][a-z0-9-]*$/i.test(outputSuffix)) {
+  throw new Error('DEMO_OUTPUT_SUFFIX must be a simple filename suffix (letters, digits, hyphens)');
+}
+const outputStem = `cangshan-3d-story-demo${outputSuffix ? `-${outputSuffix}` : ''}`;
+const outputPath = path.join(outputDir, `${outputStem}.webm`);
 const viewport = { width: 1600, height: 900 };
 const headless = process.env.DEMO_HEADLESS === '1';
 const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'cangshan-3d-demo-'));
@@ -50,8 +55,19 @@ try {
     const state = window.__cangshanDemo?.state?.();
     return state?.heroLoaded && state?.heroineLoaded;
   }, null, { timeout: 60000 });
+  const loadedModels = await page.evaluate(() => window.__cangshanDemo.state());
+  const demoUrl = new URL(baseUrl);
+  const usesImplicitDemoHero = demoUrl.searchParams.get('demo') === '1'
+    && !demoUrl.searchParams.has('hero')
+    && !demoUrl.searchParams.has('heroAsset');
+  if (!loadedModels.heroClips.includes('Walk')) {
+    throw new Error(`Demo hero GLB has no Walk clip: ${JSON.stringify(loadedModels)}`);
+  }
+  if (usesImplicitDemoHero && !loadedModels.heroAsset.endsWith('shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v19-game-ready.glb')) {
+    throw new Error(`Automatic story demo did not load the approved v19 hero: ${JSON.stringify(loadedModels)}`);
+  }
   await page.waitForTimeout(900);
-  await page.screenshot({ path: path.join(outputDir, 'cangshan-3d-story-demo-cover.png') });
+  await page.screenshot({ path: path.join(outputDir, `${outputStem}-cover.png`) });
   const startedAt = Date.now();
   let result;
   while (!result) {
@@ -68,9 +84,9 @@ try {
   if (pageErrors.length) throw new Error(`Browser errors: ${pageErrors.join(' | ')}`);
   if (badResponses.length) throw new Error(`Failed responses: ${badResponses.join(' | ')}`);
   await page.waitForTimeout(2200);
-  await page.screenshot({ path: path.join(outputDir, 'cangshan-3d-story-demo-end.png') });
+  await page.screenshot({ path: path.join(outputDir, `${outputStem}-end.png`) });
   demoCompleted = true;
-  console.log(JSON.stringify({ baseUrl, outputPath, viewport, headless, result, pageErrors, badResponses }, null, 2));
+  console.log(JSON.stringify({ baseUrl, outputPath, viewport, headless, result, loadedModels, pageErrors, badResponses }, null, 2));
 } finally {
   await page.close().catch(() => {});
   await context.close().catch(() => {});

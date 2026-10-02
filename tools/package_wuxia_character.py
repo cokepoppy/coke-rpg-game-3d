@@ -21,6 +21,8 @@ CHARACTER_WEIGHT_MODE = os.environ.get("CANGSHAN_WEIGHT_MODE", "heuristic")
 CHARACTER_GAIT_MODE = os.environ.get("CANGSHAN_GAIT_MODE", "ik")
 CHARACTER_OUTPUT_SUFFIX = os.environ.get("CANGSHAN_OUTPUT_SUFFIX", "")
 CHARACTER_ARM_SWING = float(os.environ.get("CANGSHAN_ARM_SWING", "0.28"))
+CHARACTER_FOREARM_BEND = float(os.environ.get("CANGSHAN_FOREARM_BEND", "0.04"))
+CHARACTER_FOREARM_FOLLOW = float(os.environ.get("CANGSHAN_FOREARM_FOLLOW", "0.0"))
 CHARACTER_STRIDE_HALF = float(os.environ.get("CANGSHAN_STRIDE_HALF", "0.21"))
 CHARACTER_SWING_LIFT = float(os.environ.get("CANGSHAN_SWING_LIFT", "0.06"))
 CHARACTER_ROOT_BOB_SCALE = float(os.environ.get("CANGSHAN_ROOT_BOB_SCALE", "1.0"))
@@ -693,13 +695,15 @@ def create_actions(rig, gait_gain=1.0, profile="legacy"):
             root = root_height(step_phase)
             side = -0.008 if support == "R" else 0.008
             arm = -CHARACTER_ARM_SWING * cos(2.0 * pi * loop_phase)
+            forearm_follow = CHARACTER_FOREARM_FOLLOW * sin(2.0 * pi * loop_phase)
             twist = 0.010 * cos(2.0 * pi * loop_phase)
             pose = frame(root=root, side_shift=side,
                          arm_l=(-arm, 0, 0), arm_r=(arm, 0, 0),
                          foot_l=(foot_l, 0, 0), foot_r=(foot_r, 0, 0),
                          pelvis=(twist, 0, 0), spine=(0.004, 0, 0),
                          chest=(-twist * 0.45, 0, 0), head=(-0.003 * sin(2*pi*loop_phase), 0, 0),
-                         fore_l=(0.04, 0, 0), fore_r=(0.04, 0, 0))
+                         fore_l=(CHARACTER_FOREARM_BEND + forearm_follow, 0, 0),
+                         fore_r=(CHARACTER_FOREARM_BEND - forearm_follow, 0, 0))
             for side_name, (forward, lift) in (("L", step_l), ("R", step_r)):
                 thigh_angle, shin_angle = solve_walk_leg(
                     profile, side_name, forward, lift, root)

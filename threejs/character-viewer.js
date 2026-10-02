@@ -185,6 +185,10 @@ const characterAsset = requestedModel === 'pants'
     ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v16-game-ready.glb'
   : requestedModel === 'island-rig-zelda-review-v17'
     ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v17-game-ready.glb'
+  : requestedModel === 'island-rig-zelda-review-v18'
+    ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v18-game-ready.glb'
+  : requestedModel === 'island-rig-zelda-review-v19'
+    ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v19-game-ready.glb'
   : requestedModel === 'island-rig'
     ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-prototype-game-ready.glb'
   : './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-game-ready.glb';
@@ -229,6 +233,8 @@ loader.load(characterAsset, (gltf) => {
   const walk = gltf.animations.find((clip) => clip.name === 'Walk') || gltf.animations[0];
   if (walk) selectClip(walk);
   status.textContent = requestedModel === 'pants' ? '独立裤腿 GLB 已载入'
+    : requestedModel === 'island-rig-zelda-review-v18' ? '前臂轻微跟随修正版 v18 已载入'
+    : requestedModel === 'island-rig-zelda-review-v19' ? '肘部自然弯曲与前臂跟随 v19 已载入'
     : requestedModel === 'island-rig-zelda-review-v17' ? '落地重心压缩与膝轴修正版 v17 已载入'
     : requestedModel === 'island-rig-zelda-review-v16' ? '按真实关节枢轴求解步态 v16 已载入'
     : requestedModel === 'island-rig-zelda-review-v15' ? '前弯膝轴与自然步幅 v15 已载入'

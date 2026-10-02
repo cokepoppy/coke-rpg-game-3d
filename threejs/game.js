@@ -59,6 +59,10 @@ if (HERO_RIG_VARIANT === 'island-rig-zelda') {
   CONFIG.assets.hero = './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v16-game-ready.glb';
 } else if (HERO_RIG_VARIANT === 'island-rig-zelda-review-v17') {
   CONFIG.assets.hero = './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v17-game-ready.glb';
+} else if (HERO_RIG_VARIANT === 'island-rig-zelda-review-v18') {
+  CONFIG.assets.hero = './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v18-game-ready.glb';
+} else if (HERO_RIG_VARIANT === 'island-rig-zelda-review-v19') {
+  CONFIG.assets.hero = './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-review-v19-game-ready.glb';
 }
 const DEMO_MODE = query.get('demo') === '1';
 const MAP_METERS_PER_PIXEL = CONFIG.mapWidth / CONFIG.globalMapWidth;

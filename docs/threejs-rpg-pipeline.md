@@ -11,6 +11,8 @@
 
 ## 角色单图到 3D
 
+新建角色（包括下一位女性角色）的可复用步骤、骨架/动作审查门槛和单角色打包命令，见 [`cangshan-character-creation-workflow.md`](./cangshan-character-creation-workflow.md)。
+
 1. 先以旧角色行走表为外观基准，生成干净浅色背景、完整全身、正面略偏 3/4、手臂离开身体的单人参考图：
    - `assets/characters/hero/hero-walk-anchored-v4-motionfix.png` → `assets/generated/hunyuan-references/shen-linchuan-imagegen-reference.png`
    - `wechat-minigame/character-pack/companion.png` → `assets/generated/hunyuan-references/su-luo-imagegen-reference.png`

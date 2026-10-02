@@ -25,6 +25,15 @@ const CONFIG = {
 };
 const query = new URLSearchParams(location.search);
 const HERO_RIG_VARIANT = query.get('hero');
+const generatedCharacterFilename = /^[a-z0-9][a-z0-9._-]*\.glb$/i;
+const requestedHeroAsset = query.get('heroAsset');
+const requestedHeroineAsset = query.get('heroineAsset');
+if (requestedHeroAsset && generatedCharacterFilename.test(requestedHeroAsset)) {
+  CONFIG.assets.hero = `./assets/generated/threejs-wuxia/models/${encodeURIComponent(requestedHeroAsset)}`;
+}
+if (requestedHeroineAsset && generatedCharacterFilename.test(requestedHeroineAsset)) {
+  CONFIG.assets.heroine = `./assets/generated/threejs-wuxia/models/${encodeURIComponent(requestedHeroineAsset)}`;
+}
 if (HERO_RIG_VARIANT === 'island-rig-zelda') {
   CONFIG.assets.hero = './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-prototype-game-ready.glb';
 } else if (HERO_RIG_VARIANT === 'island-rig-zelda-review-v2') {
@@ -727,9 +736,11 @@ function showToast(message) {
 function updateModelStatus() {
   const heroReady = player?.assetLoaded;
   const companionReady = heroine?.assetLoaded;
-  const heroName = ['island-rig-zelda', 'island-rig-zelda-review-v2'].includes(HERO_RIG_VARIANT) ? '沈临川步态修正版' : '沈临川';
-  if (heroReady && companionReady) modelStatus.textContent = `3D场景与角色模型 · ${heroName} / 苏萝`;
-  else if (heroReady) modelStatus.textContent = '3D场景与角色模型 · 沈临川已载入';
+  const heroName = query.get('heroName')?.trim().slice(0, 24)
+    || (['island-rig-zelda', 'island-rig-zelda-review-v2'].includes(HERO_RIG_VARIANT) ? '沈临川步态修正版' : '沈临川');
+  const heroineName = query.get('heroineName')?.trim().slice(0, 24) || '苏萝';
+  if (heroReady && companionReady) modelStatus.textContent = `3D场景与角色模型 · ${heroName} / ${heroineName}`;
+  else if (heroReady) modelStatus.textContent = `3D场景与角色模型 · ${heroName}已载入`;
   else modelStatus.textContent = '3D场景已载入 · 角色模型载入中';
 }
 

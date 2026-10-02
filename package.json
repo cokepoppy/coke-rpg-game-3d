@@ -6,6 +6,7 @@
     "3d:dev": "vite --host 127.0.0.1 --port 5180",
     "3d:build": "vite build --config vite.three.config.mjs && node tools/copy-threejs-assets.mjs",
     "3d:character:build": "blender -b --python tools/package_wuxia_pants_character.py",
+    "3d:character:build:single": "blender -b --python tools/package_wuxia_character.py",
     "3d:character:build:v2": "CANGSHAN_CHARACTER_PROFILE=proportion-v2 blender -b --python tools/package_wuxia_character.py",
     "3d:character:build:island-rig": "CANGSHAN_CHARACTER_PROFILE=proportion-v2 CANGSHAN_WEIGHT_MODE=component-rigid CANGSHAN_OUTPUT_SUFFIX=-island-rig-prototype blender -b --python tools/package_wuxia_character.py",
     "3d:character:build:island-rig:zelda-walk": "CANGSHAN_CHARACTER_PROFILE=proportion-v2 CANGSHAN_WEIGHT_MODE=component-rigid CANGSHAN_GAIT_MODE=zelda CANGSHAN_OUTPUT_SUFFIX=-island-rig-zelda-walk-prototype blender -b --python tools/package_wuxia_character.py",

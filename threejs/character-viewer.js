@@ -148,8 +148,13 @@ timeline.addEventListener('input', () => {
 });
 
 const loader = new GLTFLoader();
-const requestedModel = new URLSearchParams(window.location.search).get('model');
-const characterAsset = requestedModel === 'pants'
+const characterQuery = new URLSearchParams(window.location.search);
+const requestedModel = characterQuery.get('model');
+const customCharacterAssetName = characterQuery.get('asset');
+const customCharacterAsset = customCharacterAssetName && /^[a-z0-9][a-z0-9._-]*\.glb$/i.test(customCharacterAssetName)
+  ? `./assets/generated/threejs-wuxia/models/${encodeURIComponent(customCharacterAssetName)}`
+  : null;
+const builtInCharacterAsset = requestedModel === 'pants'
   ? './assets/generated/threejs-wuxia/models/shen-linchuan-pants-game-ready.glb'
   : requestedModel === 'island-rig-zelda'
     ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-zelda-walk-prototype-game-ready.glb'
@@ -192,6 +197,7 @@ const characterAsset = requestedModel === 'pants'
   : requestedModel === 'island-rig'
     ? './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-island-rig-prototype-game-ready.glb'
   : './assets/generated/threejs-wuxia/models/shen-linchuan-proportion-v2-hunyuan-game-ready.glb';
+const characterAsset = customCharacterAsset || builtInCharacterAsset;
 loader.load(characterAsset, (gltf) => {
   model = gltf.scene;
   model.traverse((object) => {
@@ -232,7 +238,8 @@ loader.load(characterAsset, (gltf) => {
   document.querySelector('#clip-count').textContent = `${gltf.animations.length} 段`;
   const walk = gltf.animations.find((clip) => clip.name === 'Walk') || gltf.animations[0];
   if (walk) selectClip(walk);
-  status.textContent = requestedModel === 'pants' ? '独立裤腿 GLB 已载入'
+  status.textContent = customCharacterAsset ? '候选角色 GLB 已载入'
+    : requestedModel === 'pants' ? '独立裤腿 GLB 已载入'
     : requestedModel === 'island-rig-zelda-review-v18' ? '前臂轻微跟随修正版 v18 已载入'
     : requestedModel === 'island-rig-zelda-review-v19' ? '肘部自然弯曲与前臂跟随 v19 已载入'
     : requestedModel === 'island-rig-zelda-review-v17' ? '落地重心压缩与膝轴修正版 v17 已载入'

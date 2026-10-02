@@ -11,6 +11,7 @@ playable GLB carries the same clips through glTF animation export.
 from pathlib import Path
 from math import acos, atan2, cos, pi, sin
 import os
+import re
 import bpy
 from mathutils import Euler, Quaternion, Vector
 
@@ -31,9 +32,17 @@ CHARACTER_IK_KNEE_DIRECTION = os.environ.get("CANGSHAN_IK_KNEE_DIRECTION", "back
 CHARACTER_IK_USE_JOINT_PIVOTS = os.environ.get("CANGSHAN_IK_USE_JOINT_PIVOTS", "0") == "1"
 CHARACTER_RIG_DEPTH_OFFSET = float(os.environ.get("CANGSHAN_RIG_DEPTH_OFFSET", "0.0"))
 CHARACTER_LOWER_BODY_WIDTH = float(os.environ.get("CANGSHAN_LOWER_BODY_WIDTH", "1.0"))
+CHARACTER_ID = os.environ.get("CANGSHAN_CHARACTER_ID", "").strip()
+CHARACTER_NAME = os.environ.get("CANGSHAN_CHARACTER_NAME", "").strip()
 if not 0.65 <= CHARACTER_LOWER_BODY_WIDTH <= 1.0:
     raise ValueError("CANGSHAN_LOWER_BODY_WIDTH must be between 0.65 and 1.0")
-if CHARACTER_PROFILE == "proportion-v2":
+if CHARACTER_ID and not re.fullmatch(r"[a-z0-9][a-z0-9-]*", CHARACTER_ID):
+    raise ValueError("CANGSHAN_CHARACTER_ID must be a lowercase slug (letters, digits, hyphens)")
+if CHARACTER_ID:
+    # Package one character at a time so calibrating a new rig cannot overwrite
+    # the other party members' GLBs or Blender review files.
+    CHARACTERS = ((CHARACTER_ID, CHARACTER_NAME or CHARACTER_ID),)
+elif CHARACTER_PROFILE == "proportion-v2":
     CHARACTERS = (("shen-linchuan-proportion-v2-hunyuan", "沈临川 · 比例修正版"),)
 else:
     CHARACTERS = (("shen-linchuan", "沈临川"), ("su-luo", "苏萝"))
@@ -893,6 +902,8 @@ def optimize_character_textures(profile):
 def package_character(slug, display_name):
     source = ROOT / "assets/generated/threejs-wuxia/source" / f"{slug}.glb"
     if not source.exists():
+        if CHARACTER_ID == slug:
+            raise FileNotFoundError(f"Selected character source GLB does not exist: {source}")
         print(f"SKIP missing Hunyuan source: {source}")
         return
     out_dir = ROOT / "assets/generated/threejs-wuxia/models"

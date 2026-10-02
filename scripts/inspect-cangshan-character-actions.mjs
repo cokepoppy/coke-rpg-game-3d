@@ -10,12 +10,17 @@ const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:5180/threejs-character
 const output = path.resolve(process.env.CHARACTER_AUDIT_OUTPUT || 'screenshots/cangshan-character-viewer');
 const auditView = process.env.CHARACTER_AUDIT_VIEW || 'side';
 const auditModel = process.env.CHARACTER_AUDIT_MODEL || 'proportion-v2';
+const auditAsset = process.env.CHARACTER_AUDIT_ASSET || '';
 if (!['front', 'threequarter', 'side', 'back'].includes(auditView)) {
   throw new Error(`Unsupported CHARACTER_AUDIT_VIEW: ${auditView}`);
 }
-if (!['proportion-v2', 'pants', 'island-rig', 'island-rig-zelda', 'island-rig-zelda-review-v2', 'island-rig-zelda-review-v3', 'island-rig-zelda-review-v4', 'island-rig-zelda-review-v5', 'island-rig-zelda-review-v6', 'island-rig-zelda-review-v7', 'island-rig-zelda-review-v8', 'island-rig-zelda-review-v9', 'island-rig-zelda-review-v10', 'island-rig-zelda-review-v11', 'island-rig-zelda-review-v12', 'island-rig-zelda-review-v13', 'island-rig-zelda-review-v14', 'island-rig-zelda-review-v15', 'island-rig-zelda-review-v16', 'island-rig-zelda-review-v17', 'island-rig-zelda-review-v18', 'island-rig-zelda-review-v19'].includes(auditModel)) {
+if (auditAsset && !/^[a-z0-9][a-z0-9._-]*\.glb$/i.test(auditAsset)) {
+  throw new Error('CHARACTER_AUDIT_ASSET must be a GLB filename inside the generated model directory');
+}
+if (!auditAsset && !['proportion-v2', 'pants', 'island-rig', 'island-rig-zelda', 'island-rig-zelda-review-v2', 'island-rig-zelda-review-v3', 'island-rig-zelda-review-v4', 'island-rig-zelda-review-v5', 'island-rig-zelda-review-v6', 'island-rig-zelda-review-v7', 'island-rig-zelda-review-v8', 'island-rig-zelda-review-v9', 'island-rig-zelda-review-v10', 'island-rig-zelda-review-v11', 'island-rig-zelda-review-v12', 'island-rig-zelda-review-v13', 'island-rig-zelda-review-v14', 'island-rig-zelda-review-v15', 'island-rig-zelda-review-v16', 'island-rig-zelda-review-v17', 'island-rig-zelda-review-v18', 'island-rig-zelda-review-v19'].includes(auditModel)) {
   throw new Error(`Unsupported CHARACTER_AUDIT_MODEL: ${auditModel}`);
 }
+const auditLabel = auditAsset || auditModel;
 const gameSource = await fs.readFile(path.resolve('threejs/game.js'), 'utf8');
 const walkSpeedMatch = gameSource.match(/walkSpeed:\s*([0-9]*\.?[0-9]+)/);
 if (!walkSpeedMatch) throw new Error('Could not read CONFIG.walkSpeed from threejs/game.js');
@@ -51,7 +56,9 @@ const page = await browser.newPage({ viewport, deviceScaleFactor: 1 });
 const pageErrors = [];
 page.on('pageerror', (error) => pageErrors.push(error.message));
 const auditUrl = new URL(baseUrl);
-if (auditModel === 'pants' || auditModel === 'island-rig' || auditModel === 'island-rig-zelda' || auditModel === 'island-rig-zelda-review-v2' || auditModel === 'island-rig-zelda-review-v3' || auditModel === 'island-rig-zelda-review-v4' || auditModel === 'island-rig-zelda-review-v5' || auditModel === 'island-rig-zelda-review-v6' || auditModel === 'island-rig-zelda-review-v7' || auditModel === 'island-rig-zelda-review-v8' || auditModel === 'island-rig-zelda-review-v9' || auditModel === 'island-rig-zelda-review-v10' || auditModel === 'island-rig-zelda-review-v11' || auditModel === 'island-rig-zelda-review-v12' || auditModel === 'island-rig-zelda-review-v13' || auditModel === 'island-rig-zelda-review-v14' || auditModel === 'island-rig-zelda-review-v15' || auditModel === 'island-rig-zelda-review-v16' || auditModel === 'island-rig-zelda-review-v17' || auditModel === 'island-rig-zelda-review-v18' || auditModel === 'island-rig-zelda-review-v19') {
+if (auditAsset) {
+  auditUrl.searchParams.set('asset', auditAsset);
+} else if (auditModel === 'pants' || auditModel === 'island-rig' || auditModel === 'island-rig-zelda' || auditModel === 'island-rig-zelda-review-v2' || auditModel === 'island-rig-zelda-review-v3' || auditModel === 'island-rig-zelda-review-v4' || auditModel === 'island-rig-zelda-review-v5' || auditModel === 'island-rig-zelda-review-v6' || auditModel === 'island-rig-zelda-review-v7' || auditModel === 'island-rig-zelda-review-v8' || auditModel === 'island-rig-zelda-review-v9' || auditModel === 'island-rig-zelda-review-v10' || auditModel === 'island-rig-zelda-review-v11' || auditModel === 'island-rig-zelda-review-v12' || auditModel === 'island-rig-zelda-review-v13' || auditModel === 'island-rig-zelda-review-v14' || auditModel === 'island-rig-zelda-review-v15' || auditModel === 'island-rig-zelda-review-v16' || auditModel === 'island-rig-zelda-review-v17' || auditModel === 'island-rig-zelda-review-v18' || auditModel === 'island-rig-zelda-review-v19') {
   auditUrl.searchParams.set('model', auditModel);
 }
 await page.goto(auditUrl.toString(), { waitUntil: 'domcontentloaded', timeout: 60000 });
@@ -202,7 +209,8 @@ const secondPlantSamples = gaitSamples.filter(({ phase }) => phase >= 0.52 && ph
 const firstPlantWorldZ = firstPlantSamples.map(({ phase, bones }) => bones[`foot${firstSupportSide}`].z + stepDistance * phase);
 const secondPlantWorldZ = secondPlantSamples.map(({ phase, bones }) => bones[`foot${secondSupportSide}`].z + stepDistance * (phase - 0.5));
 const gaitAnalysis = {
-  model: auditModel,
+  model: auditLabel,
+  automatedThresholdProfile: auditAsset ? 'manual-review-character-specific' : 'shen-linchuan-review',
   view: auditView,
   forwardAxis: 'z',
   assumedGameWalkSpeedMps: gameWalkSpeedMps,
@@ -263,33 +271,36 @@ const audit = { baseUrl, clips, phases, gaitSamples, gaitAnalysis, output, pageE
 await fs.writeFile(path.join(output, 'audit.json'), `${JSON.stringify(audit, null, 2)}\n`);
 console.log(JSON.stringify({
   output,
-  model: auditModel,
+  model: auditLabel,
+  automatedThresholdProfile: auditAsset ? 'manual-review-character-specific' : 'shen-linchuan-review',
   framesSampled: phases.length,
   keyPoseViews: [...poseSheetViews, 'side-rig'],
   gaitAnalysis,
   pageErrors
 }, null, 2));
-if (!gaitAnalysis.passesOppositeArmSwing) {
-  throw new Error('Walk audit failed: each hand must oppose its same-side foot, and the hands must oppose each other.');
-}
-if (gaitAnalysis.stepsPerMinute > 165 || gaitAnalysis.stepsPerMinute < 95) {
-  throw new Error(`Walk audit failed: gait cadence ${gaitAnalysis.stepsPerMinute.toFixed(1)} steps/min is outside the 95-165 brisk-walk review range.`);
-}
-const stanceFootDrifts = Object.values(gaitAnalysis.plantedFootAudit)
-  .map((stance) => stance.worldForwardDriftAtWalkSpeed.span);
-if (stanceFootDrifts.some((drift) => drift > 0.03)) {
-  throw new Error(`Walk audit failed: stance foot drift exceeds 3 cm (${stanceFootDrifts.map((drift) => drift.toFixed(3)).join(', ')}).`);
-}
-if (gaitAnalysis.footLateralSeparationM.min < 0.20) {
-  throw new Error(`Walk audit failed: the left and right feet cross or lose their lateral spacing (${gaitAnalysis.footLateralSeparationM.min.toFixed(3)} m).`);
-}
-if (gaitAnalysis.footLateralSeparationM.max > 0.27) {
-  throw new Error(`Walk audit failed: the stance is too wide (${gaitAnalysis.footLateralSeparationM.max.toFixed(3)} m); review for a crab-like gait.`);
-}
-if (gaitAnalysis.handLateralSeparationM.max > 0.78) {
-  throw new Error(`Walk audit failed: the relaxed arm spread remains too wide (${gaitAnalysis.handLateralSeparationM.max.toFixed(3)} m).`);
-}
-if (gaitAnalysis.visibleSilhouetteChange.side.contactToPassing < 0.005) {
-  throw new Error(`Walk audit failed: the side-view mesh barely changes between contact and passing (${(gaitAnalysis.visibleSilhouetteChange.side.contactToPassing * 100).toFixed(2)}% pixels).`);
+if (!auditAsset) {
+  if (!gaitAnalysis.passesOppositeArmSwing) {
+    throw new Error('Walk audit failed: each hand must oppose its same-side foot, and the hands must oppose each other.');
+  }
+  if (gaitAnalysis.stepsPerMinute > 165 || gaitAnalysis.stepsPerMinute < 95) {
+    throw new Error(`Walk audit failed: gait cadence ${gaitAnalysis.stepsPerMinute.toFixed(1)} steps/min is outside the 95-165 brisk-walk review range.`);
+  }
+  const stanceFootDrifts = Object.values(gaitAnalysis.plantedFootAudit)
+    .map((stance) => stance.worldForwardDriftAtWalkSpeed.span);
+  if (stanceFootDrifts.some((drift) => drift > 0.03)) {
+    throw new Error(`Walk audit failed: stance foot drift exceeds 3 cm (${stanceFootDrifts.map((drift) => drift.toFixed(3)).join(', ')}).`);
+  }
+  if (gaitAnalysis.footLateralSeparationM.min < 0.20) {
+    throw new Error(`Walk audit failed: the left and right feet cross or lose their lateral spacing (${gaitAnalysis.footLateralSeparationM.min.toFixed(3)} m).`);
+  }
+  if (gaitAnalysis.footLateralSeparationM.max > 0.27) {
+    throw new Error(`Walk audit failed: the stance is too wide (${gaitAnalysis.footLateralSeparationM.max.toFixed(3)} m); review for a crab-like gait.`);
+  }
+  if (gaitAnalysis.handLateralSeparationM.max > 0.78) {
+    throw new Error(`Walk audit failed: the relaxed arm spread remains too wide (${gaitAnalysis.handLateralSeparationM.max.toFixed(3)} m).`);
+  }
+  if (gaitAnalysis.visibleSilhouetteChange.side.contactToPassing < 0.005) {
+    throw new Error(`Walk audit failed: the side-view mesh barely changes between contact and passing (${(gaitAnalysis.visibleSilhouetteChange.side.contactToPassing * 100).toFixed(2)}% pixels).`);
+  }
 }
 if (pageErrors.length) throw new Error(`Viewer browser errors: ${pageErrors.join('; ')}`);
